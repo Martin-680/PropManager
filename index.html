@@ -301,7 +301,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 <div id="access-denied">
   <div class="ad-icon">🚫</div>
   <div class="ad-title">Access Not Granted</div>
-  <div class="ad-sub">Your Google account hasn't been added to this workspace yet. Ask your property manager to add you as a user.</div>
+  <div class="ad-sub">Your Google account hasn't been added to this workspace yet.</div>
+  <div id="debug-info" style="width:100%;max-width:340px"></div>
   <button onclick="signOut()" style="margin-top:12px;padding:12px 24px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub);">Sign out & try another account</button>
 </div>
 
@@ -815,9 +816,7 @@ async function handleToken(resp){
 async function checkUserAccess(){
   setStatus('<span class="ag-spinner"></span>');
   try {
-    // Load users sheet
     await loadAllData();
-    // Get signed-in Google account email via tokeninfo
     const r = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`);
     const info = await r.json();
     const email = (info.email||'').toLowerCase();
@@ -825,12 +824,23 @@ async function checkUserAccess(){
     if(!user){
       document.getElementById('auth-gate').classList.add('hidden');
       document.getElementById('access-denied').classList.add('show');
+      // Show debug info so user can see exactly what's happening
+      const dbg = document.getElementById('debug-info');
+      if(dbg){
+        const usersInSheet = DB.users.map(u=>u.email||'(no email)').join(', ') || '(no users found in sheet)';
+        dbg.innerHTML=`<div style="margin-top:16px;padding:14px;background:#0F1628;border:1px solid #1E2D47;border-radius:10px;text-align:left;font-size:12px;font-family:monospace;line-height:1.8;word-break:break-all">
+          <div><b style="color:#F59E0B">Your Google email:</b><br/><span style="color:#F0F4FF">${email||'(could not retrieve)'}</span></div>
+          <div style="margin-top:8px"><b style="color:#F59E0B">Emails in Users sheet:</b><br/><span style="color:#F0F4FF">${usersInSheet}</span></div>
+          <div style="margin-top:8px"><b style="color:#F59E0B">Total rows in Users sheet:</b> <span style="color:#F0F4FF">${DB.users.length}</span></div>
+        </div>`;
+      }
       return;
     }
     currentUser = user;
     launchApp();
   } catch(e) {
     setStatus('Failed to connect to Google Sheets. Check your Spreadsheet ID and sharing settings.', true);
+    console.error('checkUserAccess error:', e);
   }
 }
 
