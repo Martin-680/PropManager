@@ -1131,7 +1131,7 @@ function populateAssetSelect(id){
 function populateSupplierSelect(id){
   const el=document.getElementById(id); if(!el) return;
   const cur=el.value;
-  el.innerHTML='<option value="">None</option>'+DB.suppliers.filter(s=>s.status!=='Inactive').map(s=>`<option value="${s.id}">${s.name} (R${s.ratePerHour}/hr)</option>`).join('');
+  el.innerHTML='<option value="">None</option>'+DB.suppliers.filter(s=>s.status!=='Inactive').map(s=>`<option value="${s.id}">${s.name} (€ ${s.ratePerHour}/hr)</option>`).join('');
   if(cur) el.value=cur;
 }
 function populateMgrSelect(id){
@@ -1297,7 +1297,7 @@ function renderGlobalSearch(){
   }
   if(sups.length){
     html+=`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Suppliers</div>`;
-    sups.forEach(s=>{html+=`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:11px 13px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="navTo('suppliers');setTimeout(()=>openSupDetail('${s.id}'),200)"><div><div style="font-size:13px;font-weight:600">${s.name}</div></div><span style="font-size:12px;color:var(--green);font-weight:600">R${s.ratePerHour}/hr</span></div>`;});
+    sups.forEach(s=>{html+=`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:11px 13px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="navTo('suppliers');setTimeout(()=>openSupDetail('${s.id}'),200)"><div><div style="font-size:13px;font-weight:600">${s.name}</div></div><span style="font-size:12px;color:var(--green);font-weight:600">€ ${s.ratePerHour}/hr</span></div>`;});
   }
   if(res) res.innerHTML=html;
 }
@@ -1373,7 +1373,7 @@ function openTixDetail(id){
       <div class="dr"><span class="dk">📅 Opened</span><span class="dv">${df(t.dateOpened)}</span></div>
       ${t.status==='Closed'?`<div class="dr"><span class="dk">✅ Closed</span><span class="dv">${df(t.dateClosed)}</span></div>`:`<div class="dr"><span class="dk">⏱ Days Open</span><span class="dv" style="color:var(--amber)">${daysSince(t.dateOpened)} days</span></div>`}
       <div class="dr"><span class="dk">🔧 Asset</span><span class="dv">${ast?ast.id+' – '+ast.name:'None'}</span></div>
-      <div class="dr"><span class="dk">🏭 Supplier</span><span class="dv">${sup?`<span style="color:var(--pink)">${sup.name}</span> <span style="font-size:11px;color:var(--muted)">(R${sup.ratePerHour}/hr)</span>`:'None'}</span></div>
+      <div class="dr"><span class="dk">🏭 Supplier</span><span class="dv">${sup?`<span style="color:var(--pink)">${sup.name}</span> <span style="font-size:11px;color:var(--muted)">(€ ${sup.ratePerHour}/hr)</span>`:'None'}</span></div>
       <div class="dr"><span class="dk">📢 Reported By</span><span class="dv">${t.reportedBy||'—'}</span></div>
       <div class="dr"><span class="dk">📝 Notes</span><span class="dv">${t.notes||'—'}</span></div>
       <div class="dr"><span class="dk">👁 Created By</span><span class="dv">${t.createdBy||'—'}</span></div>
@@ -1738,7 +1738,7 @@ function openFloorView(buildingName, buildingId, floorEnc){
       <div class="sup-card" onclick="openSupDetail('${s.id}')">
         <div class="sup-hdr">
           <div><div class="sup-name">${s.name}</div><div class="sup-contact">${s.contact||'—'}</div></div>
-          <div style="text-align:right"><div class="sup-rate">R${s.ratePerHour}/hr</div><span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'};margin-top:4px">${s.status}</span></div>
+          <div style="text-align:right"><div class="sup-rate">€ ${s.ratePerHour}/hr</div><span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'};margin-top:4px">${s.status}</span></div>
         </div>
       </div>`).join('');
   } else {
@@ -1867,9 +1867,9 @@ function renderSuppliers(){
         <span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'}">${s.status}</span>
       </div>
       <div style="display:flex;gap:16px;margin:6px 0 8px;align-items:flex-end">
-        <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Rate/hr</div><div class="sup-rate">R${s.ratePerHour||0}</div></div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Rate/hr</div><div class="sup-rate">€ ${s.ratePerHour||0}</div></div>
         <div style="width:1px;height:32px;background:var(--border);flex-shrink:0"></div>
-        <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Transport</div><div style="font-size:13px;font-weight:700;color:var(--sub)">R${s.transportCost||0}</div></div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Transport</div><div style="font-size:13px;font-weight:700;color:var(--sub)">€ ${s.transportCost||0}</div></div>
       </div>
       <div class="sup-tags">${exp.map(e=>`<span class="sup-tag" style="${activeExp===e?'background:#DBEAFE;border-color:#93C5FD;color:var(--blue);font-weight:700':''}">${e}</span>`).join('')}</div>
     </div>`;
@@ -1886,7 +1886,7 @@ function openSupDetail(id){
     </div>
     <div style="padding:0 18px">
       <div class="dr"><span class="dk">👤 Contact</span><span class="dv">${s.contact||'—'}</span></div>
-      <div class="dr"><span class="dk">💰 Rate</span><span class="dv" style="color:var(--green)">R${s.ratePerHour}/hr + R${s.transportCost} transport</span></div>
+      <div class="dr"><span class="dk">💰 Rate</span><span class="dv" style="color:var(--green)">€ ${s.ratePerHour}/hr + € ${s.transportCost} transport</span></div>
       <div class="dr"><span class="dk">📞 Phone</span><span class="dv">${s.phone||'—'}</span></div>
       <div class="dr"><span class="dk">📧 Email</span><span class="dv">${s.email||'—'}</span></div>
       <div class="dr"><span class="dk">📍 Address</span><span class="dv">${s.address||'—'}</span></div>
