@@ -295,7 +295,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 
 <!-- Auth Gate -->
 <div id="auth-gate">
-  <div class="ag-logo">🏢</div>
+  <div class="ag-logo" style="font-size:0;color:var(--blue)"><svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.85"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></div>
   <div class="ag-title">PropManager Pro</div>
   <div class="ag-sub">Sign in with your Google account to access your property management workspace.</div>
   <button class="ag-google-btn" onclick="signIn()">
@@ -304,13 +304,13 @@ input,select,textarea{font-family:inherit;color:var(--text);}
   </button>
   <div class="ag-status" id="ag-status"></div>
   <div style="margin-top:24px;padding:12px 16px;background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.15);border-radius:10px;font-size:12px;color:var(--sub);text-align:center;max-width:280px;line-height:1.6">
-    💡 Your Google account must be added to the Users sheet by an administrator before you can sign in.
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;vertical-align:middle;margin-right:4px;color:var(--blue)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Your Google account must be added to the Users sheet by an administrator before you can sign in.
   </div>
 </div>
 
 <!-- Access Denied -->
 <div id="access-denied">
-  <div class="ad-icon">🚫</div>
+  <div class="ad-icon" style="font-size:0;color:var(--red)"><svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
   <div class="ad-title">Access Not Granted</div>
   <div class="ad-sub">Your Google account hasn't been added to this workspace yet.</div>
   <div id="debug-info" style="width:100%;max-width:340px"></div>
@@ -336,7 +336,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       </div>
       <div style="padding:0 14px 10px">
         <div class="sbar" style="margin:0">
-          <span style="color:var(--muted);font-size:16px">🔍</span>
+          <span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           <input id="global-search" placeholder="Search tickets, assets, suppliers…" oninput="renderGlobalSearch()"/>
           <button id="gs-clear" onclick="clearGlobalSearch()" style="color:var(--muted);font-size:15px;display:none">✕</button>
         </div>
@@ -368,12 +368,12 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Tickets</div><div class="topbar-sub" id="tix-lbl"></div></div>
         <div class="topbar-actions">
-          <button class="ib" onclick="openNewTicket()" id="btn-new-tix" style="display:none" title="New Ticket">＋</button>
+          <button class="ib" onclick="openNewTicket()" id="btn-new-tix" style="display:none" title="New Ticket"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
         </div>
       </div>
     </div>
-    <div class="sbar"><span style="color:var(--muted);font-size:16px">🔍</span><input id="tsearch" placeholder="Search tickets…" oninput="setPage('tix',1);renderTix()"/></div>
+    <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="tsearch" placeholder="Search tickets…" oninput="setPage('tix',1);renderTix()"/></div>
     <div class="fbar">
       <div class="fsel-wrap"><div class="fsel-lbl">Status</div>
         <select class="fsel" id="sel-tix-status" onchange="setPage('tix',1);renderTix()">
@@ -384,9 +384,9 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       </div>
       <div class="fsel-wrap"><div class="fsel-lbl">Priority</div>
         <select class="fsel" id="sel-tix-pri" onchange="setPage('tix',1);renderTix()">
-          <option value="All">All Priorities</option><option value="Critical">🔴 Critical</option>
-          <option value="High">🟠 High</option><option value="Medium">🔵 Medium</option><option value="Low">🟢 Low</option>
-          <option value="Planned">🟣 Planned</option><option value="Requested">🟡 Requested</option><option value="Ordered">🔵 Ordered</option>
+          <option value="All">All Priorities</option><option value="Critical">Critical</option>
+          <option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
+          <option value="Planned">Planned</option><option value="Requested">Requested</option><option value="Ordered">Ordered</option>
         </select>
       </div>
       <div class="fsel-wrap"><div class="fsel-lbl">Category</div>
@@ -405,7 +405,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <select id="sel-tix-sort" onchange="setPage('tix',1);renderTix()" style="background:none;border:none;font-size:12px;color:var(--muted);font-family:inherit;cursor:pointer;outline:none;padding:0">
           <option value="newest">↓ Newest first</option>
           <option value="oldest">↑ Oldest first</option>
-          <option value="priority">⚡ By priority</option>
+          <option value="priority">By priority</option>
           <option value="days">⏱ Most overdue</option>
         </select>
       </div>
@@ -420,12 +420,12 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Assets</div><div class="topbar-sub" id="ast-lbl"></div></div>
         <div class="topbar-actions">
-          <button class="ib" onclick="openNewAsset()" id="btn-new-ast" style="display:none" title="New Asset">＋</button>
+          <button class="ib" onclick="openNewAsset()" id="btn-new-ast" style="display:none" title="New Asset"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
         </div>
       </div>
     </div>
-    <div class="sbar"><span style="color:var(--muted);font-size:16px">🔍</span><input id="asearch" placeholder="Search assets…" oninput="setPage('ast',1);renderAst()"/></div>
+    <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="asearch" placeholder="Search assets…" oninput="setPage('ast',1);renderAst()"/></div>
     <div class="fbar">
       <div class="fsel-wrap"><div class="fsel-lbl">Status</div>
         <select class="fsel" id="sel-ast-status" onchange="setPage('ast',1);renderAst()">
@@ -450,12 +450,12 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Team</div><div class="topbar-sub">Staff & Contractors</div></div>
         <div class="topbar-actions">
-          <button class="ib" onclick="openNewUser()" id="btn-new-usr" style="display:none" title="Add User">＋</button>
+          <button class="ib" onclick="openNewUser()" id="btn-new-usr" style="display:none" title="Add User"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
         </div>
       </div>
     </div>
-    <div class="sbar"><span style="color:var(--muted);font-size:16px">🔍</span><input id="usearch" placeholder="Search team…" oninput="setPage('usr',1);renderUsers()"/></div>
+    <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="usearch" placeholder="Search team…" oninput="setPage('usr',1);renderUsers()"/></div>
     <div id="usr-list"></div>
   </div>
 
@@ -465,7 +465,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Buildings</div><div class="topbar-sub" id="bld-lbl"></div></div>
         <div class="topbar-actions">
-          <button class="ib" onclick="openNewBuilding()" id="btn-new-bld" style="display:none" title="Add Building">＋</button>
+          <button class="ib" onclick="openNewBuilding()" id="btn-new-bld" style="display:none" title="Add Building"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
         </div>
       </div>
@@ -479,17 +479,17 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Suppliers</div><div class="topbar-sub" id="sup-lbl"></div></div>
         <div class="topbar-actions">
-          <button class="ib" onclick="openNewSupplier()" id="btn-new-sup" style="display:none" title="Add Supplier">＋</button>
+          <button class="ib" onclick="openNewSupplier()" id="btn-new-sup" style="display:none" title="Add Supplier"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
         </div>
       </div>
     </div>
-    <div class="sbar"><span style="color:var(--muted);font-size:16px">🔍</span><input id="ssearch" placeholder="Search suppliers…" oninput="setPage('sup',1);renderSuppliers()"/></div>
+    <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="ssearch" placeholder="Search suppliers…" oninput="setPage('sup',1);renderSuppliers()"/></div>
     <div class="fbar">
       <div class="fsel-wrap"><div class="fsel-lbl">Status</div>
         <select class="fsel" id="sel-sup-status" onchange="setPage('sup',1);renderSuppliers()">
           <option value="All">All Statuses</option><option value="Active">Active</option>
-          <option value="Preferred">⭐ Preferred</option><option value="Inactive">Inactive</option>
+          <option value="Preferred">Preferred</option><option value="Inactive">Inactive</option>
         </select>
       </div>
       <div class="fsel-wrap"><div class="fsel-lbl">Expertise</div>
@@ -517,7 +517,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
           <div class="topbar-sub" id="floor-view-sub"></div>
         </div>
         <div class="topbar-actions">
-          <button class="ib" onclick="navBack()" title="Back">←</button>
+          <button class="ib" onclick="navBack()" title="Back"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
         </div>
       </div>
@@ -527,16 +527,16 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 
   <!-- ═══════ NAV ═══════ -->
   <nav class="bottom-nav">
-    <button class="ni active" onclick="navTo('dashboard')"><span class="ni-icon">📊</span>Dash</button>
-    <button class="ni" onclick="navTo('tickets')"><span class="ni-icon">🎫</span>Tickets<span class="ni-badge" id="open-badge" style="display:none"></span></button>
-    <button class="ni" onclick="navTo('assets')"><span class="ni-icon">🔧</span>Assets</button>
-    <button class="ni" onclick="navTo('users')"><span class="ni-icon">👤</span>Team</button>
-    <button class="ni" onclick="navTo('buildings')"><span class="ni-icon">🏢</span>Buildings</button>
-    <button class="ni" onclick="navTo('suppliers')"><span class="ni-icon">🏭</span>Suppliers</button>
+    <button class="ni active" onclick="navTo('dashboard')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dash</button>
+    <button class="ni" onclick="navTo('tickets')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></span>Tickets<span class="ni-badge" id="open-badge" style="display:none"></span></button>
+    <button class="ni" onclick="navTo('assets')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>Assets</button>
+    <button class="ni" onclick="navTo('users')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>Team</button>
+    <button class="ni" onclick="navTo('buildings')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></span>Buildings</button>
+    <button class="ni" onclick="navTo('suppliers')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7-6-7 6v3l-4-3v12z"/><path d="M17 20v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/></svg></span>Suppliers</button>
   </nav>
 
   <!-- FAB -->
-  <button class="fab" id="fab-quick" onclick="openQuickTicket()" style="display:none" title="Quick Ticket">⚡</button>
+  <button class="fab" id="fab-quick" onclick="openQuickTicket()" style="display:none" title="Quick Ticket"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
 
 </div>
 
@@ -544,7 +544,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-head">
-    <div class="drawer-logo">🏢 PropManager</div>
+    <div class="drawer-logo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--blue)"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg> PropManager</div>
     <button class="drawer-close" onclick="closeDrawer()">✕</button>
   </div>
   <div id="drawer-user-section" class="drawer-user"></div>
@@ -599,7 +599,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div class="fg"><label>Reported By</label><input class="fi2" id="tf-reporter" placeholder="Name of reporter"/></div>
     <div class="fg"><label>Notes</label><textarea class="ft2" id="tf-notes" placeholder="Additional details…"></textarea></div>
     <button class="btn-p" onclick="saveTix()">Save Ticket</button>
-    <button class="btn-s" id="btn-dup-tix" onclick="duplicateTix()" style="display:none;background:#EEF2FF;border-color:#C7D2FE;color:var(--indigo);font-weight:700">⧉ Duplicate Ticket</button>
+    <button class="btn-s" id="btn-dup-tix" onclick="duplicateTix()" style="display:none;background:#EEF2FF;border-color:#C7D2FE;color:var(--indigo);font-weight:700"> Duplicate Ticket</button>
     <button class="btn-s" onclick="closeMo('mo-tix')">Cancel</button>
   </div>
 </div>
@@ -731,7 +731,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 <div class="mo" id="mo-quick-tix" onclick="mcClick(event,'mo-quick-tix')">
   <div class="ms">
     <div class="mh"></div>
-    <div class="mt"><span>⚡ Quick Ticket</span><button class="mt-close" onclick="closeMo('mo-quick-tix')">✕</button></div>
+    <div class="mt"><span style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Quick Ticket</span><button class="mt-close" onclick="closeMo('mo-quick-tix')">✕</button></div>
     <div style="padding:0 18px 12px;font-size:12px;color:var(--muted)">Log an issue fast — essentials only</div>
     <div class="fg"><label>Subject *</label><input class="fi2" id="qt-subj" placeholder="Describe the issue briefly…"/></div>
     <div class="frow2">
@@ -740,7 +740,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <select class="fs2" id="qt-pri"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option><option>Planned</option><option>Requested</option><option>Ordered</option></select>
       </div>
     </div>
-    <button class="btn-p" onclick="saveQuickTicket()">⚡ Create Ticket</button>
+    <button class="btn-p" onclick="saveQuickTicket()" style="display:inline-flex;align-items:center;gap:8px;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Create Ticket</button>
     <button class="btn-s" onclick="closeMo('mo-quick-tix')">Cancel</button>
   </div>
 </div>
@@ -749,11 +749,11 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 <div class="mo" id="mo-export" onclick="mcClick(event,'mo-export')">
   <div class="ms">
     <div class="mh"></div>
-    <div class="mt"><span>📤 Export</span><button class="mt-close" onclick="closeMo('mo-export')">✕</button></div>
+    <div class="mt"><span style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Export</span><button class="mt-close" onclick="closeMo('mo-export')">✕</button></div>
     <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:10px">
-      <button onclick="exportCSV('tickets')" style="padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--blue);text-align:left">📋 Export Tickets to CSV</button>
-      <button onclick="exportCSV('assets')" style="padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--teal);text-align:left">🔧 Export Assets to CSV</button>
-      <button onclick="exportCSV('suppliers')" style="padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--pink);text-align:left">🏭 Export Suppliers to CSV</button>
+      <button onclick="exportCSV('tickets')" style="padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--blue);text-align:left"> Export Tickets to CSV</button>
+      <button onclick="exportCSV('assets')" style="padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--teal);text-align:left"> Export Assets to CSV</button>
+      <button onclick="exportCSV('suppliers')" style="padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--pink);text-align:left"> Export Suppliers to CSV</button>
     </div>
   </div>
 </div>
@@ -762,10 +762,10 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 <div class="mo" id="mo-confirm" onclick="mcClick(event,'mo-confirm')">
   <div class="ms">
     <div class="mh"></div>
-    <div class="mt"><span>⚠️ Confirm Delete</span><button class="mt-close" onclick="closeMo('mo-confirm')">✕</button></div>
+    <div class="mt"><span style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Confirm Delete</span><button class="mt-close" onclick="closeMo('mo-confirm')">✕</button></div>
     <div style="padding:0 18px 20px">
       <div id="confirm-msg" style="font-size:14px;color:var(--sub);line-height:1.6;margin-bottom:20px"></div>
-      <button class="btn-danger" onclick="doConfirmedDelete()">🗑 Yes, Delete</button>
+      <button class="btn-danger" onclick="doConfirmedDelete()"> Yes, Delete</button>
       <button class="btn-s" onclick="closeMo('mo-confirm')">Cancel</button>
     </div>
   </div>
@@ -829,7 +829,7 @@ function showSync(){ document.getElementById('sync-bar').classList.add('active')
 function hideSync(){ document.getElementById('sync-bar').classList.remove('active'); }
 let _tid=0;
 function toast(msg,type=''){
-  if(!type && (msg.includes('✅')||msg.includes('added')||msg.includes('created')||msg.includes('updated')||msg.includes('refreshed'))) type='ok';
+  if(!type && (msg.includes('added')||msg.includes('created')||msg.includes('updated')||msg.includes('refreshed')||msg.includes('closed')||msg.includes('deleted')||msg.includes('exported')||msg.includes('commented'))) type='ok';
   const w=document.getElementById('toast-wrap');
   const el=document.createElement('div');
   el.className='toast'+(type?' '+type:'');
@@ -913,7 +913,7 @@ async function checkUserAccess(){
 }
 
 async function refreshAllData(){
-  toast('🔄 Refreshing data…');
+  toast('Refreshing data…');
   try {
     await loadAllData();
     if(currentScreen==='dashboard') renderDash();
@@ -922,8 +922,8 @@ async function refreshAllData(){
     if(currentScreen==='users') renderUsers();
     if(currentScreen==='buildings') renderBlds();
     if(currentScreen==='suppliers') renderSuppliers();
-    toast('✅ Data refreshed');
-  } catch(e){ toast('⚠️ Refresh failed','err'); }
+    toast('Data refreshed');
+  } catch(e){ toast('Refresh failed','err'); }
 }
 
 function signOut(){
@@ -941,7 +941,7 @@ function launchApp(){
   document.getElementById('app').style.flexDirection='column';
   applyPermUI();
   navTo('dashboard');
-  toast(`👋 Welcome, ${currentUser.name.split(' ')[0]}!`);
+  toast(`Welcome, ${currentUser.name.split(' ')[0]}!`);
   // Auto-refresh every 5 minutes
   setInterval(async()=>{
     try{ await loadAllData(); if(currentScreen==='dashboard') renderDash(); } catch(e){}
@@ -1053,7 +1053,7 @@ async function writeSheet(key){
     hideSync();
     const msg = e?.result?.error?.message || e?.message || 'Unknown error';
     const code = e?.result?.error?.code || e?.status || '';
-    toast('⚠️ ' + (code ? code+': ' : '') + msg, 'err');
+    toast( (code ? code+': ' : '') + msg, 'err');
     console.error('writeSheet ['+key+'] error:', JSON.stringify(e));
     throw e;
   }
@@ -1082,14 +1082,14 @@ function openDrawer(){
   const alertCount = getAlertCount();
   const items = document.getElementById('drawer-items');
   let html = '';
-  if(can('canCreateTickets')) html+=di('⚡','Quick Ticket',"openQuickTicket();closeDrawer()");
-  html+=di('📊','Dashboard',"navTo('dashboard');closeDrawer()");
+  if(can('canCreateTickets')) html+=di('<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>','Quick Ticket',"openQuickTicket();closeDrawer()");
+  html+=di('<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>','Dashboard',"navTo('dashboard');closeDrawer()");
   html+=`<div class="drawer-sep"></div>`;
-  if(alertCount) html+=`<div class="drawer-item" onclick="navTo('dashboard');closeDrawer()"><div class="drawer-item-icon">🚨</div><div style="flex:1">Alerts</div><span class="drawer-item-badge">${alertCount}</span></div>`;
-  html+=di('📤','Export CSV',"openExportModal();closeDrawer()");
-  html+=di('🔄','Refresh Data',"refreshAllData();closeDrawer()");
+  if(alertCount) html+=`<div class="drawer-item" onclick="navTo('dashboard');closeDrawer()"><div class="drawer-item-icon"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style="flex:1">Alerts</div><span class="drawer-item-badge">${alertCount}</span></div>`;
+  html+=di('<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>','Export CSV',"openExportModal();closeDrawer()");
+  html+=di('<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>','Refresh Data',"refreshAllData();closeDrawer()");
   html+=`<div class="drawer-sep"></div>`;
-  html+=`<div class="drawer-item danger" onclick="signOut();closeDrawer()"><div class="drawer-item-icon">🚪</div><div>Sign Out</div></div>`;
+  html+=`<div class="drawer-item danger" onclick="signOut();closeDrawer()"><div class="drawer-item-icon"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div><div>Sign Out</div></div>`;
   items.innerHTML=html;
   document.getElementById('drawer-overlay').classList.add('open');
   document.getElementById('drawer').classList.add('open');
@@ -1260,14 +1260,14 @@ function renderAlerts(){
   const el=document.getElementById('dash-alerts'); if(!el) return;
   const alerts=[];
   const critOpen=DB.tickets.filter(t=>t.priority==='Critical'&&t.status!=='Closed');
-  if(critOpen.length) alerts.push({type:'crit',icon:'🚨',title:`${critOpen.length} Critical ticket${critOpen.length>1?'s':''} need attention`,sub:critOpen.slice(0,2).map(t=>t.subject).join(' · ')});
+  if(critOpen.length) alerts.push({type:'crit',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',title:`${critOpen.length} Critical ticket${critOpen.length>1?'s':''} need attention`,sub:critOpen.slice(0,2).map(t=>t.subject).join(' · ')});
   const overdue=DB.tickets.filter(t=>t.status!=='Closed'&&daysSince(t.dateOpened)>7);
-  if(overdue.length) alerts.push({type:'warn',icon:'⏰',title:`${overdue.length} ticket${overdue.length>1?'s':''} open longer than 7 days`,sub:`Oldest: ${Math.max(...overdue.map(t=>daysSince(t.dateOpened)))} days`});
+  if(overdue.length) alerts.push({type:'warn',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--amber)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',title:`${overdue.length} ticket${overdue.length>1?'s':''} open longer than 7 days`,sub:`Oldest: ${Math.max(...overdue.map(t=>daysSince(t.dateOpened)))} days`});
   const soon=new Date(today); soon.setDate(soon.getDate()+30);
   const expired=DB.assets.filter(a=>a.warrantyExpiry&&new Date(a.warrantyExpiry)<today);
-  if(expired.length) alerts.push({type:'crit',icon:'🛡️',title:`${expired.length} warranty expired`,sub:expired.slice(0,2).map(a=>a.name).join(' · ')});
+  if(expired.length) alerts.push({type:'crit',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--red)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',title:`${expired.length} warranty expired`,sub:expired.slice(0,2).map(a=>a.name).join(' · ')});
   const expiring=DB.assets.filter(a=>a.warrantyExpiry&&new Date(a.warrantyExpiry)>=today&&new Date(a.warrantyExpiry)<=soon);
-  if(expiring.length) alerts.push({type:'warn',icon:'🗓️',title:`${expiring.length} warranty expiring within 30 days`,sub:expiring.slice(0,2).map(a=>a.name).join(' · ')});
+  if(expiring.length) alerts.push({type:'warn',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--amber)"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',title:`${expiring.length} warranty expiring within 30 days`,sub:expiring.slice(0,2).map(a=>a.name).join(' · ')});
   if(!alerts.length){el.innerHTML='';return;}
   el.innerHTML=`<div style="padding:0 14px 4px;margin-top:4px"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Alerts (${alerts.length})</div></div>`
     +alerts.map(a=>`<div class="alert-card alert-${a.type}"><div class="alert-icon">${a.icon}</div><div class="alert-body"><div class="alert-title">${a.title}</div><div class="alert-sub">${a.sub}</div></div></div>`).join('');
@@ -1319,7 +1319,7 @@ function renderDash(){
   rt.innerHTML=(unassigned||myTix?`<div style="display:flex;gap:8px;margin:0 14px 10px;flex-wrap:wrap">
     ${myTix?`<div style="flex:1;min-width:120px;background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.2);border-radius:var(--rs);padding:10px 12px;cursor:pointer" onclick="navTo('tickets');setTimeout(()=>{document.getElementById('sel-tix-status').value='mine';renderTix();},100)"><div style="font-size:18px;font-weight:800;font-family:'Outfit',sans-serif;color:var(--blue)">${myTix}</div><div style="font-size:11px;color:var(--sub)">My open tickets</div></div>`:''}
     ${unassigned?`<div style="flex:1;min-width:120px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:var(--rs);padding:10px 12px;cursor:pointer" onclick="navTo('tickets');setTimeout(()=>{document.getElementById('sel-tix-status').value='Open';renderTix();},100)"><div style="font-size:18px;font-weight:800;font-family:'Outfit',sans-serif;color:var(--red)">${unassigned}</div><div style="font-size:11px;color:var(--sub)">Unassigned</div></div>`:''}
-  </div>`:'')+(recent.length?'<div class="tlist">'+recent.map(t=>tixItemHTML(t)).join('')+'</div>':'<div class="empty"><div class="empty-icon">✅</div><div style="font-size:13px">No open tickets!</div></div>');
+  </div>`:'')+(recent.length?'<div class="tlist">'+recent.map(t=>tixItemHTML(t)).join('')+'</div>':'<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--green)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px">No open tickets!</div></div>');
 }
 
 /* KPI drill-down */
@@ -1414,7 +1414,7 @@ function renderTix(){
   else list=[...list].sort((a,b)=>new Date(b.dateOpened)-new Date(a.dateOpened));
   document.getElementById('tix-lbl').textContent=`${list.length} ticket${list.length!==1?'s':''}`;
   const c=document.getElementById('tix-list');
-  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">🎫</div><div style="font-size:13px">No tickets found</div><div style="font-size:12px;color:var(--muted);margin-top:4px"><button onclick="clearTixFilters()" style="color:var(--blue);font-weight:600;background:none;border:none;cursor:pointer">Clear filters</button></div></div>';return;}
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></div><div style="font-size:13px">No tickets found</div><div style="font-size:12px;color:var(--muted);margin-top:4px"><button onclick="clearTixFilters()" style="color:var(--blue);font-weight:600;background:none;border:none;cursor:pointer">Clear filters</button></div></div>';return;}
   const page=pages.tix;
   const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
   c.innerHTML='<div class="tlist">'+slice.map(t=>tixItemHTML(t,true)).join('')+'</div>'+renderPagination('tix',list.length,'goTixPage');
@@ -1431,7 +1431,7 @@ function tixItemHTML(t,clickable=true){
     <div class="ti-left">
       <div class="ti-id">${t.id} · ${t.building}${t.subdivision?' · '+t.subdivision:''}</div>
       <div class="ti-subj">${t.subject}</div>
-      <div class="ti-meta"><span>📁 ${t.category}</span><span>👤 ${(t.assignedTo||'Unassigned').split(' ')[0]}</span>${days?`<span style="${daysSince(t.dateOpened)>7?'color:var(--amber);font-weight:700':''}">⏱ ${days}</span>`:''}</div>
+      <div class="ti-meta"><span style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>${t.category}</span><span style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${(t.assignedTo||'Unassigned').split(' ')[0]}</span>${days?`<span style="${daysSince(t.dateOpened)>7?'color:var(--amber);font-weight:700':''}">⏱ ${days}</span>`:''}</div>
     </div>
     <div class="ti-right"><span class="badge ${stCls}">${t.status}</span></div>
   </div>`;
@@ -1446,7 +1446,7 @@ function openTixDetail(id){
   const acts=Array.isArray(t.activity)?t.activity:[];
   const actHTML=acts.length?acts.map(a=>{
     const dt=new Date(a.ts); const dstr=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-    return`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:28px;height:28px;border-radius:8px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">💬</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">${a.user}</div><div style="font-size:12px;color:var(--sub);margin-top:1px">${a.action}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${dstr}</div></div></div>`;
+    return`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:28px;height:28px;border-radius:8px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 0 2 2z"/></svg></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">${a.user}</div><div style="font-size:12px;color:var(--sub);margin-top:1px">${a.action}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${dstr}</div></div></div>`;
   }).join(''):'<div style="font-size:12px;color:var(--muted);padding:8px 0">No activity yet</div>';
 
   const titleEl=document.getElementById('tix-detail-title');
@@ -1472,17 +1472,17 @@ function openTixDetail(id){
       <div class="dr"><span class="dk">Opened</span><span class="dv">${df(t.dateOpened)}</span></div>
       ${t.status==='Closed'?`<div class="dr"><span class="dk">Closed</span><span class="dv">${df(t.dateClosed)}</span></div>`:`<div class="dr"><span class="dk">Days Open</span><span class="dv" style="color:var(--amber)">${daysSince(t.dateOpened)} days</span></div>`}
       <div class="dr"><span class="dk">Asset</span><span class="dv">${ast?ast.id+' – '+ast.name:'None'}</span></div>
-      <div class="dr"><span class="dk">Supplier</span><span class="dv">${sup?`<span style="color:var(--pink)">${sup.name}</span> <span style="font-size:11px;color:var(--muted)">(€ ${sup.ratePerHour}/hr)</span>${sup.phone?` <a href="tel:${sup.phone}" style="display:block;font-size:11px;color:var(--blue);margin-top:5px">📞 ${sup.phone}</a>`:''}${sup.email?` <a href="mailto:${sup.email}" style="display:block;font-size:11px;color:var(--blue);margin-top:4px">✉ ${sup.email}</a>`:''}`:'None'}</span></div>
+      <div class="dr"><span class="dk">Supplier</span><span class="dv">${sup?`<span style="color:var(--pink)">${sup.name}</span> <span style="font-size:11px;color:var(--muted)">(€ ${sup.ratePerHour}/hr)</span>${sup.phone?` <a href="tel:${sup.phone}" style="display:block;font-size:11px;color:var(--blue);margin-top:5px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12 19.79 19.79 0 0 1 1.97 3.34a2 2 0 0 1 1.94-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${sup.phone}</a>`:''}${sup.email?` <a href="mailto:${sup.email}" style="display:block;font-size:11px;color:var(--blue);margin-top:4px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> ${sup.email}</a>`:''}`:'None'}</span></div>
       <div class="dr"><span class="dk">Reported By</span><span class="dv">${t.reportedBy||'—'}</span></div>
       <div class="dr"><span class="dk">Notes</span><span class="dv">${t.notes||'—'}</span></div>
       <div class="dr"><span class="dk">Created By</span><span class="dv">${t.createdBy||'—'}</span></div>
     </div>
     <div style="padding:14px 18px 0;display:flex;gap:9px;flex-wrap:wrap">
-      ${can('canCreateTickets')?`<button onclick="editTix('${t.id}')" style="flex:1;min-width:120px;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--blue)">✏️ Edit</button>`:''}
-      ${can('canCloseTickets')&&t.status!=='Closed'?`<button onclick="quickCloseTix('${t.id}')" style="flex:1;min-width:120px;padding:13px;background:linear-gradient(135deg,#10B981,#06B6D4);border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff">✅ Close</button>`:''}
-      ${can('canCloseTickets')&&t.status==='Open'?`<button onclick="quickProgTix('${t.id}')" style="flex:1;min-width:120px;padding:13px;background:linear-gradient(135deg,#F59E0B,#EAB308);border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff">▶ In Progress</button>`:''}
+      ${can('canCreateTickets')?`<button onclick="editTix('${t.id}')" style="flex:1;min-width:120px;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--blue)"> Edit</button>`:''}
+      ${can('canCloseTickets')&&t.status!=='Closed'?`<button onclick="quickCloseTix('${t.id}')" style="flex:1;min-width:120px;padding:13px;background:linear-gradient(135deg,#10B981,#06B6D4);border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> Close</button>`:''}
+      ${can('canCloseTickets')&&t.status==='Open'?`<button onclick="quickProgTix('${t.id}')" style="flex:1;min-width:120px;padding:13px;background:linear-gradient(135deg,#F59E0B,#EAB308);border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> In Progress</button>`:''}
     </div>
-    ${can('canEditAll')?`<button onclick="confirmDelete('ticket','${t.id}')" class="btn-danger" style="margin-top:10px">🗑 Delete Ticket</button>`:''}
+    ${can('canEditAll')?`<button onclick="confirmDelete('ticket','${t.id}')" class="btn-danger" style="margin-top:10px"> Delete Ticket</button>`:''}
     <div style="padding:16px 18px 0">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Activity Log</div>
       <div id="act-log-${t.id}">${actHTML}</div>
@@ -1505,10 +1505,10 @@ async function addComment(tixId){
   const logEl=document.getElementById('act-log-'+tixId);
   if(logEl) logEl.innerHTML=t.activity.map(a=>{
     const dt=new Date(a.ts); const dstr=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-    return`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:28px;height:28px;border-radius:8px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">💬</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">${a.user}</div><div style="font-size:12px;color:var(--sub);margin-top:1px">${a.action}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${dstr}</div></div></div>`;
+    return`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:28px;height:28px;border-radius:8px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 0 2 2z"/></svg></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">${a.user}</div><div style="font-size:12px;color:var(--sub);margin-top:1px">${a.action}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${dstr}</div></div></div>`;
   }).join('');
   await writeSheet('tickets');
-  toast('💬 Comment added');
+  toast('Comment added');
 }
 
 async function quickCloseTix(id){
@@ -1518,7 +1518,7 @@ async function quickCloseTix(id){
   t.activity.push({ts:new Date().toISOString(),user:currentUser.name,action:'Closed ticket'});
   closeMo('mo-tix-detail');
   await writeSheet('tickets');
-  toast('✅ Ticket closed');
+  toast('Ticket closed');
   if(currentScreen==='tickets') renderTix();
   if(currentScreen==='dashboard') renderDash();
 }
@@ -1529,7 +1529,7 @@ async function quickProgTix(id){
   t.activity.push({ts:new Date().toISOString(),user:currentUser.name,action:'Status → In Progress'});
   closeMo('mo-tix-detail');
   await writeSheet('tickets');
-  toast('▶ In Progress');
+  toast('In Progress');
   if(currentScreen==='tickets') renderTix();
   if(currentScreen==='dashboard') renderDash();
 }
@@ -1597,7 +1597,7 @@ async function saveTix(){
   }
   closeMo('mo-tix');
   await writeSheet('tickets');
-  toast(editingId.tix?'✅ Ticket updated':'✅ Ticket created');
+  toast(editingId.tix?'Ticket updated':'Ticket created');
   if(currentScreen==='tickets') renderTix();
   if(currentScreen==='dashboard') renderDash();
 }
@@ -1620,7 +1620,7 @@ function duplicateTix(){
   // Close current modal, write sheet, then open duplicate in edit mode
   closeMo('mo-tix');
   writeSheet('tickets').then(()=>{
-    toast(`✅ Duplicated as ${newId}`);
+    toast(`Duplicated as ${newId}`);
     if(currentScreen==='tickets') renderTix();
     if(currentScreen==='dashboard') renderDash();
     // Open the new duplicate in edit mode
@@ -1645,7 +1645,7 @@ async function saveQuickTicket(){
   DB.tickets.unshift({id,building:bldg,subdivision:'',unit:'TBD',subject:subj,status:'Open',priority:document.getElementById('qt-pri').value,category:'General',assignedTo:'',dateOpened:today.toISOString().split('T')[0],dateClosed:'',assetId:'',supplierId:'',reportedBy:'',notes:'',createdBy:currentUser.name,activity:JSON.stringify([{ts:new Date().toISOString(),user:currentUser.name,action:'Quick ticket created'}])});
   closeMo('mo-quick-tix');
   await writeSheet('tickets');
-  toast(`⚡ ${id} created`);
+  toast(`${id} created`);
   if(currentScreen==='tickets') renderTix();
   if(currentScreen==='dashboard') renderDash();
 }
@@ -1665,7 +1665,7 @@ function renderAst(){
   if(q) list=list.filter(a=>a.name.toLowerCase().includes(q)||a.building.toLowerCase().includes(q)||a.id.toLowerCase().includes(q));
   document.getElementById('ast-lbl').textContent=`${list.length} asset${list.length!==1?'s':''}`;
   const c=document.getElementById('ast-list');
-  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">🔧</div><div style="font-size:13px">No assets found</div></div>';return;}
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div style="font-size:13px">No assets found</div></div>';return;}
   const page=pages.ast;
   const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
   const sc={Active:'var(--green)','Under Maintenance':'var(--amber)',Decommissioned:'var(--red)'};
@@ -1675,17 +1675,17 @@ function renderAst(){
     const warnExpired = wExp && wExp < today;
     const warnSoon = wExp && !warnExpired && wExp <= soon;
     const warrantyColor = warnExpired ? 'var(--red)' : warnSoon ? 'var(--amber)' : 'var(--sub)';
-    const warrantyLabel = warnExpired ? `🛡 Expired ${df(a.warrantyExpiry)}` : warnSoon ? `🛡 Expiring ${df(a.warrantyExpiry)}` : a.warrantyExpiry ? `🛡 ${df(a.warrantyExpiry)}` : '';
+    const warrantyLabel = warnExpired ? `Expired ${df(a.warrantyExpiry)}` : warnSoon ? `Expiring ${df(a.warrantyExpiry)}` : a.warrantyExpiry ? `Warranty ${df(a.warrantyExpiry)}` : '';
     const openTix = DB.tickets.filter(t=>t.assetId===a.id&&t.status!=='Closed').length;
     return`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:8px;cursor:pointer${warnExpired?' border-left:3px solid var(--red)':warnSoon?' border-left:3px solid var(--amber)':''}" onclick="openAstDetail('${a.id}')">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
       <div><div style="font-size:10px;color:var(--teal);font-weight:700;margin-bottom:2px">${a.id}</div><div style="font-size:14px;font-weight:700">${a.name}</div></div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
         <span class="badge" style="background:${sc[a.status]||'var(--green)'}18;color:${sc[a.status]||'var(--green)'}">${a.status}</span>
-        ${openTix?`<span style="font-size:10px;font-weight:700;color:var(--amber)">⚠ ${openTix} open ticket${openTix>1?'s':''}</span>`:''}
+        ${openTix?`<span style="font-size:10px;font-weight:700;color:var(--amber)">${openTix} open ticket${openTix>1?'s':''}</span>`:''}
       </div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub)"><span>🏢 ${a.building}</span><span>📁 ${a.category}</span>${warrantyLabel?`<span style="color:${warrantyColor};font-weight:${warnExpired||warnSoon?'700':'400'}">${warrantyLabel}</span>`:''}</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub)"><span style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg> ${a.building}</span><span style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> ${a.category}</span>${warrantyLabel?`<span style="color:${warrantyColor};font-weight:${warnExpired||warnSoon?'700':'400'}">${warrantyLabel}</span>`:''}</div>
   </div>`;
   }).join('')+'</div>'+renderPagination('ast',list.length,'goAstPage');
 }
@@ -1712,9 +1712,9 @@ function openAstDetail(id){
     </div>
     ${relTix.length?`<div style="padding:14px 18px 0"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Open Tickets (${relTix.length})</div><div class="tlist" style="padding:0">${relTix.map(t=>tixItemHTML(t,true)).join('')}</div></div>`:''}
     <div style="padding:14px 18px 0;display:flex;gap:9px;flex-wrap:wrap">
-      ${can('canEditAssets')?`<button onclick="editAst('${a.id}')" style="flex:1;min-width:120px;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--blue)">✏️ Edit</button>`:''}
+      ${can('canEditAssets')?`<button onclick="editAst('${a.id}')" style="flex:1;min-width:120px;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--blue)"> Edit</button>`:''}
     </div>
-    ${can('canEditAll')?`<button onclick="confirmDelete('asset','${a.id}')" class="btn-danger" style="margin-top:10px">🗑 Delete Asset</button>`:''}
+    ${can('canEditAll')?`<button onclick="confirmDelete('asset','${a.id}')" class="btn-danger" style="margin-top:10px"> Delete Asset</button>`:''}
     <div style="height:20px"></div>`;
   openMo('mo-ast-detail');
 }
@@ -1753,7 +1753,7 @@ async function saveAst(){
   else { DB.assets.push({id:nextId(DB.assets,'AST'),...data}); }
   closeMo('mo-ast');
   await writeSheet('assets');
-  toast(editingId.ast?'✅ Asset updated':'✅ Asset created');
+  toast(editingId.ast?'Asset updated':'Asset created');
   if(currentScreen==='assets') renderAst();
 }
 
@@ -1766,7 +1766,7 @@ function renderUsers(){
   let list=DB.users;
   if(q) list=list.filter(u=>u.name.toLowerCase().includes(q)||u.email.toLowerCase().includes(q)||u.role.toLowerCase().includes(q));
   const c=document.getElementById('usr-list');
-  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">👤</div><div style="font-size:13px">No users found</div></div>';return;}
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div style="font-size:13px">No users found</div></div>';return;}
   const page=pages.usr;
   const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
   c.innerHTML=slice.map(u=>{
@@ -1816,7 +1816,7 @@ async function saveUser(){
   else { DB.users.push({id:nextId(DB.users,'USR'),...data}); }
   closeMo('mo-usr');
   await writeSheet('users');
-  toast(editingId.usr?'✅ User updated':'✅ User added');
+  toast(editingId.usr?'User updated':'User added');
   if(currentScreen==='users') renderUsers();
 }
 
@@ -1825,7 +1825,7 @@ async function saveUser(){
 ══════════════════════════════════════════════════════════ */
 function openFloorView(buildingName, buildingId, floorEnc){
   const floor = decodeURIComponent(floorEnc);
-  document.getElementById('floor-view-title').textContent = '🏢 ' + floor;
+  document.getElementById('floor-view-title').textContent = floor;
   document.getElementById('floor-view-sub').textContent = buildingName;
 
   const tickets   = DB.tickets.filter(t=>t.building===buildingName && t.subdivision===floor);
@@ -1849,7 +1849,7 @@ function openFloorView(buildingName, buildingId, floorEnc){
   if(tickets.length){
     html += '<div class="tlist">' + tickets.map(t=>tixItemHTML(t,true)).join('') + '</div>';
   } else {
-    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:28px">🎫</div><div style="font-size:12px">No tickets for this floor</div></div>';
+    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></div><div style="font-size:12px">No tickets for this floor</div></div>';
   }
 
   // ── Assets ──
@@ -1859,12 +1859,12 @@ function openFloorView(buildingName, buildingId, floorEnc){
     html += '<div style="padding:0 14px 8px">' + assets.map(a=>`
       <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:8px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.05)" onclick="closeMo('mo-ast-detail');openAstDetail('${a.id}')">
         <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div><div style="font-size:10px;color:var(--teal);font-weight:700">${a.id}</div><div style="font-size:14px;font-weight:700">${a.name}</div><div style="font-size:11px;color:var(--sub);margin-top:2px">📁 ${a.category}</div></div>
+          <div><div style="font-size:10px;color:var(--teal);font-weight:700">${a.id}</div><div style="font-size:14px;font-weight:700">${a.name}</div><div style="font-size:11px;color:var(--sub);margin-top:2px;display:flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> ${a.category}</div></div>
           <span class="badge" style="background:${sc[a.status]||'var(--green)'}18;color:${sc[a.status]||'var(--green)'}">${a.status}</span>
         </div>
       </div>`).join('') + '</div>';
   } else {
-    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:28px">🔧</div><div style="font-size:12px">No assets for this floor</div></div>';
+    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div style="font-size:12px">No assets for this floor</div></div>';
   }
 
   // ── Suppliers linked via tickets on this floor ──
@@ -1881,7 +1881,7 @@ function openFloorView(buildingName, buildingId, floorEnc){
         </div>
       </div>`).join('');
   } else {
-    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:28px">🏭</div><div style="font-size:12px">No suppliers linked to this floor</div></div>';
+    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7-6-7 6v3l-4-3v12z"/><path d="M17 20v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/></svg></div><div style="font-size:12px">No suppliers linked to this floor</div></div>';
   }
 
   document.getElementById('floor-view-body').innerHTML = html;
@@ -1895,7 +1895,7 @@ function renderBlds(){
   const list=DB.buildings;
   document.getElementById('bld-lbl').textContent=`${list.length} building${list.length!==1?'s':''}`;
   const c=document.getElementById('bld-list');
-  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">🏢</div><div style="font-size:13px">No buildings yet</div></div>';return;}
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></div><div style="font-size:13px">No buildings yet</div></div>';return;}
   c.innerHTML=list.map(b=>{
     const subs=parseSubs(b.subs);
     const openTix=DB.tickets.filter(t=>t.building===b.name&&t.status!=='Closed').length;
@@ -1910,7 +1910,7 @@ function renderBlds(){
         <div class="bs"><div class="bs-val">${b.yearBuilt||'—'}</div><div class="bs-lbl">Built</div></div>
         <div class="bs"><div class="bs-val">${subs.length}</div><div class="bs-lbl">Floors</div></div>
       </div>
-      ${subs.length?`<div class="bc-subs">${subs.map(s=>`<span class="sub-tag" style="cursor:pointer" onclick="openFloorView('${b.name}','${b.id}','${encodeURIComponent(s)}')" title="View ${s}">🏢 ${s}</span>`).join('')}</div>`:''}
+      ${subs.length?`<div class="bc-subs">${subs.map(s=>`<span class="sub-tag" style="cursor:pointer" onclick="openFloorView('${b.name}','${b.id}','${encodeURIComponent(s)}')" title="View ${s}">${s}</span>`).join('')}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -1949,7 +1949,7 @@ async function saveBld(){
   else { DB.buildings.push({id:nextId(DB.buildings,'BLD'),...data}); }
   closeMo('mo-bld');
   await writeSheet('buildings');
-  toast(editingId.bld?'✅ Building updated':'✅ Building added');
+  toast(editingId.bld?'Building updated':'Building added');
   if(currentScreen==='buildings') renderBlds();
 }
 
@@ -1993,7 +1993,7 @@ function renderSuppliers(){
   if(sortVal==='desc') list.sort((a,b)=>(b.ratePerHour||0)-(a.ratePerHour||0));
   document.getElementById('sup-lbl').textContent=`${list.length} supplier${list.length!==1?'s':''}`;
   const c=document.getElementById('sup-list');
-  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">🏭</div><div style="font-size:13px">No suppliers found</div></div>';return;}
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7-6-7 6v3l-4-3v12z"/><path d="M17 20v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/></svg></div><div style="font-size:13px">No suppliers found</div></div>';return;}
   const page=pages.sup;
   const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
   const stCol={Active:'var(--green)',Preferred:'var(--amber)',Inactive:'var(--muted)'};
@@ -2002,7 +2002,7 @@ function renderSuppliers(){
     const activeExp=expertiseVal!=='All'?expertiseVal:null;
     return`<div class="sup-card" onclick="openSupDetail('${s.id}')">
       <div class="sup-hdr">
-        <div><div class="sup-name">${s.name}</div><div class="sup-contact">${s.contact||'—'}</div>${s.phone?`<div style="font-size:12px;color:var(--sub);margin-top:2px">📞 ${s.phone}</div>`:''}</div>
+        <div><div class="sup-name">${s.name}</div><div class="sup-contact">${s.contact||'—'}</div>${s.phone?`<div style="font-size:12px;color:var(--sub);margin-top:2px" style="font-size:12px;color:var(--sub);margin-top:2px;display:flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12 19.79 19.79 0 0 1 1.97 3.34a2 2 0 0 1 1.94-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${s.phone}</div>`:''}</div>
         <span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'}">${s.status}</span>
       </div>
       <div style="display:flex;gap:16px;margin:6px 0 8px;align-items:flex-end">
@@ -2024,18 +2024,18 @@ function openSupDetail(id){
       <span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'}">${s.status}</span>
     </div>
     <div style="padding:0 18px">
-      <div class="dr"><span class="dk">👤 Contact</span><span class="dv">${s.contact||'—'}</span></div>
-      <div class="dr"><span class="dk">💰 Rate</span><span class="dv" style="color:var(--green)">€ ${s.ratePerHour}/hr + € ${s.transportCost} transport</span></div>
-      <div class="dr"><span class="dk">📞 Phone</span><span class="dv">${s.phone||'—'}</span></div>
-      <div class="dr"><span class="dk">📧 Email</span><span class="dv">${s.email||'—'}</span></div>
-      <div class="dr"><span class="dk">📍 Address</span><span class="dv">${s.address||'—'}</span></div>
-      <div class="dr"><span class="dk">⭐ Rating</span><span class="dv">${'⭐'.repeat(parseInt(s.rating)||0)}</span></div>
-      <div class="dr"><span class="dk">🛠 Expertise</span><span class="dv">${exp.join(', ')||'—'}</span></div>
+      <div class="dr"><span class="dk">Contact</span><span class="dv">${s.contact||'—'}</span></div>
+      <div class="dr"><span class="dk">Rate</span><span class="dv" style="color:var(--green)">€ ${s.ratePerHour}/hr + € ${s.transportCost} transport</span></div>
+      <div class="dr"><span class="dk">Phone</span><span class="dv">${s.phone||'—'}</span></div>
+      <div class="dr"><span class="dk">Email</span><span class="dv">${s.email||'—'}</span></div>
+      <div class="dr"><span class="dk">Address</span><span class="dv">${s.address||'—'}</span></div>
+      <div class="dr"><span class="dk">Rating</span><span class="dv">${Array.from({length:parseInt(s.rating)||0}).map(()=>'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>').join('')}</span></div>
+      <div class="dr"><span class="dk">Expertise</span><span class="dv">${exp.join(', ')||'—'}</span></div>
     </div>
     <div style="padding:12px 18px 0;display:flex;gap:9px">
-      ${can('canManageSuppliers')?`<button onclick="editSupplier('${s.id}')" style="flex:1;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--blue)">✏️ Edit</button>`:''}
+      ${can('canManageSuppliers')?`<button onclick="editSupplier('${s.id}')" style="flex:1;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--blue)"> Edit</button>`:''}
     </div>
-    ${can('canEditAll')?`<button onclick="confirmDelete('supplier','${s.id}')" class="btn-danger" style="margin-top:10px">🗑 Delete</button>`:''}
+    ${can('canEditAll')?`<button onclick="confirmDelete('supplier','${s.id}')" class="btn-danger" style="margin-top:10px"> Delete</button>`:''}
     <div style="height:20px"></div>`;
   openMo('mo-sup-detail');
 }
@@ -2076,7 +2076,7 @@ async function saveSupplier(){
   else { DB.suppliers.push({id:nextId(DB.suppliers,'SUP'),...data}); }
   closeMo('mo-sup');
   await writeSheet('suppliers');
-  toast(editingId.sup?'✅ Supplier updated':'✅ Supplier added');
+  toast(editingId.sup?'Supplier updated':'Supplier added');
   if(currentScreen==='suppliers') renderSuppliers();
 }
 
@@ -2099,7 +2099,7 @@ async function doConfirmedDelete(){
   if(key) DB[key]=DB[key].filter(x=>x.id!==id);
   closeMo('mo-confirm');
   await writeSheet(key);
-  toast(`🗑 ${type} deleted`);
+  toast(`${type} deleted`);
   if(currentScreen==='tickets') renderTix();
   if(currentScreen==='assets') renderAst();
   if(currentScreen==='suppliers') renderSuppliers();
@@ -2129,7 +2129,7 @@ function exportCSV(type){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=`propmanager_${type}_${today.toISOString().split('T')[0]}.csv`;a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
-  toast(`📋 ${type} exported`);
+  toast(`${type} exported`);
 }
 </script>
 
