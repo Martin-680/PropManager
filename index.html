@@ -1864,7 +1864,12 @@ function renderSuppliers(){
     return`<div class="sup-card" onclick="openSupDetail('${s.id}')">
       <div class="sup-hdr">
         <div><div class="sup-name">${s.name}</div><div class="sup-contact">${s.contact||'—'}</div></div>
-        <div style="text-align:right"><div class="sup-rate">R${s.ratePerHour}/hr</div><span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'};margin-top:4px">${s.status}</span></div>
+        <span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'}">${s.status}</span>
+      </div>
+      <div style="display:flex;gap:16px;margin:6px 0 8px;align-items:flex-end">
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Rate/hr</div><div class="sup-rate">R${s.ratePerHour||0}</div></div>
+        <div style="width:1px;height:32px;background:var(--border);flex-shrink:0"></div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Transport</div><div style="font-size:13px;font-weight:700;color:var(--sub)">R${s.transportCost||0}</div></div>
       </div>
       <div class="sup-tags">${exp.map(e=>`<span class="sup-tag" style="${activeExp===e?'background:#DBEAFE;border-color:#93C5FD;color:var(--blue);font-weight:700':''}">${e}</span>`).join('')}</div>
     </div>`;
