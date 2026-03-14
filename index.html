@@ -682,6 +682,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div class="fg"><label>Building Name *</label><input class="fi2" id="bf-name" placeholder="e.g. Maple Tower"/></div>
     <div class="fg"><label>Address</label><input class="fi2" id="bf-addr" placeholder="Full address"/></div>
     <div class="fg"><label>Days Open</label><input class="fi2" id="bf-daysopen" placeholder="e.g. Mon–Fri 8:00–18:00"/></div>
+    <div class="fg"><label>Time Open</label><input class="fi2" id="bf-timeopen" placeholder="e.g. 08:00–18:00"/></div>
     <div class="frow2">
       <div class="fg"><label>Workspace</label><input class="fi2" type="number" id="bf-units" placeholder="0"/></div>
       <div class="fg"><label>Assets</label><input class="fi2" type="number" id="bf-year" placeholder="0"/></div>
@@ -791,7 +792,7 @@ const TABS = { users:'Users', buildings:'Buildings', assets:'Assets', tickets:'T
 /* Column orders for each sheet (row index 0 = header) */
 const COLS = {
   users:     ['id','name','role','email','phone','buildings','active'],
-  buildings: ['id','name','address','daysOpen','units','yearBuilt','manager','phone','subs'],
+  buildings: ['id','name','address','daysOpen','timeOpen','units','yearBuilt','manager','phone','subs'],
   assets:    ['id','name','building','subdivision','location','category','status','manufacturer','model','warrantyExpiry','purchaseDate','lastServiced'],
   tickets:   ['id','building','subdivision','unit','subject','status','priority','category','assignedTo','dateOpened','dateClosed','assetId','supplierId','reportedBy','notes','createdBy','activity'],
   suppliers: ['id','name','contact','expertise','desc','ratePerHour','transportCost','phone','email','website','address','status','rating'],
@@ -2002,7 +2003,7 @@ function openNewBuilding(){
   if(!can('canManageBuildings')) return;
   editingId.bld=null;
   document.getElementById('bld-modal-title').textContent='Add Building';
-  ['bf-name','bf-addr','bf-daysopen','bf-units','bf-year','bf-phone','bf-subs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['bf-name','bf-addr','bf-daysopen','bf-timeopen','bf-units','bf-year','bf-phone','bf-subs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   populateMgrSelect('bf-mgr');
   renderFloorChips('bf-floors-ms','bf-subs',[]);
   openMo('mo-bld');
@@ -2015,6 +2016,7 @@ function editBld(id){
   document.getElementById('bf-name').value=b.name;
   document.getElementById('bf-addr').value=b.address||'';
   document.getElementById('bf-daysopen').value=b.daysOpen||'';
+  document.getElementById('bf-timeopen').value=b.timeOpen||'';
   document.getElementById('bf-units').value=b.units||'';
   document.getElementById('bf-year').value=b.yearBuilt||'';
   document.getElementById('bf-phone').value=b.phone||'';
@@ -2029,7 +2031,7 @@ async function saveBld(){
   if(!name){toast('Building name required','err');return;}
   const subsRaw=document.getElementById('bf-subs').value;
   const subs=subsRaw?subsRaw.split(',').map(s=>s.trim()).filter(Boolean):[];
-  const data={name,address:document.getElementById('bf-addr').value,daysOpen:document.getElementById('bf-daysopen').value,units:parseInt(document.getElementById('bf-units').value)||0,yearBuilt:parseInt(document.getElementById('bf-year').value)||'',manager:document.getElementById('bf-mgr').value,phone:document.getElementById('bf-phone').value,subs:subs.join(', ')};
+  const data={name,address:document.getElementById('bf-addr').value,daysOpen:document.getElementById('bf-daysopen').value,timeOpen:document.getElementById('bf-timeopen').value,units:parseInt(document.getElementById('bf-units').value)||0,yearBuilt:parseInt(document.getElementById('bf-year').value)||'',manager:document.getElementById('bf-mgr').value,phone:document.getElementById('bf-phone').value,subs:subs.join(', ')};
   if(editingId.bld){ Object.assign(DB.buildings.find(x=>x.id===editingId.bld),data); }
   else { DB.buildings.push({id:nextId(DB.buildings,'BLD'),...data}); }
   closeMo('mo-bld');
