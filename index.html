@@ -1930,10 +1930,10 @@ function openBldDetail(id){
   // ── Info strip ──
   html+=`<div style="margin:12px 14px 4px;padding:14px 16px;background:linear-gradient(135deg,rgba(37,99,235,.07),rgba(79,70,229,.04));border:1.5px solid var(--border);border-radius:var(--r)">
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px">
+      <div class="bs"><div class="bs-val">${subs.length}</div><div class="bs-lbl">Floors</div></div>
       <div class="bs"><div class="bs-val">${b.units||0}</div><div class="bs-lbl">Workspace</div></div>
       <div class="bs"><div class="bs-val">${openTix.length}</div><div class="bs-lbl">Open Tix</div></div>
       <div class="bs"><div class="bs-val">${b.yearBuilt||'—'}</div><div class="bs-lbl">Built</div></div>
-      <div class="bs"><div class="bs-val">${subs.length}</div><div class="bs-lbl">Floors</div></div>
     </div>
     ${b.manager?`<div style="margin-top:10px;font-size:12px;color:var(--sub)">Manager: <strong>${b.manager}</strong></div>`:''}
     ${b.phone?`<div style="margin-top:6px;font-size:12px;color:var(--sub)">Phone: <a href="tel:${b.phone}" onclick="event.stopPropagation()" style="color:var(--blue);font-weight:700;text-decoration:none">${b.phone}</a></div>`:''}
@@ -1988,10 +1988,10 @@ function renderBlds(){
         ${can('canManageBuildings')?`<button onclick="event.stopPropagation();editBld('${b.id}')" style="padding:7px 12px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);border-radius:var(--rs);font-size:12px;font-weight:700;color:var(--blue)">Edit</button>`:''}
       </div>
       <div class="bc-body">
+        <div class="bs"><div class="bs-val">${subs.length}</div><div class="bs-lbl">Floors</div></div>
         <div class="bs"><div class="bs-val">${b.units||0}</div><div class="bs-lbl">Workspace</div></div>
         <div class="bs"><div class="bs-val">${openTix}</div><div class="bs-lbl">Open Tix</div></div>
         <div class="bs"><div class="bs-val">${b.yearBuilt||'—'}</div><div class="bs-lbl">Built</div></div>
-        <div class="bs"><div class="bs-val">${subs.length}</div><div class="bs-lbl">Floors</div></div>
       </div>
       ${subs.length?`<div class="bc-subs">${subs.map(s=>`<span class="sub-tag" style="cursor:pointer" onclick="event.stopPropagation();openFloorView('${b.name}','${b.id}','${encodeURIComponent(s)}')" title="View ${s}">${s}</span>`).join('')}</div>`:''}
     </div>`;
