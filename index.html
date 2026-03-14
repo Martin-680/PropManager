@@ -1998,6 +1998,7 @@ function renderBlds(){
         ${can('canManageBuildings')?`<button onclick="event.stopPropagation();editBld('${b.id}')" style="padding:7px 12px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);border-radius:var(--rs);font-size:12px;font-weight:700;color:var(--blue)">Edit</button>`:''}
       </div>
       <div class="bc-body">
+        <div class="bs"><div class="bs-val">${subs.length}</div><div class="bs-lbl">Floors</div></div>
         <div class="bs"><div class="bs-val">${b.units||0}</div><div class="bs-lbl">Workspace</div></div>
         <div class="bs"><div class="bs-val">${openTix}</div><div class="bs-lbl">Open Tix</div></div>
         <div class="bs"><div class="bs-val">${DB.assets.filter(a=>a.building===b.name).length}</div><div class="bs-lbl">Assets</div></div>
