@@ -1,0 +1,2250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#F4F6FA"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<title>PropManager Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F4F6FA; --surface:#FFFFFF; --card:#FFFFFF; --card2:#F8FAFF;
+  --border:#E4E9F2; --border2:#D0D8EC;
+  --blue:#2563EB; --indigo:#4F46E5; --teal:#0891B2; --green:#059669;
+  --amber:#D97706; --red:#DC2626; --purple:#7C3AED; --pink:#DB2777;
+  --text:#0F172A; --sub:#475569; --muted:#94A3B8;
+  --nav-h:64px; --safe-b:env(safe-area-inset-bottom,0px);
+  --r:14px; --rs:10px;
+  --shadow:0 8px 32px rgba(0,0,0,.5);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+input,select,textarea{font-family:inherit;color:var(--text);}
+::-webkit-scrollbar{width:0;height:0;}
+
+/* ── APP SHELL ── */
+#app{height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
+.screen{flex:1;overflow-y:auto;display:none;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* ── LOADING / AUTH GATE ── */
+#auth-gate{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:40px;}
+#auth-gate.hidden{display:none;}
+.ag-logo{font-size:56px;margin-bottom:4px;}
+.ag-title{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.5px;text-align:center;}
+.ag-sub{font-size:14px;color:var(--sub);text-align:center;line-height:1.6;max-width:280px;}
+.ag-google-btn{display:flex;align-items:center;gap:12px;padding:14px 28px;background:#fff;border-radius:12px;font-size:15px;font-weight:600;color:#1f1f1f;box-shadow:0 2px 16px rgba(0,0,0,.12);border:1.5px solid var(--border);transition:transform .15s,box-shadow .15s;margin-top:8px;}
+.ag-google-btn:active{transform:scale(.97);}
+.ag-google-btn img{width:22px;height:22px;}
+.ag-status{font-size:13px;color:var(--sub);text-align:center;min-height:20px;}
+.ag-error{color:var(--red);}
+.ag-spinner{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── ACCESS DENIED ── */
+#access-denied{position:fixed;inset:0;z-index:900;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:16px;text-align:center;}
+#access-denied.show{display:flex;}
+.ad-icon{font-size:52px;}
+.ad-title{font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;}
+.ad-sub{font-size:14px;color:var(--sub);line-height:1.7;max-width:300px;}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,rgba(244,246,250,.98) 0%,rgba(244,246,250,.85) 100%);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:env(safe-area-inset-top,0) 0 0;flex-shrink:0;}
+.topbar-inner{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.topbar-left{display:flex;flex-direction:column;min-width:0;}
+.topbar-title{font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar-sub{font-size:11px;color:var(--sub);margin-top:1px;}
+.topbar-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.ib{width:36px;height:36px;border-radius:11px;background:#fff;border:1.5px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .15s;color:var(--sub);flex-shrink:0;}
+.ib:active{transform:scale(.92);background:var(--border);}
+
+/* ── BURGER ── */
+.burger{width:36px;height:36px;border-radius:11px;background:#fff;border:1.5px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0;transition:all .15s;cursor:pointer;position:relative;}
+.burger:active{transform:scale(.92);}
+.burger-line{width:16px;height:2px;background:var(--sub);border-radius:2px;}
+.burger-dot{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none;}
+
+/* ── DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;z-index:600;background:rgba(15,23,42,.45);opacity:0;pointer-events:none;transition:opacity .25s;}
+.drawer-overlay.open{opacity:1;pointer-events:all;}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:601;width:min(300px,88vw);background:var(--surface);border-left:1.5px solid var(--border);box-shadow:-8px 0 32px rgba(0,0,0,.1);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);padding-top:env(safe-area-inset-top,0);}
+.drawer.open{transform:translateX(0);}
+.drawer-head{padding:18px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.drawer-logo{font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;}
+.drawer-close{width:32px;height:32px;border-radius:9px;background:#F1F5F9;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--muted);}
+.drawer-user{padding:16px 18px;border-bottom:1px solid var(--border);}
+.drawer-avatar{width:46px;height:46px;border-radius:14px;margin-bottom:10px;object-fit:cover;}
+.drawer-avatar-initials{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;font-family:'Outfit',sans-serif;margin-bottom:10px;}
+.drawer-name{font-size:15px;font-weight:700;}
+.drawer-role{font-size:12px;color:var(--sub);}
+.drawer-email{font-size:11px;color:var(--muted);margin-top:2px;}
+.drawer-items{flex:1;overflow-y:auto;padding:8px 0;}
+.drawer-item{display:flex;align-items:center;gap:13px;padding:13px 20px;font-size:14px;font-weight:500;color:var(--sub);cursor:pointer;transition:background .15s;}
+.drawer-item:active{background:var(--card);}
+.drawer-item-icon{font-size:19px;width:26px;text-align:center;flex-shrink:0;}
+.drawer-sep{height:1px;background:var(--border);margin:6px 18px;}
+.drawer-item.danger{color:var(--red);}
+.drawer-item-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(239,68,68,.15);color:var(--red);}
+.drawer-footer{padding:12px 18px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center;background:var(--surface);}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{height:var(--nav-h);padding-bottom:var(--safe-b);background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(6,1fr);position:relative;z-index:200;flex-shrink:0;}
+.ni{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;font-weight:500;color:var(--muted);transition:color .2s;padding:6px 2px;position:relative;}
+.ni.active{color:var(--blue);}
+.ni-icon{font-size:20px;transition:transform .2s;}
+.ni.active .ni-icon{transform:scale(1.15);}
+.ni:active .ni-icon{transform:scale(.88);}
+.ni-badge{position:absolute;top:6px;right:calc(50% - 16px);background:var(--red);color:#fff;font-size:9px;font-weight:800;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);}
+
+/* ── CARDS / SURFACE ── */
+.card{background:var(--card);border:1.5px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.06);border-radius:var(--r);padding:14px 16px;margin:0 14px 10px;}
+.fu{margin:0 14px 10px;}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;padding:16px 14px 8px;flex-shrink:0;}
+.sh-title{font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);}
+.sh-link{font-size:12px;color:var(--blue);font-weight:600;}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px 14px 4px;flex-shrink:0;}
+.kpi{background:var(--card);border:1.5px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.06);border-radius:var(--r);padding:16px;cursor:pointer;transition:transform .15s,border-color .15s;position:relative;overflow:hidden;}
+.kpi:active{transform:scale(.97);}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0;}
+.kpi-total::before{background:linear-gradient(90deg,var(--blue),var(--indigo));}
+.kpi-open::before{background:var(--red);}
+.kpi-prog::before{background:var(--amber);}
+.kpi-closed::before{background:var(--green);}
+.kpi-num{font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-lbl{font-size:11px;color:var(--sub);font-weight:500;}
+.kpi-hint{font-size:10px;color:var(--muted);margin-top:6px;}
+
+/* ── CHARTS ── */
+.ch-row{display:flex;align-items:center;gap:10px;padding:5px 0;}
+.ch-lbl{font-size:12px;color:var(--sub);width:72px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ch-wrap{flex:1;height:8px;background:#EEF2FF;border-radius:4px;overflow:hidden;}
+.ch-fill{height:100%;border-radius:4px;transition:width .4s ease;}
+.ch-cnt{font-size:12px;color:var(--sub);width:20px;text-align:right;flex-shrink:0;}
+
+/* ── TREND ── */
+.trend-wrap{display:flex;gap:3px;align-items:flex-end;height:60px;}
+.trend-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.trend-bars{display:flex;gap:2px;align-items:flex-end;width:100%;height:46px;}
+.trend-bar{flex:1;border-radius:3px 3px 0 0;min-height:2px;}
+.trend-lbl{font-size:8px;color:var(--muted);}
+.trend-legend{display:flex;gap:14px;margin-top:10px;}
+.trend-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub);}
+.trend-leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+
+/* ── ALERTS ── */
+.alert-card{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border-radius:var(--rs);border:1px solid;margin:0 14px 8px;cursor:pointer;transition:transform .12s;}
+.alert-card:active{transform:scale(.98);}
+.alert-crit{background:rgba(220,38,38,.06);border-color:rgba(220,38,38,.2);}
+.alert-warn{background:rgba(217,119,6,.06);border-color:rgba(217,119,6,.2);}
+.alert-info{background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.18);}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.alert-body{flex:1;}
+.alert-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.alert-sub{font-size:11px;color:var(--sub);}
+
+/* ── SEARCH BAR ── */
+.sbar{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--border);border-radius:var(--rs);padding:10px 14px;margin:0 14px 10px;flex-shrink:0;}
+.sbar input{flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);}
+.sbar input::placeholder{color:var(--muted);}
+
+/* ── FILTER BAR ── */
+.fbar{display:flex;gap:8px;padding:0 14px 10px;flex-shrink:0;overflow-x:auto;}
+.fbar::-webkit-scrollbar{display:none;}
+.fsel-wrap{display:flex;flex-direction:column;gap:3px;min-width:120px;flex:1;}
+.fsel-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.fsel{background:#fff;border:1.5px solid var(--border);border-radius:var(--rs);padding:8px 10px;font-size:13px;color:var(--text);outline:none;width:100%;}
+.fsel.active-filter{border-color:var(--blue);}
+
+/* ── TICKET LIST ── */
+.tlist{display:flex;flex-direction:column;gap:8px;padding:0 14px 8px;}
+.ti{background:var(--card);border:1.5px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:var(--r);padding:13px 14px;display:flex;align-items:flex-start;gap:11px;cursor:pointer;transition:border-color .15s;}
+.ti:active{border-color:var(--border2);}
+.pdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.p-critical{background:var(--red);}
+.p-high{background:var(--amber);}
+.p-medium{background:var(--blue);}
+.p-low{background:var(--green);}
+.p-planned{background:var(--purple);}
+.p-requested{background:#EAB308;}
+.p-ordered{background:var(--teal);}
+.ti-left{flex:1;min-width:0;}
+.ti-id{font-size:10px;color:var(--muted);font-weight:600;margin-bottom:2px;}
+.ti-subj{font-size:14px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ti-meta{display:flex;gap:10px;flex-wrap:wrap;}
+.ti-meta span{font-size:11px;color:var(--sub);}
+.ti-right{flex-shrink:0;}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.b-open{background:rgba(239,68,68,.15);color:var(--red);}
+.b-prog{background:rgba(245,158,11,.15);color:var(--amber);}
+.b-closed{background:rgba(16,185,129,.15);color:var(--green);}
+.b-cancel{background:rgba(74,90,122,.2);color:var(--muted);}
+.b-planned{background:rgba(168,85,247,.15);color:var(--purple);}
+.b-requested{background:rgba(234,179,8,.15);color:#CA8A04;}
+.b-ordered{background:rgba(6,182,212,.15);color:var(--teal);}
+.role-badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.rb-manager{background:rgba(139,92,246,.15);color:var(--purple);}
+.rb-supervisor{background:rgba(6,182,212,.15);color:var(--teal);}
+.rb-tech{background:rgba(59,130,246,.15);color:var(--blue);}
+.rb-admin{background:rgba(245,158,11,.15);color:var(--amber);}
+.rb-contractor{background:rgba(74,90,122,.2);color:var(--muted);}
+
+/* ── MODALS ── */
+.mo{position:fixed;inset:0;z-index:500;background:rgba(15,23,42,.5);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .22s;}
+.mo.open{opacity:1;pointer-events:all;}
+.ms{background:var(--surface);border-radius:22px 22px 0 0;border-top:1.5px solid var(--border);box-shadow:0 -8px 40px rgba(0,0,0,.12);max-height:92vh;overflow-y:auto;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);}
+.mh{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 8px;}
+.mt{display:flex;align-items:center;justify-content:space-between;padding:8px 18px 14px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;}
+.mt-close{width:30px;height:30px;border-radius:9px;background:#F1F5F9;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);}
+
+/* ── FORMS ── */
+.fg{display:flex;flex-direction:column;gap:6px;padding:0 18px 12px;}
+.fg label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.fi2{background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);padding:11px 13px;font-size:14px;color:var(--text);outline:none;width:100%;transition:border-color .15s;}
+.fi2:focus{border-color:var(--blue);}
+.fs2{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:11px 13px;font-size:14px;color:var(--text);outline:none;width:100%;}
+.ft2{background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);padding:11px 13px;font-size:14px;color:var(--text);outline:none;width:100%;resize:vertical;min-height:80px;}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px;}
+.frow2 .fg{padding:0;}
+.btn-p{width:calc(100% - 36px);margin:4px 18px;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff;display:block;}
+.btn-s{width:calc(100% - 36px);margin:8px 18px 4px;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub);display:block;}
+.btn-danger{width:calc(100% - 36px);margin:4px 18px;padding:13px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:var(--rs);font-size:14px;font-weight:700;color:var(--red);display:block;}
+
+/* ── DETAIL ROWS ── */
+.dr{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);gap:12px;}
+.dk{font-size:12px;color:var(--muted);flex-shrink:0;padding-top:1px;}
+.dv{font-size:13px;color:var(--text);text-align:right;font-weight:500;flex:1;min-width:0;word-break:break-word;}
+
+/* ── TEAM ── */
+.user-card{background:var(--card);border:1.5px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:var(--r);padding:14px 16px;margin:0 14px 8px;display:flex;align-items:center;gap:13px;cursor:pointer;}
+.uc-av{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;font-family:'Outfit',sans-serif;flex-shrink:0;}
+.uc-name{font-size:14px;font-weight:700;margin-bottom:2px;}
+.uc-sub{font-size:12px;color:var(--muted);}
+
+/* ── BUILDING CARD ── */
+.bc-wrap{background:var(--card);border:1.5px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.06);border-radius:var(--r);margin:0 14px 12px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s;}
+.bc-wrap:active{transform:scale(.98);border-color:var(--blue);}
+.bc-hdr{padding:14px 16px;background:linear-gradient(135deg,rgba(37,99,235,.06),rgba(79,70,229,.04));display:flex;justify-content:space-between;align-items:flex-start;}
+.bc-name{font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;margin-bottom:2px;}
+.bc-addr{font-size:13px;color:var(--sub);font-weight:500;}
+.bc-body{padding:12px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.bs{text-align:center;}
+.bs-val{font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;}
+.bs-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+.bc-subs{padding:0 16px 14px;}
+.sub-tag{display:inline-flex;align-items:center;gap:5px;background:#EEF2FF;border:1.5px solid #C7D2FE;border-radius:8px;padding:4px 10px;font-size:12px;margin:3px 3px 3px 0;}
+.floors-ms{display:flex;flex-wrap:wrap;gap:8px;padding:6px 0;}
+.floor-chip{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--sub);transition:all .15s;user-select:none;}
+.floor-chip.selected{background:#2563EB;border-color:#2563EB;color:#fff;}
+.floor-chip:active{transform:scale(.94);}
+
+/* ── SUPPLIER ── */
+.sup-card{background:var(--card);border:1.5px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:var(--r);margin:0 14px 8px;padding:14px 16px;cursor:pointer;}
+.sup-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.sup-name{font-size:15px;font-weight:700;}
+.sup-contact{font-size:12px;color:var(--muted);margin-top:2px;}
+.sup-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.sup-tag{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:6px;padding:3px 8px;font-size:11px;color:var(--sub);}
+.sup-rate{font-size:13px;font-weight:700;color:var(--green);}
+
+/* ── PAGINATION ── */
+.pgbar{display:flex;align-items:center;gap:5px;padding:10px 14px;flex-wrap:wrap;}
+.pg-btn{min-width:34px;height:34px;border-radius:9px;background:#fff;border:1.5px solid var(--border);color:var(--sub);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0 8px;}
+.pg-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.pg-btn:disabled{opacity:.3;pointer-events:none;}
+.pg-info{font-size:12px;color:var(--muted);font-weight:500;padding:0 4px;}
+.pg-dots{font-size:13px;color:var(--muted);}
+
+/* ── TOAST ── */
+#toast-wrap{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 16px);left:50%;transform:translateX(-50%);z-index:900;display:flex;flex-direction:column;gap:8px;pointer-events:none;align-items:center;}
+.toast{background:#1E293B;border:1px solid #334155;border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;color:#F8FAFC;box-shadow:0 6px 24px rgba(0,0,0,.4);white-space:nowrap;animation:toastin .25s ease;opacity:0;}
+.toast.show{opacity:1;}
+.toast.err{background:#450A0A;border-color:rgba(239,68,68,.5);color:#FCA5A5;}
+.toast.ok{background:#052E16;border-color:rgba(16,185,129,.4);color:#6EE7B7;}
+@keyframes toastin{from{transform:translateY(12px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 14px);right:14px;width:54px;height:54px;border-radius:17px;z-index:150;background:linear-gradient(135deg,var(--blue),var(--indigo));display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 28px rgba(37,99,235,.4);transition:transform .2s,box-shadow .2s;}
+.fab:active{transform:scale(.91);}
+
+/* ── SYNC INDICATOR ── */
+#sync-bar{position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--indigo));z-index:999;transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+#sync-bar.active{transform:scaleX(1);}
+
+/* ── EMPTY ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;gap:12px;color:var(--muted);}
+.empty-icon{font-size:44px;opacity:.4;}
+
+/* ── GUEST BANNER ── */
+.guest-banner{display:flex;align-items:center;gap:10px;background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.18);border-radius:var(--rs);padding:12px 14px;margin:0 14px 8px;font-size:13px;}
+.gb-icon{font-size:18px;flex-shrink:0;}
+.gb-text{flex:1;color:var(--sub);}
+.gb-btn{font-size:12px;font-weight:700;color:var(--blue);flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<!-- Sync bar -->
+<div id="sync-bar"></div>
+<!-- Toast -->
+<div id="toast-wrap"></div>
+
+<!-- Auth Gate -->
+<div id="auth-gate">
+  <div class="ag-logo" style="font-size:0;color:var(--blue)"><svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.85"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></div>
+  <div class="ag-title">PropManager Pro</div>
+  <div class="ag-sub">Sign in with your Google account to access your property management workspace.</div>
+  <button class="ag-google-btn" onclick="signIn()">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"/>
+    Sign in with Google
+  </button>
+  <div class="ag-status" id="ag-status"></div>
+  <div style="margin-top:24px;padding:12px 16px;background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.15);border-radius:10px;font-size:12px;color:var(--sub);text-align:center;max-width:280px;line-height:1.6">
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;vertical-align:middle;margin-right:4px;color:var(--blue)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Your Google account must be added to the Users sheet by an administrator before you can sign in.
+  </div>
+</div>
+
+<!-- Access Denied -->
+<div id="access-denied">
+  <div class="ad-icon" style="font-size:0;color:var(--red)"><svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
+  <div class="ad-title">Access Not Granted</div>
+  <div class="ad-sub">Your Google account hasn't been added to this workspace yet.</div>
+  <div id="debug-info" style="width:100%;max-width:340px"></div>
+  <button onclick="signOut()" style="margin-top:12px;padding:12px 24px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub);">Sign out & try another account</button>
+</div>
+
+<div id="app" style="display:none">
+
+  <!-- ═══════ DASHBOARD ═══════ -->
+  <div id="screen-dashboard" class="screen active">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="topbar-left">
+          <div class="topbar-title">PropManager Pro</div>
+          <div class="topbar-sub" id="dash-date"></div>
+        </div>
+        <div class="topbar-actions">
+          <button class="burger" id="burger-btn" onclick="openDrawer()">
+            <div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div>
+            <div class="burger-dot" id="burger-alert-dot"></div>
+          </button>
+        </div>
+      </div>
+      <div style="padding:0 14px 10px">
+        <div class="sbar" style="margin:0">
+          <span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input id="global-search" placeholder="Search tickets, assets, suppliers…" oninput="renderGlobalSearch()"/>
+          <button id="gs-clear" onclick="clearGlobalSearch()" style="color:var(--muted);font-size:15px;display:none">✕</button>
+        </div>
+        <div id="global-results" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div id="dash-guest-banner"></div>
+    <div id="dash-alerts"></div>
+    <div class="kpi-grid">
+      <div class="kpi kpi-total" onclick="openKpiList('All')"><div class="kpi-num" id="kpi-total">—</div><div class="kpi-lbl">Total Tickets</div><div class="kpi-hint">Tap to view →</div></div>
+      <div class="kpi kpi-open" onclick="openKpiList('Open')"><div class="kpi-num" id="kpi-open">—</div><div class="kpi-lbl">Open</div><div class="kpi-hint">Tap to view →</div></div>
+      <div class="kpi kpi-prog" onclick="openKpiList('In Progress')"><div class="kpi-num" id="kpi-prog">—</div><div class="kpi-lbl">In Progress</div><div class="kpi-hint">Tap to view →</div></div>
+      <div class="kpi kpi-closed" onclick="openKpiList('Closed')"><div class="kpi-num" id="kpi-closed">—</div><div class="kpi-lbl">Closed</div><div class="kpi-hint">Tap to view →</div></div>
+    </div>
+    <div class="sh fu"><span class="sh-title">By Building</span></div>
+    <div class="card fu" id="bldg-chart"></div>
+    <div class="sh fu"><span class="sh-title">By Priority</span></div>
+    <div class="card fu" id="pri-chart"></div>
+    <div class="sh fu"><span class="sh-title">Last 8 Weeks</span></div>
+    <div class="card fu" id="trend-chart"></div>
+    <div class="sh fu"><span class="sh-title">Recent Open</span><span class="sh-link" onclick="navTo('tickets')">All →</span></div>
+    <div id="dash-recent" class="fu"></div>
+    <div style="height:80px"></div>
+  </div>
+
+  <!-- ═══════ TICKETS ═══════ -->
+  <div id="screen-tickets" class="screen">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="topbar-left"><div class="topbar-title">Tickets</div><div class="topbar-sub" id="tix-lbl"></div></div>
+        <div class="topbar-actions">
+          <button class="ib" onclick="openNewTicket()" id="btn-new-tix" style="display:none" title="New Ticket"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
+        </div>
+      </div>
+    </div>
+    <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="tsearch" placeholder="Search tickets…" oninput="setPage('tix',1);renderTix()"/></div>
+    <div class="fbar">
+      <div class="fsel-wrap"><div class="fsel-lbl">Status</div>
+        <select class="fsel" id="sel-tix-status" onchange="setPage('tix',1);renderTix()">
+          <option value="All">All Statuses</option><option value="Open">Open</option>
+          <option value="In Progress">In Progress</option><option value="Closed">Closed</option>
+          <option value="Planned">Planned</option><option value="Requested">Requested</option><option value="Ordered">Ordered</option>
+          <option value="mine">Assigned to Me</option>
+        </select>
+      </div>
+      <div class="fsel-wrap"><div class="fsel-lbl">Priority</div>
+        <select class="fsel" id="sel-tix-pri" onchange="setPage('tix',1);renderTix()">
+          <option value="All">All Priorities</option><option value="Critical">Critical</option>
+          <option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
+        </select>
+      </div>
+      <div class="fsel-wrap"><div class="fsel-lbl">Category</div>
+        <select class="fsel" id="sel-tix-cat" onchange="setPage('tix',1);renderTix()">
+          <option value="All">All Categories</option><option>General</option><option>Plumbing</option><option>Electrical</option><option>HVAC</option><option>Security</option><option>Safety</option><option>Structural</option><option>Cleaning</option>
+        </select>
+      </div>
+      <div class="fsel-wrap"><div class="fsel-lbl">Building</div>
+        <select class="fsel" id="sel-tix-bldg" onchange="setPage('tix',1);renderTix()">
+          <option value="All">All Buildings</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 14px 8px">
+      <div style="font-size:12px;color:var(--muted)">
+        <select id="sel-tix-sort" onchange="setPage('tix',1);renderTix()" style="background:none;border:none;font-size:12px;color:var(--muted);font-family:inherit;cursor:pointer;outline:none;padding:0">
+          <option value="newest">↓ Newest first</option>
+          <option value="oldest">↑ Oldest first</option>
+          <option value="priority">By priority</option>
+          <option value="days">⏱ Most overdue</option>
+        </select>
+      </div>
+      <button onclick="clearTixFilters()" style="font-size:12px;color:var(--blue);font-weight:600;background:none;border:none;cursor:pointer">Clear filters</button>
+    </div>
+    <div id="tix-list"></div>
+  </div>
+
+  <!-- ═══════ ASSETS ═══════ -->
+  <div id="screen-assets" class="screen">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="topbar-left"><div class="topbar-title">Assets</div><div class="topbar-sub" id="ast-lbl"></div></div>
+        <div class="topbar-actions">
+          <button class="ib" onclick="openNewAsset()" id="btn-new-ast" style="display:none" title="New Asset"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
+        </div>
+      </div>
+    </div>
+    <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="asearch" placeholder="Search assets…" oninput="setPage('ast',1);renderAst()"/></div>
+    <div class="fbar">
+      <div class="fsel-wrap"><div class="fsel-lbl">Status</div>
+        <select class="fsel" id="sel-ast-status" onchange="setPage('ast',1);renderAst()">
+          <option value="All">All Statuses</option><option value="Active">Active</option>
+          <option value="Under Maintenance">Under Maintenance</option><option value="Decommissioned">Decommissioned</option>
+        </select>
+      </div>
+      <div class="fsel-wrap"><div class="fsel-lbl">Category</div>
+        <select class="fsel" id="sel-ast-cat" onchange="setPage('ast',1);renderAst()">
+          <option value="All">All Categories</option><option>HVAC</option><option>Electrical</option>
+          <option>Plumbing</option><option>Security</option><option>Safety</option>
+          <option>Structural</option><option>Equipment</option><option>Tools</option><option>General</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:flex-end;padding:0 14px 8px">
+      <button onclick="clearAstFilters()" style="font-size:12px;color:var(--blue);font-weight:600;background:none;border:none;cursor:pointer">Clear filters</button>
+    </div>
+    <div id="ast-list"></div>
+  </div>
+
+  <!-- ═══════ TEAM ═══════ -->
+  <div id="screen-users" class="screen">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="topbar-left"><div class="topbar-title">Team</div><div class="topbar-sub">Staff & Contractors</div></div>
+        <div class="topbar-actions">
+          <button class="ib" onclick="openNewUser()" id="btn-new-usr" style="display:none" title="Add User"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
+        </div>
+      </div>
+    </div>
+    <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="usearch" placeholder="Search team…" oninput="setPage('usr',1);renderUsers()"/></div>
+    <div id="usr-list"></div>
+  </div>
+
+  <!-- ═══════ BUILDINGS ═══════ -->
+  <div id="screen-buildings" class="screen">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="topbar-left"><div class="topbar-title">Buildings</div><div class="topbar-sub" id="bld-lbl"></div></div>
+        <div class="topbar-actions">
+          <button class="ib" onclick="openNewBuilding()" id="btn-new-bld" style="display:none" title="Add Building"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
+        </div>
+      </div>
+    </div>
+    <div id="bld-list"></div>
+  </div>
+
+  <!-- ═══════ SUPPLIERS ═══════ -->
+  <div id="screen-suppliers" class="screen">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="topbar-left"><div class="topbar-title">Suppliers</div><div class="topbar-sub" id="sup-lbl"></div></div>
+        <div class="topbar-actions">
+          <button class="ib" onclick="openNewSupplier()" id="btn-new-sup" style="display:none" title="Add Supplier"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
+        </div>
+      </div>
+    </div>
+    <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="ssearch" placeholder="Search suppliers…" oninput="setPage('sup',1);renderSuppliers()"/></div>
+    <div class="fbar">
+      <div class="fsel-wrap"><div class="fsel-lbl">Status</div>
+        <select class="fsel" id="sel-sup-status" onchange="setPage('sup',1);renderSuppliers()">
+          <option value="All">All Statuses</option><option value="Active">Active</option>
+          <option value="Preferred">Preferred</option><option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="fsel-wrap"><div class="fsel-lbl">Expertise</div>
+        <select class="fsel" id="sel-sup-expertise" onchange="setPage('sup',1);renderSuppliers()">
+          <option value="All">All Expertise</option>
+        </select>
+      </div>
+      <div class="fsel-wrap"><div class="fsel-lbl">Sort by Rate</div>
+        <select class="fsel" id="sel-sup-sort" onchange="renderSuppliers()">
+          <option value="none">Default</option>
+          <option value="asc">Rate ↑ Low → High</option>
+          <option value="desc">Rate ↓ High → Low</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:flex-end;padding:0 14px 8px">
+      <button onclick="clearSupFilters()" style="font-size:12px;color:var(--blue);font-weight:600;background:none;border:none;cursor:pointer">Clear filters</button>
+    </div>
+    <div id="sup-list"></div>
+  </div>
+
+  <!-- ═══════ FLOOR VIEW (no nav) ═══════ -->
+  <div id="screen-floor" class="screen">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="topbar-left">
+          <div class="topbar-title" id="floor-view-title">Floor</div>
+          <div class="topbar-sub" id="floor-view-sub"></div>
+        </div>
+        <div class="topbar-actions">
+          <button class="ib" onclick="navBack()" title="Back"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
+        </div>
+      </div>
+    </div>
+    <div id="floor-view-body" style="padding-bottom:16px"></div>
+  </div>
+
+  <!-- ═══════ NAV ═══════ -->
+  <nav class="bottom-nav" style="grid-template-columns:repeat(5,1fr)">
+    <button class="ni active" onclick="navTo('dashboard')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dash</button>
+    <button class="ni" onclick="navTo('tickets')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></span>Tickets<span class="ni-badge" id="open-badge" style="display:none"></span></button>
+    <button class="ni" onclick="navTo('assets')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>Assets</button>
+    <button class="ni" onclick="navTo('buildings')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></span>Buildings</button>
+    <button class="ni" onclick="navTo('suppliers')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7-6-7 6v3l-4-3v12z"/><path d="M17 20v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/></svg></span>Suppliers</button>
+  </nav>
+
+  <!-- FAB -->
+  <button class="fab" id="fab-quick" onclick="openQuickTicket()" style="display:none" title="Quick Ticket"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
+
+</div>
+
+<!-- ═══════ DRAWER ═══════ -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="drawer-logo" style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--blue)"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg> PropManager</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div id="drawer-user-section" class="drawer-user"></div>
+  <div class="drawer-items" id="drawer-items"></div>
+  <div class="drawer-footer">PropManager Pro · v2.0 · Google Sheets</div>
+</div>
+
+<!-- ═══════ MODALS ═══════ -->
+
+<!-- KPI drill-down -->
+<div class="mo" id="mo-kpi-list" onclick="mcClick(event,'mo-kpi-list')">
+  <div class="ms" style="max-height:88vh">
+    <div class="mh"></div>
+    <div class="mt"><span id="kpi-list-title">Tickets</span><button class="mt-close" onclick="closeMo('mo-kpi-list')">✕</button></div>
+    <div style="padding:0 14px 6px;display:flex;justify-content:space-between;align-items:center">
+      <span id="kpi-list-count" style="font-size:12px;color:var(--muted)"></span>
+      <button onclick="goToTicketsFiltered()" style="font-size:12px;color:var(--blue);font-weight:600">Open in Tickets →</button>
+    </div>
+    <div id="kpi-list-body" style="overflow-y:auto;padding-bottom:24px"></div>
+  </div>
+</div>
+
+<!-- Ticket form -->
+<div class="mo" id="mo-tix" onclick="mcClick(event,'mo-tix')">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt"><span id="tix-modal-title">New Ticket</span><button class="mt-close" onclick="closeMo('mo-tix')">✕</button></div>
+    <div class="fg"><label>Subject *</label><input class="fi2" id="tf-subj" placeholder="Describe the issue…"/></div>
+    <div class="frow2">
+      <div class="fg"><label>Building *</label><select class="fs2" id="tf-bldg" onchange="populateSubs('tf-sub','tf-bldg')"><option value="">Select…</option></select></div>
+      <div class="fg"><label>Floor</label><select class="fs2" id="tf-sub"><option value="">None</option></select></div>
+    </div>
+    <div class="frow2">
+      <div class="fg"><label>Unit / Area</label><input class="fi2" id="tf-unit" placeholder="e.g. Unit 3A"/></div>
+      <div class="fg"><label>Priority</label>
+        <select class="fs2" id="tf-pri"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select>
+      </div>
+    </div>
+    <div class="frow2">
+      <div class="fg"><label>Category</label>
+        <select class="fs2" id="tf-cat"><option>General</option><option>Plumbing</option><option>Electrical</option><option>HVAC</option><option>Security</option><option>Safety</option><option>Structural</option><option>Cleaning</option></select>
+      </div>
+      <div class="fg"><label>Status</label>
+        <select class="fs2" id="tf-status"><option>Open</option><option>In Progress</option><option>Planned</option><option>Requested</option><option>Ordered</option><option>Closed</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Assign To</label><select class="fs2" id="tf-assign"><option value="">Unassigned</option></select></div>
+    <div class="frow2">
+      <div class="fg"><label>Asset</label><select class="fs2" id="tf-asset"><option value="">None</option></select></div>
+      <div class="fg"><label>Supplier</label><select class="fs2" id="tf-supplier"><option value="">None</option></select></div>
+    </div>
+    <div class="fg"><label>Reported By</label><input class="fi2" id="tf-reporter" placeholder="Name of reporter"/></div>
+    <div class="fg"><label>Notes</label><textarea class="ft2" id="tf-notes" placeholder="Additional details…"></textarea></div>
+    <button class="btn-p" onclick="saveTix()">Save Ticket</button>
+    <button class="btn-s" id="btn-dup-tix" onclick="duplicateTix()" style="display:none;background:#EEF2FF;border-color:#C7D2FE;color:var(--indigo);font-weight:700"> Duplicate Ticket</button>
+    <button class="btn-s" onclick="closeMo('mo-tix')">Cancel</button>
+  </div>
+</div>
+
+<!-- Ticket detail -->
+<div class="mo" id="mo-tix-detail" onclick="mcClick(event,'mo-tix-detail')">
+  <div class="ms" style="max-height:92vh"><div class="mh"></div><div class="mt"><span id="tix-detail-title">Ticket Detail</span><button class="mt-close" onclick="closeMo('mo-tix-detail')">✕</button></div><div id="tix-detail-body"></div></div>
+</div>
+
+<!-- Asset form -->
+<div class="mo" id="mo-ast" onclick="mcClick(event,'mo-ast')">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt"><span id="ast-modal-title">New Asset</span><button class="mt-close" onclick="closeMo('mo-ast')">✕</button></div>
+    <div class="fg"><label>Asset Name *</label><input class="fi2" id="af-name" placeholder="e.g. HVAC Unit A"/></div>
+    <div class="frow2">
+      <div class="fg"><label>Building</label><select class="fs2" id="af-bldg" onchange="populateSubs('af-sub','af-bldg')"><option value="">Select…</option></select></div>
+      <div class="fg"><label>Floor</label><select class="fs2" id="af-sub"><option value="">None</option></select></div>
+    </div>
+    <div class="frow2">
+      <div class="fg"><label>Location</label><input class="fi2" id="af-loc" placeholder="Unit / Area"/></div>
+      <div class="fg"><label>Category</label>
+        <select class="fs2" id="af-cat"><option>HVAC</option><option>Electrical</option><option>Plumbing</option><option>Safety</option><option>Security</option><option>Structural</option><option>Equipment</option><option>Tools</option><option>General</option></select>
+      </div>
+    </div>
+    <div class="frow2">
+      <div class="fg"><label>Status</label><select class="fs2" id="af-status"><option>Active</option><option>Under Maintenance</option><option>Decommissioned</option></select></div>
+      <div class="fg"><label>Manufacturer</label><input class="fi2" id="af-mfr" placeholder="Brand"/></div>
+    </div>
+    <div class="frow2">
+      <div class="fg"><label>Model</label><input class="fi2" id="af-model" placeholder="Model #"/></div>
+      <div class="fg"><label>Warranty Expiry</label><input class="fi2" type="date" id="af-warr"/></div>
+    </div>
+    <div class="frow2">
+      <div class="fg"><label>Purchase Date</label><input class="fi2" type="date" id="af-pdate"/></div>
+      <div class="fg"><label>Last Serviced</label><input class="fi2" type="date" id="af-lsvc"/></div>
+    </div>
+    <button class="btn-p" onclick="saveAst()">Save Asset</button>
+    <button class="btn-s" onclick="closeMo('mo-ast')">Cancel</button>
+  </div>
+</div>
+
+<!-- Asset detail -->
+<div class="mo" id="mo-ast-detail" onclick="mcClick(event,'mo-ast-detail')">
+  <div class="ms"><div class="mh"></div><div class="mt"><span id="ast-detail-title">Asset Detail</span><button class="mt-close" onclick="closeMo('mo-ast-detail')">✕</button></div><div id="ast-detail-body"></div></div>
+</div>
+
+<!-- User form -->
+<div class="mo" id="mo-usr" onclick="mcClick(event,'mo-usr')">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt"><span id="usr-modal-title">Add User</span><button class="mt-close" onclick="closeMo('mo-usr')">✕</button></div>
+    <div class="frow2">
+      <div class="fg"><label>Full Name *</label><input class="fi2" id="uf-name" placeholder="Full name"/></div>
+      <div class="fg"><label>Role *</label>
+        <select class="fs2" id="uf-role">
+          <option>Maintenance Tech</option><option>Supervisor</option>
+          <option>Property Manager</option><option>Admin</option><option>Contractor</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Google Email * <span style="color:var(--muted);font-weight:400;text-transform:none">(they sign in with this)</span></label><input class="fi2" type="email" id="uf-email" placeholder="user@gmail.com"/></div>
+    <div class="fg"><label>Phone</label><input class="fi2" id="uf-phone" placeholder="555-XXXX"/></div>
+    <div class="fg"><label>Buildings Assigned</label><input class="fi2" id="uf-bldgs" placeholder="e.g. Maple Tower, All Buildings"/></div>
+    <div class="fg"><label>Active</label><select class="fs2" id="uf-active"><option value="true">Yes</option><option value="false">No</option></select></div>
+    <button class="btn-p" onclick="saveUser()">Save User</button>
+    <button class="btn-s" onclick="closeMo('mo-usr')">Cancel</button>
+  </div>
+</div>
+
+<!-- Building form -->
+<div class="mo" id="mo-bld" onclick="mcClick(event,'mo-bld')">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt"><span id="bld-modal-title">Add Building</span><button class="mt-close" onclick="closeMo('mo-bld')">✕</button></div>
+    <div class="fg"><label>Building Name *</label><input class="fi2" id="bf-name" placeholder="e.g. Maple Tower"/></div>
+    <div class="fg"><label>Address</label><input class="fi2" id="bf-addr" placeholder="Full address"/></div>
+    <div class="fg"><label>Days Open</label><input class="fi2" id="bf-daysopen" placeholder="e.g. Mon–Fri 8:00–18:00"/></div>
+    <div class="fg"><label>Time Open</label><input class="fi2" id="bf-timeopen" placeholder="e.g. 08:00–18:00"/></div>
+    <div class="frow2">
+      <div class="fg"><label>Workspace</label><input class="fi2" type="number" id="bf-units" placeholder="0"/></div>
+      <div class="fg"><label>Assets</label><input class="fi2" type="number" id="bf-year" placeholder="0"/></div>
+    </div>
+    <div class="frow2">
+      <div class="fg"><label>Manager</label><select class="fs2" id="bf-mgr"></select></div>
+      <div class="fg"><label>Phone</label><input class="fi2" id="bf-phone" placeholder="555-XXXX"/></div>
+    </div>
+    <div class="fg"><label>Floors</label>
+      <div class="floors-ms" id="bf-floors-ms"></div>
+      <input type="hidden" id="bf-subs"/>
+    </div>
+    <button class="btn-p" onclick="saveBld()">Save Building</button>
+    <button class="btn-s" onclick="closeMo('mo-bld')">Cancel</button>
+  </div>
+</div>
+
+<!-- Supplier form -->
+<div class="mo" id="mo-sup" onclick="mcClick(event,'mo-sup')">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt"><span id="sup-modal-title">Add Supplier</span><button class="mt-close" onclick="closeMo('mo-sup')">✕</button></div>
+    <div class="frow2">
+      <div class="fg"><label>Company Name *</label><input class="fi2" id="sf-name" placeholder="Company name"/></div>
+      <div class="fg"><label>Contact Person</label><input class="fi2" id="sf-contact" placeholder="Full name"/></div>
+    </div>
+    <div class="fg"><label>Expertise</label><input class="fi2" id="sf-expertise" placeholder="Plumbing, HVAC, Electrical…"/></div>
+    <div class="frow2">
+      <div class="fg"><label>Rate/hr (R)</label><input class="fi2" type="number" id="sf-rate" placeholder="0"/></div>
+      <div class="fg"><label>Transport (R)</label><input class="fi2" type="number" id="sf-transport" placeholder="0"/></div>
+    </div>
+    <div class="frow2">
+      <div class="fg"><label>Phone</label><input class="fi2" type="tel" id="sf-phone" placeholder="555-XXXX"/></div>
+      <div class="fg"><label>Email</label><input class="fi2" type="email" id="sf-email" placeholder="contact@…"/></div>
+    </div>
+    <div class="fg"><label>Address</label><input class="fi2" id="sf-address" placeholder="Physical address"/></div>
+    <div class="frow2">
+      <div class="fg"><label>Status</label><select class="fs2" id="sf-status"><option>Active</option><option>Inactive</option><option>Preferred</option></select></div>
+      <div class="fg"><label>Rating</label><select class="fs2" id="sf-rating"><option value="5">⭐⭐⭐⭐⭐</option><option value="4">⭐⭐⭐⭐</option><option value="3" selected>⭐⭐⭐</option><option value="2">⭐⭐</option><option value="1">⭐</option></select></div>
+    </div>
+    <button class="btn-p" onclick="saveSupplier()">Save Supplier</button>
+    <button class="btn-s" onclick="closeMo('mo-sup')">Cancel</button>
+  </div>
+</div>
+
+<!-- Supplier detail -->
+<div class="mo" id="mo-sup-detail" onclick="mcClick(event,'mo-sup-detail')">
+  <div class="ms"><div class="mh"></div><div id="sup-detail-body"></div></div>
+</div>
+
+<!-- Quick Ticket -->
+<div class="mo" id="mo-quick-tix" onclick="mcClick(event,'mo-quick-tix')">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt"><span style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Quick Ticket</span><button class="mt-close" onclick="closeMo('mo-quick-tix')">✕</button></div>
+    <div style="padding:0 18px 12px;font-size:12px;color:var(--muted)">Log an issue fast — essentials only</div>
+    <div class="fg"><label>Subject *</label><input class="fi2" id="qt-subj" placeholder="Describe the issue briefly…"/></div>
+    <div class="frow2">
+      <div class="fg"><label>Building *</label><select class="fs2" id="qt-bldg"><option value="">Select…</option></select></div>
+      <div class="fg"><label>Priority</label>
+        <select class="fs2" id="qt-pri"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select>
+      </div>
+    </div>
+    <button class="btn-p" onclick="saveQuickTicket()" style="display:inline-flex;align-items:center;gap:8px;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Create Ticket</button>
+    <button class="btn-s" onclick="closeMo('mo-quick-tix')">Cancel</button>
+  </div>
+</div>
+
+<!-- Export modal -->
+<div class="mo" id="mo-export" onclick="mcClick(event,'mo-export')">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt"><span style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Export</span><button class="mt-close" onclick="closeMo('mo-export')">✕</button></div>
+    <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:10px">
+      <button onclick="exportCSV('tickets')" style="padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--blue);text-align:left"> Export Tickets to CSV</button>
+      <button onclick="exportCSV('assets')" style="padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--teal);text-align:left"> Export Assets to CSV</button>
+      <button onclick="exportCSV('suppliers')" style="padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--pink);text-align:left"> Export Suppliers to CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete -->
+<div class="mo" id="mo-confirm" onclick="mcClick(event,'mo-confirm')">
+  <div class="ms">
+    <div class="mh"></div>
+    <div class="mt"><span style="display:flex;align-items:center;gap:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Confirm Delete</span><button class="mt-close" onclick="closeMo('mo-confirm')">✕</button></div>
+    <div style="padding:0 18px 20px">
+      <div id="confirm-msg" style="font-size:14px;color:var(--sub);line-height:1.6;margin-bottom:20px"></div>
+      <button class="btn-danger" onclick="doConfirmedDelete()"> Yes, Delete</button>
+      <button class="btn-s" onclick="closeMo('mo-confirm')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════════ */
+const CLIENT_ID   = '806872056167-d9r8u2mq154725634o1nbpu93mdpt5ff.apps.googleusercontent.com';
+const SHEET_ID    = '1UkjXu3yOwPWlb1bKjMnXuCrYkxsvzC6wBZ48nPr1P4A';
+const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email openid';
+const DISCOVERY   = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+
+/* Sheet tab names — must match exactly what you created */
+const TABS = { users:'Users', buildings:'Buildings', assets:'Assets', tickets:'Tickets', suppliers:'Suppliers' };
+
+/* Column orders for each sheet (row index 0 = header) */
+const COLS = {
+  users:     ['id','name','role','email','phone','buildings','active'],
+  buildings: ['id','name','address','daysOpen','timeOpen','units','yearBuilt','manager','phone','subs'],
+  assets:    ['id','name','building','subdivision','location','category','status','manufacturer','model','warrantyExpiry','purchaseDate','lastServiced'],
+  tickets:   ['id','building','subdivision','unit','subject','status','priority','category','assignedTo','dateOpened','dateClosed','assetId','supplierId','reportedBy','notes','createdBy','activity'],
+  suppliers: ['id','name','contact','expertise','desc','ratePerHour','transportCost','phone','email','website','address','status','rating'],
+};
+
+/* ══════════════════════════════════════════════════════════
+   ROLES & PERMISSIONS
+══════════════════════════════════════════════════════════ */
+const ROLES = {
+  'Property Manager': { canCreateTickets:true,  canCloseTickets:true,  canEditAssets:true,  canManageUsers:true,  canManageBuildings:true,  canManageSuppliers:true,  canEditAll:true  },
+  'Supervisor':       { canCreateTickets:true,  canCloseTickets:true,  canEditAssets:true,  canManageUsers:false, canManageBuildings:false, canManageSuppliers:true,  canEditAll:false },
+  'Maintenance Tech': { canCreateTickets:true,  canCloseTickets:true,  canEditAssets:false, canManageUsers:false, canManageBuildings:false, canManageSuppliers:false, canEditAll:false },
+  'Admin':            { canCreateTickets:false, canCloseTickets:false, canEditAssets:false, canManageUsers:true,  canManageBuildings:true,  canManageSuppliers:false, canEditAll:false },
+  'Contractor':       { canCreateTickets:false, canCloseTickets:false, canEditAssets:false, canManageUsers:false, canManageBuildings:false, canManageSuppliers:false, canEditAll:false },
+};
+const ROLE_COLORS = {'Property Manager':'#8B5CF6','Supervisor':'#06B6D4','Maintenance Tech':'#3B82F6','Admin':'#F59E0B','Contractor':'#64748B'};
+const ROLE_CLASS  = {'Property Manager':'rb-manager','Supervisor':'rb-supervisor','Maintenance Tech':'rb-tech','Admin':'rb-admin','Contractor':'rb-contractor'};
+function can(perm){ return currentUser && ROLES[currentUser.role]?.[perm]; }
+
+/* ══════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════ */
+let tokenClient, accessToken=null, currentUser=null;
+let DB = { users:[], buildings:[], assets:[], tickets:[], suppliers:[] };
+let editingId = { tix:null, ast:null, usr:null, bld:null, sup:null };
+let pendingDelete = null;
+const PAGE_SIZE = 10;
+const pages = { tix:1, ast:1, usr:1, bld:1, sup:1 };
+const today = new Date();
+const d=(n)=>{const x=new Date(today);x.setDate(x.getDate()-n);return x.toISOString().split('T')[0];};
+const df=(s)=>s?new Date(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const daysSince=(s)=>s?Math.floor((today-new Date(s))/86400000):0;
+function setPage(k,p){pages[k]=p;}
+function nextId(arr,prefix){ const nums=arr.map(x=>parseInt((x.id||'').split('-')[1]||0)).filter(n=>!isNaN(n)); return `${prefix}-${String((nums.length?Math.max(...nums):0)+1).padStart(3,'0')}`; }
+
+/* ══════════════════════════════════════════════════════════
+   SYNC BAR / TOAST
+══════════════════════════════════════════════════════════ */
+function showSync(){ document.getElementById('sync-bar').classList.add('active'); }
+function hideSync(){ document.getElementById('sync-bar').classList.remove('active'); }
+let _tid=0;
+function toast(msg,type=''){
+  if(!type && (msg.includes('added')||msg.includes('created')||msg.includes('updated')||msg.includes('refreshed')||msg.includes('closed')||msg.includes('deleted')||msg.includes('exported')||msg.includes('commented'))) type='ok';
+  const w=document.getElementById('toast-wrap');
+  const el=document.createElement('div');
+  el.className='toast'+(type?' '+type:'');
+  el.textContent=msg;
+  w.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},2800);
+}
+
+/* ══════════════════════════════════════════════════════════
+   GOOGLE IDENTITY / AUTH
+══════════════════════════════════════════════════════════ */
+function setStatus(msg,err=false){
+  const el=document.getElementById('ag-status');
+  el.innerHTML=err?`<span class="ag-error">${msg}</span>`:msg;
+}
+
+function gapiLoaded(){
+  gapi.load('client', async ()=>{
+    await gapi.client.init({ discoveryDocs:[DISCOVERY] });
+    // GIS token client
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: handleToken,
+    });
+    // Try silent restore
+    const saved = sessionStorage.getItem('pm_token');
+    if(saved){
+      accessToken = saved;
+      gapi.client.setToken({ access_token: accessToken });
+      await checkUserAccess();
+    }
+  });
+}
+
+function signIn(){
+  setStatus('<span class="ag-spinner"></span>');
+  tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+async function handleToken(resp){
+  if(resp.error){ setStatus('Sign-in failed. Please try again.', true); return; }
+  accessToken = resp.access_token;
+  sessionStorage.setItem('pm_token', accessToken);
+  gapi.client.setToken({ access_token: accessToken });
+  await checkUserAccess();
+}
+
+async function checkUserAccess(){
+  setStatus('<span class="ag-spinner"></span>');
+  try {
+    await loadAllData();
+    const r = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    const info = await r.json();
+    const email = (info.email||'').toLowerCase();
+    const user = DB.users.find(u => u.email.toLowerCase() === email && u.active !== 'false' && u.active !== false);
+    if(!user){
+      document.getElementById('auth-gate').classList.add('hidden');
+      document.getElementById('access-denied').classList.add('show');
+      // Show debug info so user can see exactly what's happening
+      const dbg = document.getElementById('debug-info');
+      if(dbg){
+        const usersInSheet = DB.users.map(u=>u.email||'(no email)').join(', ') || '(no users found in sheet)';
+        dbg.innerHTML=`<div style="margin-top:16px;padding:14px;background:#F1F5F9;border:1px solid #CBD5E1;border-radius:10px;text-align:left;font-size:12px;font-family:monospace;line-height:1.8;word-break:break-all">
+          <div><b style="color:#1E40AF">Your Google email:</b><br/><span style="color:#0F172A">${email||'(could not retrieve)'}</span></div>
+          <div style="margin-top:8px"><b style="color:#1E40AF">Emails in Users sheet:</b><br/><span style="color:#0F172A">${usersInSheet}</span></div>
+          <div style="margin-top:8px"><b style="color:#1E40AF">Total rows in Users sheet:</b> <span style="color:#0F172A">${DB.users.length}</span></div>
+        </div>`;
+      }
+      return;
+    }
+    currentUser = user;
+    launchApp();
+  } catch(e) {
+    setStatus('Failed to connect to Google Sheets. Check your Spreadsheet ID and sharing settings.', true);
+    console.error('checkUserAccess error:', e);
+  }
+}
+
+async function refreshAllData(){
+  toast('Refreshing data…');
+  try {
+    await loadAllData();
+    if(currentScreen==='dashboard') renderDash();
+    if(currentScreen==='tickets') renderTix();
+    if(currentScreen==='assets') renderAst();
+    if(currentScreen==='users') renderUsers();
+    if(currentScreen==='buildings') renderBlds();
+    if(currentScreen==='suppliers') renderSuppliers();
+    toast('Data refreshed');
+  } catch(e){ toast('Refresh failed','err'); }
+}
+
+function signOut(){
+  sessionStorage.removeItem('pm_token');
+  accessToken = null; currentUser = null;
+  document.getElementById('access-denied').classList.remove('show');
+  document.getElementById('auth-gate').classList.remove('hidden');
+  document.getElementById('app').style.display='none';
+  setStatus('');
+}
+
+function launchApp(){
+  document.getElementById('auth-gate').classList.add('hidden');
+  document.getElementById('app').style.display='flex';
+  document.getElementById('app').style.flexDirection='column';
+  applyPermUI();
+  navTo('dashboard');
+  toast(`Welcome, ${currentUser.name.split(' ')[0]}!`);
+  // Auto-refresh every 5 minutes
+  setInterval(async()=>{
+    try{ await loadAllData(); if(currentScreen==='dashboard') renderDash(); } catch(e){}
+  }, 5*60*1000);
+  // Escape key closes modals/drawer
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){
+      const openMos=document.querySelectorAll('.mo.open');
+      if(openMos.length){ closeMo(openMos[openMos.length-1].id); return; }
+      closeDrawer();
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   GOOGLE SHEETS API — READ
+══════════════════════════════════════════════════════════ */
+async function sheetsGet(range){
+  showSync();
+  try {
+    const res = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range });
+    hideSync();
+    return res.result.values || [];
+  } catch(e){ hideSync(); throw e; }
+}
+
+function rowsToObjects(rows, cols){
+  if(rows.length < 2) return [];
+  // Use header row to find column positions dynamically
+  const header = rows[0].map(h=>(h||'').toLowerCase().trim());
+  return rows.slice(1).filter(r=>r.some(c=>c)).map(r=>{
+    const obj={};
+    cols.forEach(col=>{
+      const idx = header.indexOf(col.toLowerCase());
+      let val = idx>=0 ? (r[idx]||'') : '';
+      // Parse JSON fields
+      if(col==='activity' && val){
+        try{ val=JSON.parse(val); }catch(e){ val=[]; }
+      }
+      // subs and expertise stored as plain CSV — just split, strip any stray brackets/quotes
+      if((col==='subs'||col==='expertise') && val){
+        if(val.startsWith('[')){ try{ val=JSON.parse(val); }catch(e){ val=val.replace(/[\[\]"]/g,'').split(',').map(s=>s.trim()).filter(Boolean); } }
+        else { val=val.split(',').map(s=>s.trim()).filter(Boolean); }
+      }
+      if(col==='active') val = val!=='false'&&val!=='FALSE'&&val!=='0'&&val!=='';
+      if(col==='ratePerHour'||col==='transportCost'||col==='rating'||col==='units') val=parseFloat(val)||0;
+      obj[col]=val;
+    });
+    return obj;
+  });
+}
+
+async function loadAllData(){
+  const [users,buildings,assets,tickets,suppliers] = await Promise.all([
+    sheetsGet(`${TABS.users}!A:Z`),
+    sheetsGet(`${TABS.buildings}!A:Z`),
+    sheetsGet(`${TABS.assets}!A:Z`),
+    sheetsGet(`${TABS.tickets}!A:Z`),
+    sheetsGet(`${TABS.suppliers}!A:Z`),
+  ]);
+  DB.users     = rowsToObjects(users,     COLS.users);
+  DB.buildings = rowsToObjects(buildings, COLS.buildings);
+  DB.assets    = rowsToObjects(assets,    COLS.assets);
+  DB.tickets   = rowsToObjects(tickets,   COLS.tickets);
+  DB.suppliers = rowsToObjects(suppliers, COLS.suppliers);
+}
+
+async function loadSheet(key){
+  const rows = await sheetsGet(`${TABS[key]}!A:Z`);
+  DB[key] = rowsToObjects(rows, COLS[key]);
+}
+
+/* ══════════════════════════════════════════════════════════
+   GOOGLE SHEETS API — WRITE
+══════════════════════════════════════════════════════════ */
+function objToRow(obj, cols){
+  return cols.map(col=>{
+    let v = obj[col];
+    if(v===undefined||v===null) return '';
+    if(typeof v==='boolean') return v?'TRUE':'FALSE';
+    // Store subs and expertise as plain CSV — no brackets or quotes
+    if(Array.isArray(v)){
+      if(col==='subs'||col==='expertise') return v.join(', ');
+      return JSON.stringify(v); // activity stays as JSON
+    }
+    return String(v);
+  });
+}
+
+async function writeSheet(key){
+  showSync();
+  const cols = COLS[key];
+  const rows = [cols, ...DB[key].map(o=>objToRow(o,cols))];
+  try {
+    // First clear the sheet to avoid stale data in extra columns/rows
+    await gapi.client.sheets.spreadsheets.values.clear({
+      spreadsheetId: SHEET_ID,
+      range: `${TABS[key]}!A:Z`,
+    });
+    // Then write fresh
+    await gapi.client.sheets.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: `${TABS[key]}!A1`,
+      valueInputOption: 'RAW',
+      resource: { values: rows },
+    });
+    hideSync();
+  } catch(e){
+    hideSync();
+    const msg = e?.result?.error?.message || e?.message || 'Unknown error';
+    const code = e?.result?.error?.code || e?.status || '';
+    toast( (code ? code+': ' : '') + msg, 'err');
+    console.error('writeSheet ['+key+'] error:', JSON.stringify(e));
+    throw e;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   MODAL HELPERS
+══════════════════════════════════════════════════════════ */
+function openMo(id){ document.getElementById(id)?.classList.add('open'); document.body.style.overflow='hidden'; }
+function closeMo(id){ document.getElementById(id)?.classList.remove('open'); document.body.style.overflow=''; }
+function mcClick(e,id){ if(e.target.id===id) closeMo(id); }
+
+/* ══════════════════════════════════════════════════════════
+   DRAWER
+══════════════════════════════════════════════════════════ */
+function openDrawer(){
+  const us = document.getElementById('drawer-user-section');
+  if(currentUser){
+    const col = ROLE_COLORS[currentUser.role]||'#3B82F6';
+    const ini = currentUser.name.split(' ').map(n=>n[0]).join('');
+    us.innerHTML=`<div class="drawer-avatar-initials" style="background:${col}22;color:${col};border:2px solid ${col}44">${ini}</div>
+      <div class="drawer-name">${currentUser.name}</div>
+      <div class="drawer-role"><span class="role-badge ${ROLE_CLASS[currentUser.role]}">${currentUser.role}</span></div>
+      <div class="drawer-email">${currentUser.email}</div>`;
+  }
+  const alertCount = getAlertCount();
+  const items = document.getElementById('drawer-items');
+  let html = '';
+  if(can('canCreateTickets')) html+=di('<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>','Quick Ticket',"openQuickTicket();closeDrawer()");
+  html+=di('<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>','Dashboard',"navTo('dashboard');closeDrawer()");
+  html+=`<div class="drawer-sep"></div>`;
+  if(alertCount) html+=`<div class="drawer-item" onclick="navTo('dashboard');closeDrawer()"><div class="drawer-item-icon"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style="flex:1">Alerts</div><span class="drawer-item-badge">${alertCount}</span></div>`;
+  html+=di('<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>','Team',"navTo('users');closeDrawer()");
+  html+=di('<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>','Export CSV',"openExportModal();closeDrawer()");
+  html+=di('<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>','Refresh Data',"refreshAllData();closeDrawer()");
+  html+=`<div class="drawer-sep"></div>`;
+  html+=`<div class="drawer-item danger" onclick="signOut();closeDrawer()"><div class="drawer-item-icon"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div><div>Sign Out</div></div>`;
+  items.innerHTML=html;
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function di(icon,label,action){ return`<div class="drawer-item" onclick="${action}"><div class="drawer-item-icon">${icon}</div><div>${label}</div></div>`; }
+function closeDrawer(){ document.getElementById('drawer-overlay').classList.remove('open'); document.getElementById('drawer').classList.remove('open'); document.body.style.overflow=''; }
+
+// Swipe right to close drawer on mobile
+(function(){
+  let startX=0, dragging=false;
+  document.addEventListener('touchstart',e=>{if(document.getElementById('drawer').classList.contains('open')){startX=e.touches[0].clientX;dragging=true;}},{passive:true});
+  document.addEventListener('touchmove',e=>{if(!dragging)return;const dx=e.touches[0].clientX-startX;if(dx>60)closeDrawer();},{passive:true});
+  document.addEventListener('touchend',()=>{dragging=false;},{passive:true});
+})();
+
+/* ══════════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════════ */
+let currentScreen='dashboard';
+let prevScreen='dashboard';
+function navTo(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
+  document.getElementById('screen-'+s).classList.add('active');
+  const idx=['dashboard','tickets','assets','users','buildings','suppliers'].indexOf(s);
+  if(idx>=0) document.querySelectorAll('.ni')[idx]?.classList.add('active');
+  prevScreen=currentScreen;
+  currentScreen=s;
+  document.getElementById('screen-'+s).scrollTop=0;
+  if(s==='dashboard') renderDash();
+  if(s==='tickets')   renderTix();
+  if(s==='assets')    renderAst();
+  if(s==='users')     renderUsers();
+  if(s==='buildings') renderBlds();
+  if(s==='suppliers') renderSuppliers();
+}
+function navBack(){
+  navTo(prevScreen==='floor'?'buildings':prevScreen);
+}
+
+function applyPermUI(){
+  const p = currentUser ? (ROLES[currentUser.role]||{}) : {};
+  const show=(id,v)=>{const el=document.getElementById(id);if(el)el.style.display=v?'flex':'none';};
+  show('btn-new-tix',p.canCreateTickets);
+  show('btn-new-ast',p.canEditAssets);
+  show('btn-new-usr',p.canManageUsers);
+  show('btn-new-bld',p.canManageBuildings);
+  show('btn-new-sup',p.canManageSuppliers);
+  const fab=document.getElementById('fab-quick');
+  if(fab) fab.style.display=p.canCreateTickets?'flex':'none';
+}
+
+/* ══════════════════════════════════════════════════════════
+   POPULATE HELPERS
+══════════════════════════════════════════════════════════ */
+function populateBldSelect(id){
+  const el=document.getElementById(id); if(!el) return;
+  const cur=el.value;
+  el.innerHTML='<option value="">Select…</option>'+DB.buildings.map(b=>`<option value="${b.name}">${b.name}</option>`).join('');
+  if(DB.buildings.find(b=>b.name===cur)) el.value=cur;
+}
+function parseSubs(raw){
+  if(!raw) return [];
+  if(Array.isArray(raw)) return raw.filter(Boolean);
+  const s=String(raw).trim();
+  if(s.startsWith('[')){ try{ return JSON.parse(s).filter(Boolean); }catch(e){} }
+  return s.split(',').map(x=>x.trim()).filter(Boolean);
+}
+const FLOOR_OPTIONS = ["-2", "-1", "bg", "1e", "2e", "3e", "4e", "dak", "garage"];
+function renderFloorChips(msId, hiddenId, selected){
+  const wrap = document.getElementById(msId); if(!wrap) return;
+  const sel = new Set(Array.isArray(selected)?selected:parseSubs(selected));
+  wrap.innerHTML = FLOOR_OPTIONS.map(f=>
+    `<div class="floor-chip${sel.has(f)?' selected':''}" onclick="toggleFloor(this,'${f}','${hiddenId}')">${f}</div>`
+  ).join('');
+  syncFloorHidden(hiddenId, wrap);
+}
+function toggleFloor(chip, val, hiddenId){
+  chip.classList.toggle('selected');
+  syncFloorHidden(hiddenId, chip.closest('.floors-ms'));
+}
+function syncFloorHidden(hiddenId, wrap){
+  const sel = [...wrap.querySelectorAll('.floor-chip.selected')].map(c=>c.textContent.trim());
+  const el = document.getElementById(hiddenId); if(el) el.value = sel.join(', ');
+}
+function populateSubs(subId,bldId){
+  const bldEl=document.getElementById(bldId); if(!bldEl) return;
+  const sel=document.getElementById(subId); if(!sel) return;
+  const b=DB.buildings.find(x=>x.name===bldEl.value);
+  const subs=parseSubs(b?.subs);
+  sel.innerHTML='<option value="">— Select floor —</option>'+subs.map(s=>`<option value="${s}">${s}</option>`).join('');
+}
+function populateAssignSelect(id){
+  const el=document.getElementById(id); if(!el) return;
+  const cur=el.value;
+  el.innerHTML='<option value="">Unassigned</option>'+DB.users.filter(u=>u.active).map(u=>`<option value="${u.name}">${u.name} (${u.role})</option>`).join('');
+  if(cur) el.value=cur;
+}
+function populateAssetSelect(id){
+  const el=document.getElementById(id); if(!el) return;
+  const cur=el.value;
+  el.innerHTML='<option value="">None</option>'+DB.assets.map(a=>`<option value="${a.id}">${a.id} – ${a.name}</option>`).join('');
+  if(cur) el.value=cur;
+}
+function populateSupplierSelect(id){
+  const el=document.getElementById(id); if(!el) return;
+  const cur=el.value;
+  el.innerHTML='<option value="">None</option>'+DB.suppliers.filter(s=>s.status!=='Inactive').map(s=>`<option value="${s.id}">${s.name} (€ ${s.ratePerHour}/hr)</option>`).join('');
+  if(cur) el.value=cur;
+}
+function populateMgrSelect(id){
+  const el=document.getElementById(id); if(!el) return;
+  const cur=el.value;
+  el.innerHTML='<option value="">None</option>'+DB.users.filter(u=>u.role==='Property Manager'||u.role==='Supervisor').map(u=>`<option value="${u.name}">${u.name}</option>`).join('');
+  if(cur) el.value=cur;
+}
+
+/* ══════════════════════════════════════════════════════════
+   PAGINATION
+══════════════════════════════════════════════════════════ */
+function renderPagination(key,total,fn){
+  const cur=pages[key], totalPages=Math.ceil(total/PAGE_SIZE)||1;
+  if(totalPages<=1) return '';
+  const start=(cur-1)*PAGE_SIZE+1, end=Math.min(cur*PAGE_SIZE,total);
+  let btns='',range=[];
+  for(let i=1;i<=totalPages;i++){
+    if(i===1||i===totalPages||Math.abs(i-cur)<=1) range.push(i);
+    else if(range[range.length-1]!=='…') range.push('…');
+  }
+  range.forEach(p=>{
+    if(p==='…') btns+=`<span class="pg-dots">…</span>`;
+    else btns+=`<button class="pg-btn${p===cur?' active':''}" onclick="${fn}(${p})">${p}</button>`;
+  });
+  return`<div class="pgbar">
+    <button class="pg-btn" onclick="${fn}(${cur-1})" ${cur===1?'disabled':''}>‹</button>
+    ${btns}
+    <button class="pg-btn" onclick="${fn}(${cur+1})" ${cur===totalPages?'disabled':''}>›</button>
+    <span class="pg-info">${start}–${end} of ${total}</span>
+  </div>`;
+}
+
+function syncSelActive(id){ const el=document.getElementById(id); if(el){ const v=el.value; el.classList.toggle('active-filter',v!==''&&v!=='All'); } }
+function animCount(id,n){
+  const el=document.getElementById(id); if(!el) return;
+  const cur=parseInt(el.textContent)||0; if(cur===n){el.textContent=n;return;}
+  const step=Math.ceil(Math.abs(n-cur)/12);
+  const iv=setInterval(()=>{
+    const c=parseInt(el.textContent)||0;
+    if(Math.abs(c-n)<=step){el.textContent=n;clearInterval(iv);}
+    else el.textContent=c+(n>c?step:-step);
+  },30);
+}
+
+/* ══════════════════════════════════════════════════════════
+   ALERTS
+══════════════════════════════════════════════════════════ */
+function getAlertCount(){
+  let n=0;
+  if(DB.tickets.filter(t=>t.priority==='Critical'&&t.status!=='Closed').length) n++;
+  if(DB.tickets.filter(t=>t.status!=='Closed'&&daysSince(t.dateOpened)>7).length) n++;
+  const soon=new Date(today); soon.setDate(soon.getDate()+30);
+  if(DB.assets.filter(a=>a.warrantyExpiry&&new Date(a.warrantyExpiry)<today).length) n++;
+  if(DB.assets.filter(a=>a.warrantyExpiry&&new Date(a.warrantyExpiry)>=today&&new Date(a.warrantyExpiry)<=soon).length) n++;
+  return n;
+}
+function renderAlerts(){
+  const el=document.getElementById('dash-alerts'); if(!el) return;
+  const alerts=[];
+  const critOpen=DB.tickets.filter(t=>t.priority==='Critical'&&t.status!=='Closed');
+  if(critOpen.length) alerts.push({type:'crit',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',title:`${critOpen.length} Critical ticket${critOpen.length>1?'s':''} need attention`,sub:critOpen.slice(0,2).map(t=>t.subject).join(' · '),action:`navTo('tickets');setTimeout(()=>{document.getElementById('sel-tix-pri').value='Critical';document.getElementById('sel-tix-status').value='Open';setPage('tix',1);renderTix();},100)`});
+  const overdue=DB.tickets.filter(t=>t.status!=='Closed'&&daysSince(t.dateOpened)>7);
+  if(overdue.length) alerts.push({type:'warn',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--amber)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',title:`${overdue.length} ticket${overdue.length>1?'s':''} open longer than 7 days`,sub:`Oldest: ${Math.max(...overdue.map(t=>daysSince(t.dateOpened)))} days`,action:`navTo('tickets');setTimeout(()=>{document.getElementById('sel-tix-sort').value='days';document.getElementById('sel-tix-status').value='Open';setPage('tix',1);renderTix();},100)`});
+  const soon=new Date(today); soon.setDate(soon.getDate()+30);
+  const expired=DB.assets.filter(a=>a.warrantyExpiry&&new Date(a.warrantyExpiry)<today);
+  if(expired.length) alerts.push({type:'crit',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--red)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',title:`${expired.length} warranty expired`,sub:expired.slice(0,2).map(a=>a.name).join(' · '),action:`navTo('assets');setTimeout(()=>{document.getElementById('sel-ast-status').value='Active';setPage('ast',1);renderAst();},100)`});
+  const expiring=DB.assets.filter(a=>a.warrantyExpiry&&new Date(a.warrantyExpiry)>=today&&new Date(a.warrantyExpiry)<=soon);
+  if(expiring.length) alerts.push({type:'warn',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;color:var(--amber)"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',title:`${expiring.length} warranty expiring within 30 days`,sub:expiring.slice(0,2).map(a=>a.name).join(' · '),action:`navTo('assets');setTimeout(()=>{document.getElementById('sel-ast-status').value='Active';setPage('ast',1);renderAst();},100)`});
+  if(!alerts.length){el.innerHTML='';return;}
+  const chevron='<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.4"><polyline points="9 18 15 12 9 6"/></svg>';
+  el.innerHTML=`<div style="padding:0 14px 4px;margin-top:4px"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Alerts (${alerts.length})</div></div>`
+    +alerts.map(a=>`<div class="alert-card alert-${a.type}" onclick="${a.action}"><div class="alert-icon">${a.icon}</div><div class="alert-body"><div class="alert-title">${a.title}</div><div class="alert-sub">${a.sub}</div></div>${chevron}</div>`).join('');
+  document.querySelectorAll('.burger-dot').forEach(d=>d.style.display=alerts.length?'block':'none');
+}
+
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════ */
+function renderDash(){
+  document.getElementById('dash-date').textContent=today.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  const open=DB.tickets.filter(t=>t.status==='Open').length;
+  const prog=DB.tickets.filter(t=>t.status==='In Progress').length;
+  const closed=DB.tickets.filter(t=>t.status==='Closed').length;
+  animCount('kpi-total',DB.tickets.length);
+  animCount('kpi-open',open);
+  animCount('kpi-prog',prog);
+  animCount('kpi-closed',closed);
+  const ob=document.getElementById('open-badge');
+  if(ob){ if(open>0){ob.textContent=open;ob.style.display='flex';}else ob.style.display='none'; }
+  renderAlerts();
+  // Building chart
+  const bc=document.getElementById('bldg-chart');
+  const max1=Math.max(...DB.buildings.map(b=>DB.tickets.filter(t=>t.building===b.name&&t.status!=='Closed').length),1);
+  bc.innerHTML=DB.buildings.map(b=>{const c=DB.tickets.filter(t=>t.building===b.name&&t.status!=='Closed').length;return`<div class="ch-row"><div class="ch-lbl">${b.name.split(' ')[0]}</div><div class="ch-wrap"><div class="ch-fill" style="width:${Math.round(c/max1*100)}%;background:linear-gradient(90deg,#3B82F6,#6366F1)"></div></div><div class="ch-cnt">${c}</div></div>`;}).join('');
+  // Priority chart
+  const pc=document.getElementById('pri-chart');
+  const prios=[{n:'Critical',c:'#EF4444'},{n:'High',c:'#F59E0B'},{n:'Medium',c:'#60A5FA'},{n:'Low',c:'#10B981'}];
+  const max2=Math.max(...prios.map(p=>DB.tickets.filter(t=>t.priority===p.n&&t.status!=='Closed').length),1);
+  pc.innerHTML=prios.map(p=>{const c=DB.tickets.filter(t=>t.priority===p.n&&t.status!=='Closed').length;return`<div class="ch-row"><div class="ch-lbl">${p.n}</div><div class="ch-wrap"><div class="ch-fill" style="width:${Math.round(c/max2*100)}%;background:${p.c}"></div></div><div class="ch-cnt">${c}</div></div>`;}).join('');
+  // Trend chart
+  const tc=document.getElementById('trend-chart');
+  const weeks=[];
+  for(let w=7;w>=0;w--){
+    const wS=new Date(today);wS.setDate(wS.getDate()-w*7-6);
+    const wE=new Date(today);wE.setDate(wE.getDate()-w*7);
+    const lbl=wE.toLocaleDateString('en-GB',{day:'numeric',month:'short'}).replace(' ','');
+    const opened=DB.tickets.filter(t=>{const dd=new Date(t.dateOpened);return dd>=wS&&dd<=wE;}).length;
+    const closedW=DB.tickets.filter(t=>{if(!t.dateClosed)return false;const dd=new Date(t.dateClosed);return dd>=wS&&dd<=wE;}).length;
+    weeks.push({lbl,opened,closedW});
+  }
+  const maxW=Math.max(...weeks.flatMap(w=>[w.opened,w.closedW]),1);
+  tc.innerHTML=`<div class="trend-wrap">${weeks.map(w=>`<div class="trend-col"><div class="trend-bars"><div class="trend-bar" style="height:${Math.round(w.opened/maxW*42)}px;background:var(--blue);opacity:.85"></div><div class="trend-bar" style="height:${Math.round(w.closedW/maxW*42)}px;background:var(--green);opacity:.85"></div></div><div class="trend-lbl">${w.lbl}</div></div>`).join('')}</div><div class="trend-legend"><div class="trend-leg-item"><div class="trend-leg-dot" style="background:var(--blue)"></div>Opened</div><div class="trend-leg-item"><div class="trend-leg-dot" style="background:var(--green)"></div>Closed</div></div>`;
+  // Recent open
+  const rt=document.getElementById('dash-recent');
+  const recent=DB.tickets.filter(t=>t.status==='Open'||t.status==='In Progress').slice(0,5);
+  const unassigned=DB.tickets.filter(t=>t.status!=='Closed'&&!t.assignedTo).length;
+  const myTix=currentUser?DB.tickets.filter(t=>t.status!=='Closed'&&(t.assignedTo===currentUser.name||t.createdBy===currentUser.name)).length:0;
+  rt.innerHTML=(unassigned||myTix?`<div style="display:flex;gap:8px;margin:0 14px 10px;flex-wrap:wrap">
+    ${myTix?`<div style="flex:1;min-width:120px;background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.2);border-radius:var(--rs);padding:10px 12px;cursor:pointer" onclick="navTo('tickets');setTimeout(()=>{document.getElementById('sel-tix-status').value='mine';renderTix();},100)"><div style="font-size:18px;font-weight:800;font-family:'Outfit',sans-serif;color:var(--blue)">${myTix}</div><div style="font-size:11px;color:var(--sub)">My open tickets</div></div>`:''}
+    ${unassigned?`<div style="flex:1;min-width:120px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:var(--rs);padding:10px 12px;cursor:pointer" onclick="navTo('tickets');setTimeout(()=>{document.getElementById('sel-tix-status').value='Open';renderTix();},100)"><div style="font-size:18px;font-weight:800;font-family:'Outfit',sans-serif;color:var(--red)">${unassigned}</div><div style="font-size:11px;color:var(--sub)">Unassigned</div></div>`:''}
+  </div>`:'')+(recent.length?'<div class="tlist">'+recent.map(t=>tixItemHTML(t)).join('')+'</div>':'<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--green)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px">No open tickets!</div></div>');
+}
+
+/* KPI drill-down */
+let kpiFilterStatus='All';
+function openKpiList(status){
+  kpiFilterStatus=status;
+  const list=status==='All'?DB.tickets:DB.tickets.filter(t=>t.status===status);
+  const colors={'All':'var(--blue)','Open':'var(--red)','In Progress':'var(--amber)','Closed':'var(--green)'};
+  document.getElementById('kpi-list-title').textContent=status==='All'?'All Tickets':status+' Tickets';
+  document.getElementById('kpi-list-title').style.color=colors[status]||'var(--blue)';
+  document.getElementById('kpi-list-count').textContent=`${list.length} ticket${list.length!==1?'s':''}`;
+  let page=1;
+  const render=()=>{
+    const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+    document.getElementById('kpi-list-body').innerHTML='<div class="tlist">'+slice.map(t=>tixItemHTML(t,true)).join('')+'</div>'+renderPagination('kpi',list.length,'kpiPage');
+  };
+  window.kpiPage=(p)=>{page=p;render();};
+  render();
+  openMo('mo-kpi-list');
+}
+function goToTicketsFiltered(){
+  closeMo('mo-kpi-list');
+  navTo('tickets');
+  const sel=document.getElementById('sel-tix-status');
+  if(sel&&kpiFilterStatus!=='All') sel.value=kpiFilterStatus;
+  renderTix();
+}
+
+/* ══════════════════════════════════════════════════════════
+   GLOBAL SEARCH
+══════════════════════════════════════════════════════════ */
+function renderGlobalSearch(){
+  const q=(document.getElementById('global-search')?.value||'').trim().toLowerCase();
+  const clearBtn=document.getElementById('gs-clear');
+  const res=document.getElementById('global-results');
+  if(clearBtn) clearBtn.style.display=q?'block':'none';
+  if(!q){if(res)res.innerHTML='';return;}
+  const tix=DB.tickets.filter(t=>t.subject.toLowerCase().includes(q)||t.id.toLowerCase().includes(q)||t.building.toLowerCase().includes(q)).slice(0,4);
+  const asts=DB.assets.filter(a=>a.name.toLowerCase().includes(q)||a.building.toLowerCase().includes(q)).slice(0,3);
+  const sups=DB.suppliers.filter(s=>s.name.toLowerCase().includes(q)).slice(0,2);
+  if(!tix.length&&!asts.length&&!sups.length){res.innerHTML='<div style="padding:10px 0;font-size:13px;color:var(--muted);text-align:center">No results for "'+q+'"</div>';return;}
+  let html='';
+  if(tix.length) html+=`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Tickets</div><div class="tlist" style="padding:0;margin-bottom:10px">`+tix.map(t=>tixItemHTML(t,true)).join('')+'</div>';
+  if(asts.length){
+    html+=`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Assets</div>`;
+    asts.forEach(a=>{const sc={Active:'#10B981','Under Maintenance':'#F59E0B',Decommissioned:'#EF4444'}[a.status]||'#10B981';html+=`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:11px 13px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="navTo('assets');setTimeout(()=>openAstDetail('${a.id}'),200)"><div><div style="font-size:10px;color:var(--teal);font-weight:700">${a.id}</div><div style="font-size:13px;font-weight:600">${a.name}</div><div style="font-size:11px;color:var(--muted)">${a.building}</div></div><span class="badge" style="background:${sc}18;color:${sc}">${a.status}</span></div>`;});
+  }
+  if(sups.length){
+    html+=`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Suppliers</div>`;
+    sups.forEach(s=>{html+=`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:11px 13px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="navTo('suppliers');setTimeout(()=>openSupDetail('${s.id}'),200)"><div><div style="font-size:13px;font-weight:600">${s.name}</div></div><span style="font-size:12px;color:var(--green);font-weight:600">€ ${s.ratePerHour}/hr</span></div>`;});
+  }
+  if(res) res.innerHTML=html;
+}
+function clearGlobalSearch(){ const inp=document.getElementById('global-search');if(inp)inp.value='';document.getElementById('global-results').innerHTML='';document.getElementById('gs-clear').style.display='none'; }
+
+/* ══════════════════════════════════════════════════════════
+   TICKETS
+══════════════════════════════════════════════════════════ */
+function clearTixFilters(){
+  ['sel-tix-status','sel-tix-pri','sel-tix-cat','sel-tix-bldg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='sel-tix-status'?'All':'All';});
+  const search=document.getElementById('tsearch');if(search)search.value='';
+  setPage('tix',1);renderTix();
+}
+
+function clearAstFilters(){
+  ['sel-ast-status','sel-ast-cat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='All';});
+  const search=document.getElementById('asearch');if(search)search.value='';
+  setPage('ast',1);renderAst();
+}
+
+function goTixPage(p){setPage('tix',p);renderTix();}
+function renderTix(){
+  const q=(document.getElementById('tsearch')?.value||'').toLowerCase();
+  const statusVal=document.getElementById('sel-tix-status')?.value||'All';
+  const priVal=document.getElementById('sel-tix-pri')?.value||'All';
+  const catVal=document.getElementById('sel-tix-cat')?.value||'All';
+  const bldgVal=document.getElementById('sel-tix-bldg')?.value||'All';
+  const sortVal=document.getElementById('sel-tix-sort')?.value||'newest';
+  syncSelActive('sel-tix-status'); syncSelActive('sel-tix-pri'); syncSelActive('sel-tix-cat'); syncSelActive('sel-tix-bldg');
+  // Populate building filter dynamically
+  const bldgSel=document.getElementById('sel-tix-bldg');
+  if(bldgSel&&bldgSel.options.length<=1){
+    DB.buildings.forEach(b=>{const o=document.createElement('option');o.value=b.name;o.textContent=b.name;bldgSel.appendChild(o);});
+    if(bldgVal!=='All') bldgSel.value=bldgVal;
+  }
+  let list=DB.tickets;
+  if(statusVal==='mine') list=list.filter(t=>t.assignedTo===currentUser?.name||t.createdBy===currentUser?.name);
+  else if(statusVal!=='All') list=list.filter(t=>t.status===statusVal);
+  if(priVal!=='All') list=list.filter(t=>t.priority===priVal);
+  if(catVal!=='All') list=list.filter(t=>t.category===catVal);
+  if(bldgVal!=='All') list=list.filter(t=>t.building===bldgVal);
+  if(q) list=list.filter(t=>t.subject.toLowerCase().includes(q)||t.building.toLowerCase().includes(q)||t.id.toLowerCase().includes(q)||t.assignedTo?.toLowerCase().includes(q)||(t.reportedBy||'').toLowerCase().includes(q));
+  // Sort
+  const priOrder={Critical:0,High:1,Medium:2,Low:3};
+  if(sortVal==='oldest') list=[...list].sort((a,b)=>new Date(a.dateOpened)-new Date(b.dateOpened));
+  else if(sortVal==='priority') list=[...list].sort((a,b)=>(priOrder[a.priority]??9)-(priOrder[b.priority]??9));
+  else if(sortVal==='days') list=[...list].sort((a,b)=>daysSince(b.dateOpened)-daysSince(a.dateOpened));
+  else list=[...list].sort((a,b)=>new Date(b.dateOpened)-new Date(a.dateOpened));
+  document.getElementById('tix-lbl').textContent=`${list.length} ticket${list.length!==1?'s':''}`;
+  const c=document.getElementById('tix-list');
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></div><div style="font-size:13px">No tickets found</div><div style="font-size:12px;color:var(--muted);margin-top:4px"><button onclick="clearTixFilters()" style="color:var(--blue);font-weight:600;background:none;border:none;cursor:pointer">Clear filters</button></div></div>';return;}
+  const page=pages.tix;
+  const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+  c.innerHTML='<div class="tlist">'+slice.map(t=>tixItemHTML(t,true)).join('')+'</div>'+renderPagination('tix',list.length,'goTixPage');
+}
+
+function tixItemHTML(t,clickable=true){
+  const days=t.status!=='Closed'?`${daysSince(t.dateOpened)}d open`:'';
+  const stCls={Open:'b-open','In Progress':'b-prog',Closed:'b-closed',Cancelled:'b-cancel',Planned:'b-planned',Requested:'b-requested',Ordered:'b-ordered'}[t.status]||'b-open';
+  const pCls={Critical:'p-critical',High:'p-high',Medium:'p-medium',Low:'p-low'}[t.priority]||'p-medium';
+  const fn=clickable?`openTixDetail('${t.id}')`:`navTo('tickets')`;
+  const urgency = t.status!=='Closed' && daysSince(t.dateOpened)>7 ? ' style="border-left:3px solid var(--amber)"' : t.priority==='Critical'&&t.status!=='Closed' ? ' style="border-left:3px solid var(--red)"' : '';
+  return`<div class="ti" onclick="${fn}"${urgency}>
+    <div class="pdot ${pCls}"></div>
+    <div class="ti-left">
+      <div class="ti-id">${t.id} · ${t.building}${t.subdivision?' · '+t.subdivision:''}</div>
+      <div class="ti-subj">${t.subject}</div>
+      <div class="ti-meta"><span style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>${t.category}</span><span style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${t.assignedTo?t.assignedTo.split(' ')[0]:'<strong style="color:var(--red)">Unassigned</strong>'}</span>${days?`<span style="${daysSince(t.dateOpened)>7?'color:var(--amber);font-weight:700':''}">⏱ ${days}</span>`:''}</div>
+    </div>
+    <div class="ti-right"><span class="badge ${stCls}">${t.status}</span></div>
+  </div>`;
+}
+
+function openTixDetail(id){
+  const t=DB.tickets.find(x=>x.id===id); if(!t) return;
+  const ast=DB.assets.find(a=>a.id===t.assetId);
+  const sup=DB.suppliers.find(s=>s.id===t.supplierId);
+  const priC={Critical:'#EF4444',High:'#F59E0B',Medium:'#60A5FA',Low:'#10B981'}[t.priority]||'#60A5FA';
+  const stCls={Open:'b-open','In Progress':'b-prog',Closed:'b-closed',Planned:'b-planned',Requested:'b-requested',Ordered:'b-ordered'}[t.status]||'b-open';
+  const acts=Array.isArray(t.activity)?t.activity:[];
+  const actHTML=acts.length?acts.map(a=>{
+    const dt=new Date(a.ts); const dstr=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:28px;height:28px;border-radius:8px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 0 2 2z"/></svg></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">${a.user}</div><div style="font-size:12px;color:var(--sub);margin-top:1px">${a.action}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${dstr}</div></div></div>`;
+  }).join(''):'<div style="font-size:12px;color:var(--muted);padding:8px 0">No activity yet</div>';
+
+  const titleEl=document.getElementById('tix-detail-title');
+  if(titleEl) titleEl.textContent=t.id;
+
+  document.getElementById('tix-detail-body').innerHTML=`
+    <div style="padding:0 18px 8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:11px;font-family:'Outfit',sans-serif;font-weight:700;color:var(--blue)">${t.id}</span>
+        <span class="badge ${stCls}">${t.status}</span>
+      </div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px;line-height:1.3">${t.subject}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="badge" style="background:${priC}20;color:${priC}">${t.priority}</span>
+        <span class="badge" style="background:rgba(99,102,241,.15);color:#818CF8">${t.category}</span>
+      </div>
+    </div>
+    <div style="padding:0 18px">
+      <div class="dr"><span class="dk">Building</span><span class="dv">${t.building}</span></div>
+      ${t.subdivision?`<div class="dr"><span class="dk">Floor</span><span class="dv">${t.subdivision}</span></div>`:''}
+      <div class="dr"><span class="dk">Unit / Area</span><span class="dv">${t.unit||'—'}</span></div>
+      <div class="dr"><span class="dk">Assigned To</span><span class="dv">${t.assignedTo||'—'}</span></div>
+      <div class="dr"><span class="dk">Opened</span><span class="dv">${df(t.dateOpened)}</span></div>
+      ${t.status==='Closed'?`<div class="dr"><span class="dk">Closed</span><span class="dv">${df(t.dateClosed)}</span></div>`:`<div class="dr"><span class="dk">Days Open</span><span class="dv" style="color:var(--amber)">${daysSince(t.dateOpened)} days</span></div>`}
+      <div class="dr"><span class="dk">Asset</span><span class="dv">${ast?ast.id+' – '+ast.name:'None'}</span></div>
+      <div class="dr"><span class="dk">Supplier</span><span class="dv">${sup?`<span style="color:var(--pink)">${sup.name}</span> <span style="font-size:11px;color:var(--muted)">(€ ${sup.ratePerHour}/hr)</span>`:'None'}</span></div>
+      ${sup?`<div class="dr"><span class="dk">Sup. Phone</span><span class="dv">${sup.phone?`<a href="tel:${sup.phone}" style="color:var(--blue)">${sup.phone}</a>`:'—'}</span></div>`:''}
+      ${sup?`<div class="dr"><span class="dk">Sup. Email</span><span class="dv">${sup.email?`<a href="mailto:${sup.email}" style="color:var(--blue)">${sup.email}</a>`:'—'}</span></div>`:''}
+      <div class="dr"><span class="dk">Reported By</span><span class="dv">${t.reportedBy||'—'}</span></div>
+      <div class="dr"><span class="dk">Notes</span><span class="dv">${t.notes||'—'}</span></div>
+      <div class="dr"><span class="dk">Created By</span><span class="dv">${t.createdBy||'—'}</span></div>
+    </div>
+    <div style="padding:14px 18px 0;display:flex;flex-direction:column;gap:14px">
+      ${can('canCreateTickets')||can('canEditAll')?`<div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Ticket Actions</div>
+        <div style="display:flex;gap:9px">
+          ${can('canCreateTickets')?`<button onclick="editTix('${t.id}')" style="flex:1;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--blue)"> Edit</button>`:''}
+          ${can('canEditAll')?`<button onclick="confirmDelete('ticket','${t.id}')" style="flex:1;padding:13px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--red)"> Delete</button>`:''}
+        </div>
+      </div>`:''}
+      ${can('canCloseTickets')&&t.status!=='Closed'?`<div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Status Actions</div>
+        <div style="display:flex;gap:9px">
+          ${t.status==='Open'?`<button onclick="quickProgTix('${t.id}')" style="flex:1;padding:13px;background:linear-gradient(135deg,#F59E0B,#EAB308);border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> In Progress</button>`:''}
+          <button onclick="quickCloseTix('${t.id}')" style="flex:1;padding:13px;background:linear-gradient(135deg,#10B981,#06B6D4);border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> Close</button>
+        </div>
+      </div>`:''}
+    </div>
+    <div style="padding:16px 18px 0">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Activity Log</div>
+      <div id="act-log-${t.id}">${actHTML}</div>
+      ${can('canCreateTickets')||can('canCloseTickets')?`<div style="margin-top:10px;display:flex;gap:8px">
+        <input id="act-inp-${t.id}" placeholder="Add a comment…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addComment('${t.id}');}" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit"/>
+        <button onclick="addComment('${t.id}')" style="padding:10px 14px;background:var(--blue);border-radius:var(--rs);font-weight:700;font-size:13px;color:#fff">Post</button>
+      </div>`:''}
+    </div>
+    <div style="height:24px"></div>`;
+  openMo('mo-tix-detail');
+}
+
+async function addComment(tixId){
+  const inp=document.getElementById('act-inp-'+tixId);
+  const text=(inp?.value||'').trim(); if(!text) return;
+  const t=DB.tickets.find(x=>x.id===tixId); if(!t) return;
+  if(!Array.isArray(t.activity)) t.activity=[];
+  t.activity.push({ts:new Date().toISOString(),user:currentUser.name,action:text});
+  inp.value='';
+  const logEl=document.getElementById('act-log-'+tixId);
+  if(logEl) logEl.innerHTML=t.activity.map(a=>{
+    const dt=new Date(a.ts); const dstr=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:28px;height:28px;border-radius:8px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 0 2 2z"/></svg></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">${a.user}</div><div style="font-size:12px;color:var(--sub);margin-top:1px">${a.action}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${dstr}</div></div></div>`;
+  }).join('');
+  await writeSheet('tickets');
+  toast('Comment added');
+}
+
+async function quickCloseTix(id){
+  const t=DB.tickets.find(x=>x.id===id); if(!t) return;
+  t.status='Closed'; t.dateClosed=today.toISOString().split('T')[0];
+  if(!Array.isArray(t.activity)) t.activity=[];
+  t.activity.push({ts:new Date().toISOString(),user:currentUser.name,action:'Closed ticket'});
+  closeMo('mo-tix-detail');
+  await writeSheet('tickets');
+  toast('Ticket closed');
+  if(currentScreen==='tickets') renderTix();
+  if(currentScreen==='dashboard') renderDash();
+}
+async function quickProgTix(id){
+  const t=DB.tickets.find(x=>x.id===id); if(!t) return;
+  t.status='In Progress';
+  if(!Array.isArray(t.activity)) t.activity=[];
+  t.activity.push({ts:new Date().toISOString(),user:currentUser.name,action:'Status → In Progress'});
+  closeMo('mo-tix-detail');
+  await writeSheet('tickets');
+  toast('In Progress');
+  if(currentScreen==='tickets') renderTix();
+  if(currentScreen==='dashboard') renderDash();
+}
+
+function openNewTicket(){
+  if(!can('canCreateTickets')) return;
+  editingId.tix=null;
+  document.getElementById('tix-modal-title').textContent='New Ticket';
+  document.getElementById('btn-dup-tix').style.display='none';
+  ['tf-subj','tf-unit','tf-reporter','tf-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('tf-status').value='Open';
+  document.getElementById('tf-pri').value='Medium';
+  populateBldSelect('tf-bldg'); populateSubs('tf-sub','tf-bldg');
+  populateAssignSelect('tf-assign'); populateAssetSelect('tf-asset'); populateSupplierSelect('tf-supplier');
+  openMo('mo-tix');
+}
+function editTix(id){
+  if(!can('canCreateTickets')) return;
+  const t=DB.tickets.find(x=>x.id===id); if(!t) return;
+  editingId.tix=id; closeMo('mo-tix-detail');
+  document.getElementById('tix-modal-title').textContent='Edit Ticket';
+  document.getElementById('btn-dup-tix').style.display='';
+  populateBldSelect('tf-bldg'); document.getElementById('tf-bldg').value=t.building;
+  populateSubs('tf-sub','tf-bldg'); document.getElementById('tf-sub').value=t.subdivision||'';
+  document.getElementById('tf-subj').value=t.subject;
+  document.getElementById('tf-unit').value=t.unit;
+  document.getElementById('tf-pri').value=t.priority;
+  document.getElementById('tf-cat').value=t.category;
+  document.getElementById('tf-status').value=t.status;
+  populateAssignSelect('tf-assign'); document.getElementById('tf-assign').value=t.assignedTo||'';
+  populateAssetSelect('tf-asset'); document.getElementById('tf-asset').value=t.assetId||'';
+  populateSupplierSelect('tf-supplier'); document.getElementById('tf-supplier').value=t.supplierId||'';
+  document.getElementById('tf-reporter').value=t.reportedBy||'';
+  document.getElementById('tf-notes').value=t.notes||'';
+  openMo('mo-tix');
+}
+async function saveTix(){
+  const subj=document.getElementById('tf-subj').value.trim();
+  if(!subj){toast('Subject required','err');return;}
+  const status=document.getElementById('tf-status').value;
+  if(editingId.tix){
+    const t=DB.tickets.find(x=>x.id===editingId.tix);
+    if(t){
+      const prevStatus=t.status;
+      t.building=document.getElementById('tf-bldg').value;
+      t.subdivision=document.getElementById('tf-sub').value;
+      t.unit=document.getElementById('tf-unit').value||'TBD';
+      t.subject=subj; t.priority=document.getElementById('tf-pri').value;
+      t.category=document.getElementById('tf-cat').value;
+      t.assignedTo=document.getElementById('tf-assign').value;
+      t.status=status;
+      if(status==='Closed'&&!t.dateClosed) t.dateClosed=today.toISOString().split('T')[0];
+      if(status!=='Closed') t.dateClosed='';
+      t.assetId=document.getElementById('tf-asset').value;
+      t.supplierId=document.getElementById('tf-supplier').value;
+      t.reportedBy=document.getElementById('tf-reporter').value;
+      t.notes=document.getElementById('tf-notes').value;
+      if(!Array.isArray(t.activity)) t.activity=[];
+      if(prevStatus!==status) t.activity.push({ts:new Date().toISOString(),user:currentUser.name,action:`Status: ${prevStatus} → ${status}`});
+      else t.activity.push({ts:new Date().toISOString(),user:currentUser.name,action:'Ticket updated'});
+    }
+  } else {
+    const id=nextId(DB.tickets,'TKT');
+    DB.tickets.unshift({id,building:document.getElementById('tf-bldg').value,subdivision:document.getElementById('tf-sub').value,unit:document.getElementById('tf-unit').value||'TBD',subject:subj,status,priority:document.getElementById('tf-pri').value,category:document.getElementById('tf-cat').value,assignedTo:document.getElementById('tf-assign').value,dateOpened:today.toISOString().split('T')[0],dateClosed:'',assetId:document.getElementById('tf-asset').value,supplierId:document.getElementById('tf-supplier').value,reportedBy:document.getElementById('tf-reporter').value,notes:document.getElementById('tf-notes').value,createdBy:currentUser.name,activity:JSON.stringify([{ts:new Date().toISOString(),user:currentUser.name,action:'Ticket created'}])});
+  }
+  closeMo('mo-tix');
+  await writeSheet('tickets');
+  toast(editingId.tix?'Ticket updated':'Ticket created');
+  if(currentScreen==='tickets') renderTix();
+  if(currentScreen==='dashboard') renderDash();
+}
+
+function duplicateTix(){
+  if(!editingId.tix) return;
+  const src=DB.tickets.find(x=>x.id===editingId.tix); if(!src) return;
+  // Create the duplicate with a new ID, reset dates and status, clear activity
+  const newId=nextId(DB.tickets,'TKT');
+  const dup={
+    ...src,
+    id: newId,
+    status: 'Open',
+    dateOpened: today.toISOString().split('T')[0],
+    dateClosed: '',
+    createdBy: currentUser.name,
+    activity: JSON.stringify([{ts:new Date().toISOString(),user:currentUser.name,action:`Duplicated from ${src.id}`}])
+  };
+  DB.tickets.unshift(dup);
+  // Close current modal, write sheet, then open duplicate in edit mode
+  closeMo('mo-tix');
+  writeSheet('tickets').then(()=>{
+    toast(`Duplicated as ${newId}`);
+    if(currentScreen==='tickets') renderTix();
+    if(currentScreen==='dashboard') renderDash();
+    // Open the new duplicate in edit mode
+    setTimeout(()=>editTix(newId), 150);
+  });
+}
+
+/* Quick Ticket */
+function openQuickTicket(){
+  if(!can('canCreateTickets')) return;
+  document.getElementById('qt-subj').value='';
+  populateBldSelect('qt-bldg');
+  document.getElementById('qt-pri').value='Medium';
+  openMo('mo-quick-tix');
+}
+async function saveQuickTicket(){
+  const subj=document.getElementById('qt-subj').value.trim();
+  const bldg=document.getElementById('qt-bldg').value;
+  if(!subj){toast('Subject required','err');return;}
+  if(!bldg){toast('Building required','err');return;}
+  const id=nextId(DB.tickets,'TKT');
+  DB.tickets.unshift({id,building:bldg,subdivision:'',unit:'TBD',subject:subj,status:'Open',priority:document.getElementById('qt-pri').value,category:'General',assignedTo:'',dateOpened:today.toISOString().split('T')[0],dateClosed:'',assetId:'',supplierId:'',reportedBy:'',notes:'',createdBy:currentUser.name,activity:JSON.stringify([{ts:new Date().toISOString(),user:currentUser.name,action:'Quick ticket created'}])});
+  closeMo('mo-quick-tix');
+  await writeSheet('tickets');
+  toast(`${id} created`);
+  if(currentScreen==='tickets') renderTix();
+  if(currentScreen==='dashboard') renderDash();
+}
+
+/* ══════════════════════════════════════════════════════════
+   ASSETS
+══════════════════════════════════════════════════════════ */
+function goAstPage(p){setPage('ast',p);renderAst();}
+function renderAst(){
+  const q=(document.getElementById('asearch')?.value||'').toLowerCase();
+  const statusVal=document.getElementById('sel-ast-status')?.value||'All';
+  const catVal=document.getElementById('sel-ast-cat')?.value||'All';
+  syncSelActive('sel-ast-status'); syncSelActive('sel-ast-cat');
+  let list=DB.assets;
+  if(statusVal!=='All') list=list.filter(a=>a.status===statusVal);
+  if(catVal!=='All') list=list.filter(a=>a.category===catVal);
+  if(q) list=list.filter(a=>a.name.toLowerCase().includes(q)||a.building.toLowerCase().includes(q)||a.id.toLowerCase().includes(q));
+  document.getElementById('ast-lbl').textContent=`${list.length} asset${list.length!==1?'s':''}`;
+  const c=document.getElementById('ast-list');
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div style="font-size:13px">No assets found</div></div>';return;}
+  const page=pages.ast;
+  const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+  const sc={Active:'var(--green)','Under Maintenance':'var(--amber)',Decommissioned:'var(--red)'};
+  const soon=new Date(today); soon.setDate(soon.getDate()+30);
+  c.innerHTML='<div style="padding:0 14px 8px">'+slice.map(a=>{
+    const wExp = a.warrantyExpiry ? new Date(a.warrantyExpiry) : null;
+    const warnExpired = wExp && wExp < today;
+    const warnSoon = wExp && !warnExpired && wExp <= soon;
+    const warrantyColor = warnExpired ? 'var(--red)' : warnSoon ? 'var(--amber)' : 'var(--sub)';
+    const warrantyLabel = warnExpired ? `Expired ${df(a.warrantyExpiry)}` : warnSoon ? `Expiring ${df(a.warrantyExpiry)}` : a.warrantyExpiry ? `Warranty ${df(a.warrantyExpiry)}` : '';
+    const openTix = DB.tickets.filter(t=>t.assetId===a.id&&t.status!=='Closed').length;
+    return`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:8px;cursor:pointer${warnExpired?' border-left:3px solid var(--red)':warnSoon?' border-left:3px solid var(--amber)':''}" onclick="openAstDetail('${a.id}')">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+      <div><div style="font-size:10px;color:var(--teal);font-weight:700;margin-bottom:2px">${a.id}</div><div style="font-size:14px;font-weight:700">${a.name}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="badge" style="background:${sc[a.status]||'var(--green)'}18;color:${sc[a.status]||'var(--green)'}">${a.status}</span>
+        ${openTix?`<span style="font-size:10px;font-weight:700;color:var(--amber)">${openTix} open ticket${openTix>1?'s':''}</span>`:''}
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub)"><span style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg> ${a.building}</span><span style="display:inline-flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> ${a.category}</span>${warrantyLabel?`<span style="color:${warrantyColor};font-weight:${warnExpired||warnSoon?'700':'400'}">${warrantyLabel}</span>`:''}</div>
+  </div>`;
+  }).join('')+'</div>'+renderPagination('ast',list.length,'goAstPage');
+}
+function openAstDetail(id){
+  const a=DB.assets.find(x=>x.id===id); if(!a) return;
+  const sc={Active:'var(--green)','Under Maintenance':'var(--amber)',Decommissioned:'var(--red)'}[a.status]||'var(--green)';
+  const relTix=DB.tickets.filter(t=>t.assetId===a.id&&t.status!=='Closed');
+  const titleEl=document.getElementById('ast-detail-title');
+  if(titleEl) titleEl.textContent=a.id;
+  document.getElementById('ast-detail-body').innerHTML=`
+    <div style="padding:0 18px 8px">
+      <div style="font-size:11px;font-family:'Outfit',sans-serif;font-weight:700;color:var(--teal);margin-bottom:4px">${a.id}</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:8px">${a.name}</div>
+      <span class="badge" style="background:${sc}18;color:${sc}">${a.status}</span>
+    </div>
+    <div style="padding:0 18px">
+      <div class="dr"><span class="dk">Building</span><span class="dv">${a.building}</span></div>
+      ${a.subdivision?`<div class="dr"><span class="dk">Floor</span><span class="dv">${a.subdivision}</span></div>`:''}
+      <div class="dr"><span class="dk">Location</span><span class="dv">${a.location||'—'}</span></div>
+      <div class="dr"><span class="dk">Category</span><span class="dv">${a.category}</span></div>
+      <div class="dr"><span class="dk">Manufacturer</span><span class="dv">${a.manufacturer||'—'}</span></div>
+      <div class="dr"><span class="dk">Model</span><span class="dv">${a.model||'—'}</span></div>
+      <div class="dr"><span class="dk">Warranty</span><span class="dv">${df(a.warrantyExpiry)}</span></div>
+      <div class="dr"><span class="dk">Purchased</span><span class="dv">${df(a.purchaseDate)}</span></div>
+      <div class="dr"><span class="dk">Last Serviced</span><span class="dv">${df(a.lastServiced)}</span></div>
+    </div>
+    ${relTix.length?`<div style="padding:14px 18px 0"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Open Tickets (${relTix.length})</div><div class="tlist" style="padding:0">${relTix.map(t=>tixItemHTML(t,true)).join('')}</div></div>`:''}
+    <div style="padding:14px 18px 0;display:flex;gap:9px;flex-wrap:wrap">
+      ${can('canEditAssets')?`<button onclick="editAst('${a.id}')" style="flex:1;min-width:120px;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--blue)"> Edit</button>`:''}
+    </div>
+    ${can('canEditAll')?`<button onclick="confirmDelete('asset','${a.id}')" class="btn-danger" style="margin-top:10px"> Delete Asset</button>`:''}
+    <div style="height:20px"></div>`;
+  openMo('mo-ast-detail');
+}
+function openNewAsset(){
+  if(!can('canEditAssets')) return;
+  editingId.ast=null;
+  document.getElementById('ast-modal-title').textContent='New Asset';
+  ['af-name','af-loc','af-mfr','af-model','af-warr','af-pdate','af-lsvc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('af-status').value='Active';
+  populateBldSelect('af-bldg'); populateSubs('af-sub','af-bldg');
+  openMo('mo-ast');
+}
+function editAst(id){
+  if(!can('canEditAssets')) return;
+  const a=DB.assets.find(x=>x.id===id); if(!a) return;
+  editingId.ast=id; closeMo('mo-ast-detail');
+  document.getElementById('ast-modal-title').textContent='Edit Asset';
+  document.getElementById('af-name').value=a.name;
+  populateBldSelect('af-bldg'); document.getElementById('af-bldg').value=a.building;
+  populateSubs('af-sub','af-bldg'); document.getElementById('af-sub').value=a.subdivision||'';
+  document.getElementById('af-loc').value=a.location||'';
+  document.getElementById('af-cat').value=a.category||'General';
+  document.getElementById('af-status').value=a.status||'Active';
+  document.getElementById('af-mfr').value=a.manufacturer||'';
+  document.getElementById('af-model').value=a.model||'';
+  document.getElementById('af-warr').value=a.warrantyExpiry||'';
+  document.getElementById('af-pdate').value=a.purchaseDate||'';
+  document.getElementById('af-lsvc').value=a.lastServiced||'';
+  openMo('mo-ast');
+}
+async function saveAst(){
+  const name=document.getElementById('af-name').value.trim();
+  if(!name){toast('Asset name required','err');return;}
+  const data={name,building:document.getElementById('af-bldg').value,subdivision:document.getElementById('af-sub').value,location:document.getElementById('af-loc').value,category:document.getElementById('af-cat').value,status:document.getElementById('af-status').value,manufacturer:document.getElementById('af-mfr').value,model:document.getElementById('af-model').value,warrantyExpiry:document.getElementById('af-warr').value,purchaseDate:document.getElementById('af-pdate').value,lastServiced:document.getElementById('af-lsvc').value};
+  if(editingId.ast){ Object.assign(DB.assets.find(x=>x.id===editingId.ast),data); }
+  else { DB.assets.push({id:nextId(DB.assets,'AST'),...data}); }
+  closeMo('mo-ast');
+  await writeSheet('assets');
+  toast(editingId.ast?'Asset updated':'Asset created');
+  if(currentScreen==='assets') renderAst();
+}
+
+/* ══════════════════════════════════════════════════════════
+   USERS
+══════════════════════════════════════════════════════════ */
+function goUsrPage(p){setPage('usr',p);renderUsers();}
+function renderUsers(){
+  const q=(document.getElementById('usearch')?.value||'').toLowerCase();
+  let list=DB.users;
+  if(q) list=list.filter(u=>u.name.toLowerCase().includes(q)||u.email.toLowerCase().includes(q)||u.role.toLowerCase().includes(q));
+  const c=document.getElementById('usr-list');
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div style="font-size:13px">No users found</div></div>';return;}
+  const page=pages.usr;
+  const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+  c.innerHTML=slice.map(u=>{
+    const col=ROLE_COLORS[u.role]||'#3B82F6';
+    const ini=u.name.split(' ').map(n=>n[0]).join('');
+    return`<div class="user-card" onclick="${can('canManageUsers')?`editUser('${u.id}')`:''}"  >
+      <div class="uc-av" style="background:${col}22;color:${col}">${ini}</div>
+      <div style="flex:1;min-width:0">
+        <div class="uc-name">${u.name}</div>
+        <div class="uc-sub">${u.email}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        <span class="role-badge ${ROLE_CLASS[u.role]}">${u.role}</span>
+        ${!u.active?`<span style="font-size:10px;color:var(--muted)">Inactive</span>`:''}
+      </div>
+    </div>`;
+  }).join('')+renderPagination('usr',list.length,'goUsrPage');
+}
+function openNewUser(){
+  if(!can('canManageUsers')) return;
+  editingId.usr=null;
+  document.getElementById('usr-modal-title').textContent='Add User';
+  ['uf-name','uf-email','uf-phone','uf-bldgs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('uf-role').value='Maintenance Tech';
+  document.getElementById('uf-active').value='true';
+  openMo('mo-usr');
+}
+function editUser(id){
+  if(!can('canManageUsers')) return;
+  const u=DB.users.find(x=>x.id===id); if(!u) return;
+  editingId.usr=id;
+  document.getElementById('usr-modal-title').textContent='Edit User';
+  document.getElementById('uf-name').value=u.name;
+  document.getElementById('uf-email').value=u.email;
+  document.getElementById('uf-role').value=u.role;
+  document.getElementById('uf-phone').value=u.phone||'';
+  document.getElementById('uf-bldgs').value=u.buildings||'';
+  document.getElementById('uf-active').value=u.active?'true':'false';
+  openMo('mo-usr');
+}
+async function saveUser(){
+  const name=document.getElementById('uf-name').value.trim();
+  const email=document.getElementById('uf-email').value.trim().toLowerCase();
+  if(!name||!email){toast('Name and email required','err');return;}
+  const data={name,role:document.getElementById('uf-role').value,email,phone:document.getElementById('uf-phone').value,buildings:document.getElementById('uf-bldgs').value,active:document.getElementById('uf-active').value==='true'};
+  if(editingId.usr){ Object.assign(DB.users.find(x=>x.id===editingId.usr),data); }
+  else { DB.users.push({id:nextId(DB.users,'USR'),...data}); }
+  closeMo('mo-usr');
+  await writeSheet('users');
+  toast(editingId.usr?'User updated':'User added');
+  if(currentScreen==='users') renderUsers();
+}
+
+/* ══════════════════════════════════════════════════════════
+   FLOOR VIEW
+══════════════════════════════════════════════════════════ */
+function openFloorView(buildingName, buildingId, floorEnc){
+  const floor = decodeURIComponent(floorEnc);
+  document.getElementById('floor-view-title').textContent = floor;
+  document.getElementById('floor-view-sub').textContent = buildingName;
+
+  const tickets   = DB.tickets.filter(t=>t.building===buildingName && t.subdivision===floor);
+  const assets    = DB.assets.filter(a=>a.building===buildingName && a.subdivision===floor);
+  const suppliers = DB.suppliers.filter(s=>
+    tickets.some(t=>t.supplierId===s.id) || assets.some(a=>false)
+  );
+  const building  = DB.buildings.find(b=>b.id===buildingId);
+
+  let html = '';
+
+  // ── Building info strip ──
+  html += `<div style="margin:12px 14px 4px;padding:14px 16px;background:linear-gradient(135deg,rgba(37,99,235,.07),rgba(79,70,229,.04));border:1.5px solid var(--border);border-radius:var(--r)">
+    <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Building</div>
+    <div style="font-size:16px;font-weight:800;font-family:'Outfit',sans-serif">${buildingName}</div>
+    <div style="font-size:12px;color:var(--sub);margin-top:2px">${building?.address||''}</div>
+  </div>`;
+
+  // ── Tickets ──
+  html += `<div class="sh"><span class="sh-title">Tickets (${tickets.length})</span><span class="sh-link" onclick="navTo('tickets')">All →</span></div>`;
+  if(tickets.length){
+    html += '<div class="tlist">' + tickets.map(t=>tixItemHTML(t,true)).join('') + '</div>';
+  } else {
+    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></div><div style="font-size:12px">No tickets for this floor</div></div>';
+  }
+
+  // ── Assets ──
+  const sc={Active:'var(--green)','Under Maintenance':'var(--amber)',Decommissioned:'var(--red)'};
+  html += `<div class="sh"><span class="sh-title">Assets (${assets.length})</span><span class="sh-link" onclick="navTo('assets')">All →</span></div>`;
+  if(assets.length){
+    html += '<div style="padding:0 14px 8px">' + assets.map(a=>`
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:8px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.05)" onclick="closeMo('mo-ast-detail');openAstDetail('${a.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><div style="font-size:10px;color:var(--teal);font-weight:700">${a.id}</div><div style="font-size:14px;font-weight:700">${a.name}</div><div style="font-size:11px;color:var(--sub);margin-top:2px;display:flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> ${a.category}</div></div>
+          <span class="badge" style="background:${sc[a.status]||'var(--green)'}18;color:${sc[a.status]||'var(--green)'}">${a.status}</span>
+        </div>
+      </div>`).join('') + '</div>';
+  } else {
+    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div style="font-size:12px">No assets for this floor</div></div>';
+  }
+
+  // ── Suppliers linked via tickets on this floor ──
+  const linkedSupIds = [...new Set(tickets.filter(t=>t.supplierId).map(t=>t.supplierId))];
+  const linkedSups = DB.suppliers.filter(s=>linkedSupIds.includes(s.id));
+  const stCol={Active:'var(--green)',Preferred:'var(--amber)',Inactive:'var(--muted)'};
+  html += `<div class="sh"><span class="sh-title">Suppliers (${linkedSups.length})</span><span class="sh-link" onclick="navTo('suppliers')">All →</span></div>`;
+  if(linkedSups.length){
+    html += linkedSups.map(s=>`
+      <div class="sup-card" onclick="openSupDetail('${s.id}')">
+        <div class="sup-hdr">
+          <div><div class="sup-name">${s.name}</div><div class="sup-contact">${s.contact||'—'}</div></div>
+          <div style="text-align:right"><div class="sup-rate">€ ${s.ratePerHour}/hr</div><span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'};margin-top:4px">${s.status}</span></div>
+        </div>
+      </div>`).join('');
+  } else {
+    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7-6-7 6v3l-4-3v12z"/><path d="M17 20v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/></svg></div><div style="font-size:12px">No suppliers linked to this floor</div></div>';
+  }
+
+  document.getElementById('floor-view-body').innerHTML = html;
+  navTo('floor');
+}
+
+/* ══════════════════════════════════════════════════════════
+   BUILDINGS
+══════════════════════════════════════════════════════════ */
+function openBldDetail(id){
+  const b=DB.buildings.find(x=>x.id===id); if(!b) return;
+  const subs=parseSubs(b.subs);
+  const allTix=DB.tickets.filter(t=>t.building===b.name);
+  const openTix=allTix.filter(t=>t.status!=='Closed');
+  const allAsts=DB.assets.filter(a=>a.building===b.name);
+  const sc={Active:'var(--green)','Under Maintenance':'var(--amber)',Decommissioned:'var(--red)'};
+
+  document.getElementById('floor-view-title').textContent=b.name;
+  document.getElementById('floor-view-sub').textContent=b.address||'';
+
+  let html='';
+
+  // ── Building card (mirrors list card) ──
+  html+=`<div class="bc-wrap" style="cursor:default;margin-top:12px" onclick="event.stopPropagation()">
+    <div class="bc-hdr">
+      <div>
+        <div class="bc-name">${b.name}</div>
+        ${b.address?`<div class="bc-addr">${b.address}</div>`:''}
+        ${b.daysOpen||b.timeOpen?`<div style="font-size:13px;color:var(--sub);font-weight:500;margin-top:3px">${[b.daysOpen,b.timeOpen].filter(Boolean).join(' · ')}</div>`:''}
+        ${b.phone?`<div style="font-size:13px;color:var(--sub);font-weight:500;margin-top:2px"><a href="tel:${b.phone}" onclick="event.stopPropagation()" style="color:var(--blue);font-weight:700;text-decoration:none">${b.phone}</a></div>`:''}
+        ${b.manager?`<div style="font-size:13px;color:var(--sub);font-weight:500;margin-top:3px">Manager: <strong>${b.manager}</strong></div>`:''}
+      </div>
+    </div>
+    <div class="bc-body">
+      <div class="bs"><div class="bs-val">${subs.length}</div><div class="bs-lbl">Floors</div></div>
+      <div class="bs"><div class="bs-val">${b.units||0}</div><div class="bs-lbl">Workspace</div></div>
+      <div class="bs"><div class="bs-val">${openTix.length}</div><div class="bs-lbl">Open Tix</div></div>
+      <div class="bs"><div class="bs-val">${allAsts.length}</div><div class="bs-lbl">Assets</div></div>
+    </div>
+  </div>`;
+
+  // ── Floors ──
+  if(subs.length){
+    html+=`<div class="sh"><span class="sh-title">Floors (${subs.length})</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;padding:0 14px 12px">
+      ${subs.map(s=>`<span class="sub-tag" style="cursor:pointer" onclick="openFloorView('${b.name}','${b.id}','${encodeURIComponent(s)}')">${s}</span>`).join('')}
+    </div>`;
+  }
+
+  // ── Open Tickets ──
+  html+=`<div class="sh"><span class="sh-title">Open Tickets (${openTix.length})</span><span class="sh-link" onclick="navTo('tickets');setTimeout(()=>{document.getElementById('sel-tix-bldg').value='${b.name}';renderTix();},150)">All →</span></div>`;
+  if(openTix.length){
+    html+='<div class="tlist">'+openTix.slice(0,10).map(t=>tixItemHTML(t,true)).join('')+'</div>';
+  } else {
+    html+='<div class="empty" style="padding:20px 24px"><div style="font-size:12px;color:var(--muted)">No open tickets</div></div>';
+  }
+
+  // ── Assets ──
+  html+=`<div class="sh"><span class="sh-title">Assets (${allAsts.length})</span><span class="sh-link" onclick="navTo('assets')">All →</span></div>`;
+  if(allAsts.length){
+    html+='<div style="padding:0 14px 8px">'+allAsts.map(a=>`
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 14px;margin-bottom:8px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.05)" onclick="openAstDetail('${a.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><div style="font-size:10px;color:var(--teal);font-weight:700">${a.id}</div><div style="font-size:14px;font-weight:700">${a.name}</div><div style="font-size:11px;color:var(--sub);margin-top:2px">${a.category}${a.subdivision?' · '+a.subdivision:''}</div></div>
+          <span class="badge" style="background:${sc[a.status]||'var(--green)'}18;color:${sc[a.status]||'var(--green)'}">${a.status}</span>
+        </div>
+      </div>`).join('')+'</div>';
+  } else {
+    html+='<div class="empty" style="padding:20px 24px"><div style="font-size:12px;color:var(--muted)">No assets for this building</div></div>';
+  }
+
+  html+='<div style="height:20px"></div>';
+  if(can('canManageBuildings')) html+=`<div style="padding:0 14px 16px"><button onclick="editBld('${b.id}')" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff"> Edit Building</button></div>`;
+  html+='<div style="height:20px"></div>';
+  document.getElementById('floor-view-body').innerHTML=html;
+  navTo('floor');
+}
+
+function renderBlds(){
+  const list=DB.buildings;
+  document.getElementById('bld-lbl').textContent=`${list.length} building${list.length!==1?'s':''}`;
+  const c=document.getElementById('bld-list');
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></div><div style="font-size:13px">No buildings yet</div></div>';return;}
+  c.innerHTML=list.map(b=>{
+    const subs=parseSubs(b.subs);
+    const openTix=DB.tickets.filter(t=>t.building===b.name&&t.status!=='Closed').length;
+    return`<div class="bc-wrap" onclick="openBldDetail('${b.id}')">
+      <div class="bc-hdr">
+        <div><div class="bc-name">${b.name}</div><div class="bc-addr">${b.address||'—'}</div>${b.daysOpen||b.timeOpen?`<div style="font-size:13px;color:var(--sub);font-weight:500;margin-top:3px">${[b.daysOpen,b.timeOpen].filter(Boolean).join(' · ')}</div>`:''} ${b.phone?`<div style="font-size:13px;color:var(--sub);font-weight:500;margin-top:2px">${b.phone}</div>`:''}</div>
+      </div>
+      <div class="bc-body">
+        <div class="bs"><div class="bs-val">${subs.length}</div><div class="bs-lbl">Floors</div></div>
+        <div class="bs"><div class="bs-val">${b.units||0}</div><div class="bs-lbl">Workspace</div></div>
+        <div class="bs"><div class="bs-val">${openTix}</div><div class="bs-lbl">Open Tix</div></div>
+        <div class="bs"><div class="bs-val">${DB.assets.filter(a=>a.building===b.name).length}</div><div class="bs-lbl">Assets</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openNewBuilding(){
+  if(!can('canManageBuildings')) return;
+  editingId.bld=null;
+  document.getElementById('bld-modal-title').textContent='Add Building';
+  ['bf-name','bf-addr','bf-daysopen','bf-timeopen','bf-units','bf-year','bf-phone','bf-subs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  populateMgrSelect('bf-mgr');
+  renderFloorChips('bf-floors-ms','bf-subs',[]);
+  openMo('mo-bld');
+}
+function editBld(id){
+  if(!can('canManageBuildings')) return;
+  const b=DB.buildings.find(x=>x.id===id); if(!b) return;
+  editingId.bld=id;
+  document.getElementById('bld-modal-title').textContent='Edit Building';
+  document.getElementById('bf-name').value=b.name;
+  document.getElementById('bf-addr').value=b.address||'';
+  document.getElementById('bf-daysopen').value=b.daysOpen||'';
+  document.getElementById('bf-timeopen').value=b.timeOpen||'';
+  document.getElementById('bf-units').value=b.units||'';
+  document.getElementById('bf-year').value=b.yearBuilt||'';
+  document.getElementById('bf-phone').value=b.phone||'';
+  const subs=parseSubs(b.subs);
+  document.getElementById('bf-subs').value=subs.join(', ');
+  populateMgrSelect('bf-mgr'); document.getElementById('bf-mgr').value=b.manager||'';
+  renderFloorChips('bf-floors-ms','bf-subs',subs);
+  openMo('mo-bld');
+}
+async function saveBld(){
+  const name=document.getElementById('bf-name').value.trim();
+  if(!name){toast('Building name required','err');return;}
+  const subsRaw=document.getElementById('bf-subs').value;
+  const subs=subsRaw?subsRaw.split(',').map(s=>s.trim()).filter(Boolean):[];
+  const data={name,address:document.getElementById('bf-addr').value,daysOpen:document.getElementById('bf-daysopen').value,timeOpen:document.getElementById('bf-timeopen').value,units:parseInt(document.getElementById('bf-units').value)||0,yearBuilt:parseInt(document.getElementById('bf-year').value)||'',manager:document.getElementById('bf-mgr').value,phone:document.getElementById('bf-phone').value,subs:subs.join(', ')};
+  if(editingId.bld){ Object.assign(DB.buildings.find(x=>x.id===editingId.bld),data); }
+  else { DB.buildings.push({id:nextId(DB.buildings,'BLD'),...data}); }
+  closeMo('mo-bld');
+  await writeSheet('buildings');
+  toast(editingId.bld?'Building updated':'Building added');
+  if(currentScreen==='buildings') renderBlds();
+}
+
+/* ══════════════════════════════════════════════════════════
+   SUPPLIERS
+══════════════════════════════════════════════════════════ */
+function goSupPage(p){setPage('sup',p);renderSuppliers();}
+function clearSupFilters(){
+  const s=document.getElementById('ssearch'); if(s) s.value='';
+  const st=document.getElementById('sel-sup-status'); if(st) st.value='All';
+  const ex=document.getElementById('sel-sup-expertise'); if(ex) ex.value='All';
+  const so=document.getElementById('sel-sup-sort'); if(so) so.value='none';
+  setPage('sup',1); renderSuppliers();
+}
+function populateExpertiseFilter(){
+  const sel=document.getElementById('sel-sup-expertise'); if(!sel) return;
+  const cur=sel.value;
+  // Collect all unique expertise values across all suppliers
+  const all=new Set();
+  DB.suppliers.forEach(s=>{
+    const exp=Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',').map(x=>x.trim()).filter(Boolean);
+    exp.forEach(e=>{ if(e) all.add(e); });
+  });
+  const sorted=[...all].sort();
+  sel.innerHTML='<option value="All">All Expertise</option>'+sorted.map(e=>`<option value="${e}">${e}</option>`).join('');
+  if(cur&&cur!=='All'&&all.has(cur)) sel.value=cur;
+}
+function renderSuppliers(){
+  populateExpertiseFilter();
+  const q=(document.getElementById('ssearch')?.value||'').toLowerCase();
+  const statusVal=document.getElementById('sel-sup-status')?.value||'All';
+  const expertiseVal=document.getElementById('sel-sup-expertise')?.value||'All';
+  const sortVal=document.getElementById('sel-sup-sort')?.value||'none';
+  syncSelActive('sel-sup-status');
+  syncSelActive('sel-sup-expertise');
+  syncSelActive('sel-sup-sort');
+  let list=[...DB.suppliers];
+  if(statusVal!=='All') list=list.filter(s=>s.status===statusVal);
+  if(expertiseVal!=='All'){
+    list=list.filter(s=>{
+      const exp=Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',').map(x=>x.trim()).filter(Boolean);
+      return exp.includes(expertiseVal);
+    });
+  }
+  if(q) list=list.filter(s=>s.name.toLowerCase().includes(q)||(Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',')).join(' ').toLowerCase().includes(q));
+  // Sort: by rate if selected, otherwise alphabetical by name
+  if(sortVal==='asc') list.sort((a,b)=>(a.ratePerHour||0)-(b.ratePerHour||0));
+  else if(sortVal==='desc') list.sort((a,b)=>(b.ratePerHour||0)-(a.ratePerHour||0));
+  else list.sort((a,b)=>a.name.localeCompare(b.name));
+  document.getElementById('sup-lbl').textContent=`${list.length} supplier${list.length!==1?'s':''}`;
+  const c=document.getElementById('sup-list');
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7-6-7 6v3l-4-3v12z"/><path d="M17 20v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/></svg></div><div style="font-size:13px">No suppliers found</div></div>';return;}
+  const page=pages.sup;
+  const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+  const stCol={Active:'var(--green)',Preferred:'var(--amber)',Inactive:'var(--muted)'};
+  c.innerHTML=slice.map(s=>{
+    const exp=Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',').map(x=>x.trim()).filter(Boolean);
+    const activeExp=expertiseVal!=='All'?expertiseVal:null;
+    return`<div class="sup-card" onclick="openSupDetail('${s.id}')">
+      <div class="sup-hdr">
+        <div><div class="sup-name">${s.name}</div><div class="sup-contact">${s.contact||'—'}</div>${s.phone?`<div style="font-size:12px;color:var(--sub);margin-top:2px" style="font-size:12px;color:var(--sub);margin-top:2px;display:flex;align-items:center;gap:3px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12 19.79 19.79 0 0 1 1.97 3.34a2 2 0 0 1 1.94-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${s.phone}</div>`:''}</div>
+        <span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'}">${s.status}</span>
+      </div>
+      <div style="display:flex;gap:16px;margin:6px 0 8px;align-items:flex-end">
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Rate/hr</div><div class="sup-rate">€ ${s.ratePerHour||0}</div></div>
+        <div style="width:1px;height:32px;background:var(--border);flex-shrink:0"></div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Transport</div><div style="font-size:13px;font-weight:700;color:var(--sub)">€ ${s.transportCost||0}</div></div>
+      </div>
+      <div class="sup-tags">${exp.map(e=>`<span class="sup-tag" style="${activeExp===e?'background:#DBEAFE;border-color:#93C5FD;color:var(--blue);font-weight:700':''}">${e}</span>`).join('')}</div>
+    </div>`;
+  }).join('')+renderPagination('sup',list.length,'goSupPage');
+}
+function openSupDetail(id){
+  const s=DB.suppliers.find(x=>x.id===id); if(!s) return;
+  const stCol={Active:'var(--green)',Preferred:'var(--amber)',Inactive:'var(--muted)'};
+  const exp=Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',').map(x=>x.trim()).filter(Boolean);
+  document.getElementById('sup-detail-body').innerHTML=`
+    <div style="padding:0 18px 8px">
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px">${s.name}</div>
+      <span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'}">${s.status}</span>
+    </div>
+    <div style="padding:0 18px">
+      <div class="dr"><span class="dk">Contact</span><span class="dv">${s.contact||'—'}</span></div>
+      <div class="dr"><span class="dk">Rate</span><span class="dv" style="color:var(--green)">€ ${s.ratePerHour}/hr + € ${s.transportCost} transport</span></div>
+      <div class="dr"><span class="dk">Phone</span><span class="dv">${s.phone||'—'}</span></div>
+      <div class="dr"><span class="dk">Email</span><span class="dv">${s.email||'—'}</span></div>
+      <div class="dr"><span class="dk">Address</span><span class="dv">${s.address||'—'}</span></div>
+      <div class="dr"><span class="dk">Rating</span><span class="dv">${Array.from({length:parseInt(s.rating)||0}).map(()=>'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>').join('')}</span></div>
+      <div class="dr"><span class="dk">Expertise</span><span class="dv">${exp.join(', ')||'—'}</span></div>
+    </div>
+    <div style="padding:12px 18px 0;display:flex;gap:9px">
+      ${can('canManageSuppliers')?`<button onclick="editSupplier('${s.id}')" style="flex:1;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--blue)"> Edit</button>`:''}
+    </div>
+    ${can('canEditAll')?`<button onclick="confirmDelete('supplier','${s.id}')" class="btn-danger" style="margin-top:10px"> Delete</button>`:''}
+    <div style="height:20px"></div>`;
+  openMo('mo-sup-detail');
+}
+function openNewSupplier(){
+  if(!can('canManageSuppliers')) return;
+  editingId.sup=null;
+  document.getElementById('sup-modal-title').textContent='Add Supplier';
+  ['sf-name','sf-contact','sf-expertise','sf-rate','sf-transport','sf-phone','sf-email','sf-address'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('sf-status').value='Active';
+  document.getElementById('sf-rating').value='3';
+  openMo('mo-sup');
+}
+function editSupplier(id){
+  if(!can('canManageSuppliers')) return;
+  const s=DB.suppliers.find(x=>x.id===id); if(!s) return;
+  editingId.sup=id; closeMo('mo-sup-detail');
+  document.getElementById('sup-modal-title').textContent='Edit Supplier';
+  document.getElementById('sf-name').value=s.name;
+  document.getElementById('sf-contact').value=s.contact||'';
+  const exp=Array.isArray(s.expertise)?s.expertise.join(', '):String(s.expertise||'').replace(/[\[\]"]/g,'').trim();
+  document.getElementById('sf-expertise').value=exp;
+  document.getElementById('sf-rate').value=s.ratePerHour||0;
+  document.getElementById('sf-transport').value=s.transportCost||0;
+  document.getElementById('sf-phone').value=s.phone||'';
+  document.getElementById('sf-email').value=s.email||'';
+  document.getElementById('sf-address').value=s.address||'';
+  document.getElementById('sf-status').value=s.status||'Active';
+  document.getElementById('sf-rating').value=s.rating||3;
+  openMo('mo-sup');
+}
+async function saveSupplier(){
+  const name=document.getElementById('sf-name').value.trim();
+  if(!name){toast('Company name required','err');return;}
+  const expRaw=document.getElementById('sf-expertise').value;
+  const expertise=expRaw?expRaw.split(',').map(s=>s.trim()).filter(Boolean):[];
+  const data={name,contact:document.getElementById('sf-contact').value,expertise,ratePerHour:parseFloat(document.getElementById('sf-rate').value)||0,transportCost:parseFloat(document.getElementById('sf-transport').value)||0,phone:document.getElementById('sf-phone').value,email:document.getElementById('sf-email').value,address:document.getElementById('sf-address').value,status:document.getElementById('sf-status').value,rating:parseInt(document.getElementById('sf-rating').value)||3};
+  if(editingId.sup){ Object.assign(DB.suppliers.find(x=>x.id===editingId.sup),data); }
+  else { DB.suppliers.push({id:nextId(DB.suppliers,'SUP'),...data}); }
+  closeMo('mo-sup');
+  await writeSheet('suppliers');
+  toast(editingId.sup?'Supplier updated':'Supplier added');
+  if(currentScreen==='suppliers') renderSuppliers();
+}
+
+/* ══════════════════════════════════════════════════════════
+   DELETE
+══════════════════════════════════════════════════════════ */
+function confirmDelete(type,id){
+  if(!can('canEditAll')) return;
+  pendingDelete={type,id};
+  const names={ticket:'ticket',asset:'asset',supplier:'supplier',user:'user',building:'building'};
+  document.getElementById('confirm-msg').textContent=`Are you sure you want to permanently delete this ${names[type]||type}? This cannot be undone.`;
+  closeMo('mo-tix-detail'); closeMo('mo-ast-detail'); closeMo('mo-sup-detail');
+  openMo('mo-confirm');
+}
+async function doConfirmedDelete(){
+  if(!pendingDelete) return;
+  const {type,id}=pendingDelete;
+  const map={ticket:'tickets',asset:'assets',supplier:'suppliers',user:'users',building:'buildings'};
+  const key=map[type];
+  if(key) DB[key]=DB[key].filter(x=>x.id!==id);
+  closeMo('mo-confirm');
+  await writeSheet(key);
+  toast(`${type} deleted`);
+  if(currentScreen==='tickets') renderTix();
+  if(currentScreen==='assets') renderAst();
+  if(currentScreen==='suppliers') renderSuppliers();
+  if(currentScreen==='users') renderUsers();
+  if(currentScreen==='dashboard') renderDash();
+  pendingDelete=null;
+}
+
+/* ══════════════════════════════════════════════════════════
+   EXPORT CSV
+══════════════════════════════════════════════════════════ */
+function openExportModal(){ openMo('mo-export'); }
+function exportCSV(type){
+  let rows=[],headers=[];
+  if(type==='tickets'){
+    headers=['ID','Subject','Status','Priority','Category','Building','Unit','Assigned To','Reported By','Date Opened','Date Closed','Notes'];
+    rows=DB.tickets.map(t=>[t.id,t.subject,t.status,t.priority,t.category,t.building,t.unit,t.assignedTo||'',t.reportedBy||'',t.dateOpened||'',t.dateClosed||'',t.notes||'']);
+  } else if(type==='assets'){
+    headers=['ID','Name','Building','Category','Status','Manufacturer','Model','Warranty Expiry'];
+    rows=DB.assets.map(a=>[a.id,a.name,a.building,a.category,a.status,a.manufacturer||'',a.model||'',a.warrantyExpiry||'']);
+  } else if(type==='suppliers'){
+    headers=['ID','Name','Contact','Status','Rating','Rate/Hr','Phone','Email'];
+    rows=DB.suppliers.map(s=>[s.id,s.name,s.contact||'',s.status,s.rating||'',s.ratePerHour||0,s.phone||'',s.email||'']);
+  }
+  const csv=[headers,...rows].map(r=>r.map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`propmanager_${type}_${today.toISOString().split('T')[0]}.csv`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast(`${type} exported`);
+}
+</script>
+
+<!-- Google Identity Services + GAPI -->
+<script src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</body>
+</html>
