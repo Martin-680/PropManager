@@ -187,6 +187,9 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 .b-prog{background:rgba(245,158,11,.15);color:var(--amber);}
 .b-closed{background:rgba(16,185,129,.15);color:var(--green);}
 .b-cancel{background:rgba(74,90,122,.2);color:var(--muted);}
+.b-planned{background:rgba(168,85,247,.15);color:var(--purple);}
+.b-requested{background:rgba(234,179,8,.15);color:#CA8A04;}
+.b-ordered{background:rgba(6,182,212,.15);color:var(--teal);}
 .role-badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
 .rb-manager{background:rgba(139,92,246,.15);color:var(--purple);}
 .rb-supervisor{background:rgba(6,182,212,.15);color:var(--teal);}
@@ -380,6 +383,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <select class="fsel" id="sel-tix-status" onchange="setPage('tix',1);renderTix()">
           <option value="All">All Statuses</option><option value="Open">Open</option>
           <option value="In Progress">In Progress</option><option value="Closed">Closed</option>
+          <option value="Planned">Planned</option><option value="Requested">Requested</option><option value="Ordered">Ordered</option>
           <option value="mine">Assigned to Me</option>
         </select>
       </div>
@@ -387,7 +391,6 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <select class="fsel" id="sel-tix-pri" onchange="setPage('tix',1);renderTix()">
           <option value="All">All Priorities</option><option value="Critical">Critical</option>
           <option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
-          <option value="Planned">Planned</option><option value="Requested">Requested</option><option value="Ordered">Ordered</option>
         </select>
       </div>
       <div class="fsel-wrap"><div class="fsel-lbl">Category</div>
@@ -586,7 +589,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div class="frow2">
       <div class="fg"><label>Unit / Area</label><input class="fi2" id="tf-unit" placeholder="e.g. Unit 3A"/></div>
       <div class="fg"><label>Priority</label>
-        <select class="fs2" id="tf-pri"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option><option>Planned</option><option>Requested</option><option>Ordered</option></select>
+        <select class="fs2" id="tf-pri"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select>
       </div>
     </div>
     <div class="frow2">
@@ -594,7 +597,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <select class="fs2" id="tf-cat"><option>General</option><option>Plumbing</option><option>Electrical</option><option>HVAC</option><option>Security</option><option>Safety</option><option>Structural</option><option>Cleaning</option></select>
       </div>
       <div class="fg"><label>Status</label>
-        <select class="fs2" id="tf-status"><option>Open</option><option>In Progress</option><option>Closed</option></select>
+        <select class="fs2" id="tf-status"><option>Open</option><option>In Progress</option><option>Planned</option><option>Requested</option><option>Ordered</option><option>Closed</option></select>
       </div>
     </div>
     <div class="fg"><label>Assign To</label><select class="fs2" id="tf-assign"><option value="">Unassigned</option></select></div>
@@ -745,7 +748,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div class="frow2">
       <div class="fg"><label>Building *</label><select class="fs2" id="qt-bldg"><option value="">Select…</option></select></div>
       <div class="fg"><label>Priority</label>
-        <select class="fs2" id="qt-pri"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option><option>Planned</option><option>Requested</option><option>Ordered</option></select>
+        <select class="fs2" id="qt-pri"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select>
       </div>
     </div>
     <button class="btn-p" onclick="saveQuickTicket()" style="display:inline-flex;align-items:center;gap:8px;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Create Ticket</button>
@@ -1305,7 +1308,7 @@ function renderDash(){
   bc.innerHTML=DB.buildings.map(b=>{const c=DB.tickets.filter(t=>t.building===b.name&&t.status!=='Closed').length;return`<div class="ch-row"><div class="ch-lbl">${b.name.split(' ')[0]}</div><div class="ch-wrap"><div class="ch-fill" style="width:${Math.round(c/max1*100)}%;background:linear-gradient(90deg,#3B82F6,#6366F1)"></div></div><div class="ch-cnt">${c}</div></div>`;}).join('');
   // Priority chart
   const pc=document.getElementById('pri-chart');
-  const prios=[{n:'Critical',c:'#EF4444'},{n:'High',c:'#F59E0B'},{n:'Medium',c:'#60A5FA'},{n:'Low',c:'#10B981'},{n:'Planned',c:'#A855F7'},{n:'Requested',c:'#EAB308'},{n:'Ordered',c:'#06B6D4'}];
+  const prios=[{n:'Critical',c:'#EF4444'},{n:'High',c:'#F59E0B'},{n:'Medium',c:'#60A5FA'},{n:'Low',c:'#10B981'}];
   const max2=Math.max(...prios.map(p=>DB.tickets.filter(t=>t.priority===p.n&&t.status!=='Closed').length),1);
   pc.innerHTML=prios.map(p=>{const c=DB.tickets.filter(t=>t.priority===p.n&&t.status!=='Closed').length;return`<div class="ch-row"><div class="ch-lbl">${p.n}</div><div class="ch-wrap"><div class="ch-fill" style="width:${Math.round(c/max2*100)}%;background:${p.c}"></div></div><div class="ch-cnt">${c}</div></div>`;}).join('');
   // Trend chart
@@ -1423,7 +1426,7 @@ function renderTix(){
   if(bldgVal!=='All') list=list.filter(t=>t.building===bldgVal);
   if(q) list=list.filter(t=>t.subject.toLowerCase().includes(q)||t.building.toLowerCase().includes(q)||t.id.toLowerCase().includes(q)||t.assignedTo?.toLowerCase().includes(q)||(t.reportedBy||'').toLowerCase().includes(q));
   // Sort
-  const priOrder={Critical:0,High:1,Medium:2,Low:3,Planned:4,Requested:5,Ordered:6};
+  const priOrder={Critical:0,High:1,Medium:2,Low:3};
   if(sortVal==='oldest') list=[...list].sort((a,b)=>new Date(a.dateOpened)-new Date(b.dateOpened));
   else if(sortVal==='priority') list=[...list].sort((a,b)=>(priOrder[a.priority]??9)-(priOrder[b.priority]??9));
   else if(sortVal==='days') list=[...list].sort((a,b)=>daysSince(b.dateOpened)-daysSince(a.dateOpened));
@@ -1438,8 +1441,8 @@ function renderTix(){
 
 function tixItemHTML(t,clickable=true){
   const days=t.status!=='Closed'?`${daysSince(t.dateOpened)}d open`:'';
-  const stCls={Open:'b-open','In Progress':'b-prog',Closed:'b-closed',Cancelled:'b-cancel'}[t.status]||'b-open';
-  const pCls={Critical:'p-critical',High:'p-high',Medium:'p-medium',Low:'p-low',Planned:'p-planned',Requested:'p-requested',Ordered:'p-ordered'}[t.priority]||'p-medium';
+  const stCls={Open:'b-open','In Progress':'b-prog',Closed:'b-closed',Cancelled:'b-cancel',Planned:'b-planned',Requested:'b-requested',Ordered:'b-ordered'}[t.status]||'b-open';
+  const pCls={Critical:'p-critical',High:'p-high',Medium:'p-medium',Low:'p-low'}[t.priority]||'p-medium';
   const fn=clickable?`openTixDetail('${t.id}')`:`navTo('tickets')`;
   const urgency = t.status!=='Closed' && daysSince(t.dateOpened)>7 ? ' style="border-left:3px solid var(--amber)"' : t.priority==='Critical'&&t.status!=='Closed' ? ' style="border-left:3px solid var(--red)"' : '';
   return`<div class="ti" onclick="${fn}"${urgency}>
@@ -1457,8 +1460,8 @@ function openTixDetail(id){
   const t=DB.tickets.find(x=>x.id===id); if(!t) return;
   const ast=DB.assets.find(a=>a.id===t.assetId);
   const sup=DB.suppliers.find(s=>s.id===t.supplierId);
-  const priC={Critical:'#EF4444',High:'#F59E0B',Medium:'#60A5FA',Low:'#10B981',Planned:'#A855F7',Requested:'#EAB308',Ordered:'#06B6D4'}[t.priority]||'#60A5FA';
-  const stCls={Open:'b-open','In Progress':'b-prog',Closed:'b-closed'}[t.status]||'b-open';
+  const priC={Critical:'#EF4444',High:'#F59E0B',Medium:'#60A5FA',Low:'#10B981'}[t.priority]||'#60A5FA';
+  const stCls={Open:'b-open','In Progress':'b-prog',Closed:'b-closed',Planned:'b-planned',Requested:'b-requested',Ordered:'b-ordered'}[t.status]||'b-open';
   const acts=Array.isArray(t.activity)?t.activity:[];
   const actHTML=acts.length?acts.map(a=>{
     const dt=new Date(a.ts); const dstr=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
