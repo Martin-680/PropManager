@@ -4445,8 +4445,8 @@ function openUnitDetail(id){
   const bld  = DB.buildings.find(b=>b.id===u.buildingId);
   const flr  = DB.floors.find(f=>f.id===u.floorId);
   const assets  = DB.assets.filter(a=>a.unitId===u.id && a.floorId===u.floorId);
-  const openTix = DB.tickets.filter(t=>t.unit===u.label && t.building===(bld?.name||'') && t.status!=='Closed');
-  const uInsp   = DB.inspectionItems.filter(i=>i.unitId===u.id);
+  const allTix  = DB.tickets.filter(t=>t.unit===u.label && t.building===(bld?.name||''));
+  const allInsp = DB.inspectionItems.filter(i=>i.unitId===u.id);
   const rCol    = {Approved:'var(--green)',Failed:'var(--red)',Pending:'var(--amber)',Skipped:'var(--muted)',Open:'var(--muted)'};
 
   document.getElementById('unit-detail-title').textContent = u.label;
@@ -4454,22 +4454,40 @@ function openUnitDetail(id){
 
   const tabStyle  = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:color .15s,border-color .15s';
   const tabActive = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);transition:color .15s,border-color .15s';
+  const toggleOff = 'padding:4px 10px;font-size:11px;font-weight:700;border:1px solid var(--border);border-radius:20px;background:var(--card2);color:var(--muted);cursor:pointer;transition:background .15s,color .15s';
+  const toggleOn  = 'padding:4px 10px;font-size:11px;font-weight:700;border:1px solid var(--green);border-radius:20px;background:rgba(16,185,129,.15);color:var(--green);cursor:pointer;transition:background .15s,color .15s';
 
-  const inspHTML = uInsp.length
-    ? uInsp.map(i=>{const insp=DB.inspections.find(r=>r.id===i.inspectionId);return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600;color:var(--text)">${i.label||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${insp?df(insp.dateStart):'—'}</div></div><span style="font-size:11px;font-weight:700;color:${rCol[i.result]||'var(--muted)'}">${i.result||'—'}</span></div>`;}).join('')
-    : '<div style="font-size:12px;color:var(--muted);padding:12px 0">No inspection records</div>';
+  function buildInspHTML(showClosed){
+    const items = showClosed ? allInsp : allInsp.filter(i=>i.result!=='Approved'&&i.result!=='Skipped');
+    if(!items.length) return '<div style="font-size:12px;color:var(--muted);padding:12px 0">'+(showClosed?'No inspection records':'No open inspection records')+'</div>';
+    return items.map(i=>{const insp=DB.inspections.find(r=>r.id===i.inspectionId);return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600;color:var(--text)">${i.label||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${insp?df(insp.dateStart):'—'}</div></div><span style="font-size:11px;font-weight:700;color:${rCol[i.result]||'var(--muted)'}">${i.result||'—'}</span></div>`;}).join('');
+  }
+  function buildTixHTML(showClosed){
+    const list = showClosed ? allTix : allTix.filter(t=>t.status!=='Closed');
+    if(!list.length) return '<div style="font-size:12px;color:var(--muted);padding:12px 0">'+(showClosed?'No tickets':'No open tickets')+'</div>';
+    return `<div class="tlist" style="padding:0">${list.map(t=>`<div style="${t.status==='Closed'?'opacity:.5':''}">${tixItemHTML(t,true)}</div>`).join('')}</div>`;
+  }
 
-  const tixHTML = openTix.length
-    ? `<div class="tlist" style="padding:0">${openTix.map(t=>tixItemHTML(t,true)).join('')}</div>`
-    : '<div style="font-size:12px;color:var(--muted);padding:12px 0">No open tickets</div>';
+  let showClosed=false;
+  function renderUdPanels(){
+    const ti=document.getElementById('udpanel-inspect'); if(ti) ti.innerHTML=buildInspHTML(showClosed);
+    const tt=document.getElementById('udpanel-tickets'); if(tt) tt.innerHTML=buildTixHTML(showClosed);
+    const tb=document.getElementById('udtoggle-closed');
+    if(tb){ tb.style.cssText=showClosed?toggleOn:toggleOff; tb.textContent=showClosed?'Closed ✓':'Closed'; }
+    const btnI=document.getElementById('udtab-inspect');
+    const btnT=document.getElementById('udtab-tickets');
+    if(btnI) btnI.textContent='Inspect ('+(showClosed?allInsp.length:allInsp.filter(i=>i.result!=='Approved'&&i.result!=='Skipped').length)+')';
+    if(btnT) btnT.textContent='Tickets ('+(showClosed?allTix.length:allTix.filter(t=>t.status!=='Closed').length)+')';
+  }
 
   document.getElementById('unit-detail-body').innerHTML = `
-    <div style="display:flex;border-bottom:1px solid var(--border);padding:0 18px">
-      <button id="udtab-inspect" style="${tabActive}"  onclick="unitDetailTab('inspect')">Inspect (${uInsp.length})</button>
-      <button id="udtab-tickets" style="${tabStyle}"  onclick="unitDetailTab('tickets')">Tickets (${openTix.length})</button>
+    <div style="display:flex;align-items:center;border-bottom:1px solid var(--border);padding:0 18px;gap:8px">
+      <button id="udtab-inspect" style="${tabActive}"  onclick="unitDetailTab('inspect')">Inspect</button>
+      <button id="udtab-tickets" style="${tabStyle}"  onclick="unitDetailTab('tickets')">Tickets</button>
+      <button id="udtoggle-closed" style="${toggleOff}" onclick="window._udToggleClosed()">Closed</button>
     </div>
-    <div id="udpanel-inspect" style="padding:0 18px 8px">${inspHTML}</div>
-    <div id="udpanel-tickets" style="display:none;padding:4px 18px 8px">${tixHTML}</div>
+    <div id="udpanel-inspect" style="padding:0 18px 8px"></div>
+    <div id="udpanel-tickets" style="display:none;padding:4px 18px 8px"></div>
     ${can('canManageBuildings') ? `
     <div style="padding:8px 18px 0;display:flex;gap:9px;flex-wrap:wrap">
       <button onclick="editUnit('${u.id}')" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> Edit</button>
@@ -4479,6 +4497,9 @@ function openUnitDetail(id){
       <button onclick="closeMo('mo-unit-detail')" style="width:100%;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--muted)">Cancel</button>
     </div>
     <div style="height:24px"></div>`;
+
+  window._udToggleClosed=()=>{ showClosed=!showClosed; renderUdPanels(); };
+  renderUdPanels();
   openMo('mo-unit-detail');
 }
 
@@ -4746,35 +4767,56 @@ function openFloorDetail(id){
   const bld     = DB.buildings.find(b=>b.id===f.buildingId);
   const units   = DB.units.filter(u=>u.floorId===f.id);
   const fAssets = DB.assets.filter(a=>a.floorId===f.id);
-  const fTix    = DB.tickets.filter(t=>t.floorId===f.id && t.status!=='Closed');
-
-  const fInsp = DB.inspectionItems.filter(i=>fAssets.some(a=>a.id===i.assetId)||units.some(u=>u.id===i.unitId));
-  const rCol  = {Approved:'var(--green)',Failed:'var(--red)',Pending:'var(--amber)',Skipped:'var(--muted)',Open:'var(--muted)'};
-
-  const inspHTML = fInsp.length
-    ? fInsp.map(i=>{const insp=DB.inspections.find(r=>r.id===i.inspectionId);return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600;color:var(--text)">${i.label||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${insp?df(insp.dateStart):'—'}</div></div><span style="font-size:11px;font-weight:700;color:${rCol[i.result]||'var(--muted)'}">${i.result||'—'}</span></div>`;}).join('')
-    : '<div style="font-size:12px;color:var(--muted);padding:12px 0">No inspection records</div>';
-
-  const ticketsHTML = fTix.length ? fTix.map(t=>tixItemHTML(t,true)).join('')
-    : '<div style="font-size:12px;color:var(--muted);padding:12px 0">No open tickets</div>';
+  const allTix  = DB.tickets.filter(t=>t.floorId===f.id);
+  const allInsp = DB.inspectionItems.filter(i=>fAssets.some(a=>a.id===i.assetId)||units.some(u=>u.id===i.unitId));
+  const rCol    = {Approved:'var(--green)',Failed:'var(--red)',Pending:'var(--amber)',Skipped:'var(--muted)',Open:'var(--muted)'};
 
   const tabStyle   = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:color .15s,border-color .15s';
   const tabActiveS = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);transition:color .15s,border-color .15s';
+  const toggleOff  = 'padding:4px 10px;font-size:11px;font-weight:700;border:1px solid var(--border);border-radius:20px;background:var(--card2);color:var(--muted);cursor:pointer;transition:background .15s,color .15s';
+  const toggleOn   = 'padding:4px 10px;font-size:11px;font-weight:700;border:1px solid var(--green);border-radius:20px;background:rgba(16,185,129,.15);color:var(--green);cursor:pointer;transition:background .15s,color .15s';
+
+  function buildInspHTML(showClosed){
+    const items = showClosed ? allInsp : allInsp.filter(i=>i.result!=='Approved'&&i.result!=='Skipped');
+    if(!items.length) return '<div style="font-size:12px;color:var(--muted);padding:12px 0">'+(showClosed?'No inspection records':'No open inspection records')+'</div>';
+    return items.map(i=>{const insp=DB.inspections.find(r=>r.id===i.inspectionId);return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600;color:var(--text)">${i.label||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${insp?df(insp.dateStart):'—'}</div></div><span style="font-size:11px;font-weight:700;color:${rCol[i.result]||'var(--muted)'}">${i.result||'—'}</span></div>`;}).join('');
+  }
+  function buildTixHTML(showClosed){
+    const list = showClosed ? allTix : allTix.filter(t=>t.status!=='Closed');
+    if(!list.length) return '<div style="font-size:12px;color:var(--muted);padding:12px 0">'+(showClosed?'No tickets':'No open tickets')+'</div>';
+    return list.map(t=>`<div style="${t.status==='Closed'?'opacity:.5':''}">${tixItemHTML(t,true)}</div>`).join('');
+  }
+
+  let showClosed=false;
+  function renderFdPanels(){
+    const ti=document.getElementById('fdpanel-inspect'); if(ti) ti.innerHTML=buildInspHTML(showClosed);
+    const tt=document.getElementById('fdpanel-tickets'); if(tt) tt.innerHTML=buildTixHTML(showClosed);
+    const tb=document.getElementById('fdtoggle-closed');
+    if(tb){ tb.style.cssText=showClosed?toggleOn:toggleOff; tb.textContent=showClosed?'Closed ✓':'Closed'; }
+    const btnI=document.getElementById('fdtab-inspect');
+    const btnT=document.getElementById('fdtab-tickets');
+    if(btnI) btnI.textContent='Inspect ('+(showClosed?allInsp.length:allInsp.filter(i=>i.result!=='Approved'&&i.result!=='Skipped').length)+')';
+    if(btnT) btnT.textContent='Tickets ('+(showClosed?allTix.length:allTix.filter(t=>t.status!=='Closed').length)+')';
+  }
 
   document.getElementById('floor-detail-title').textContent = f.label;
   document.getElementById('floor-detail-sub').textContent = f.id + (bld ? '  ·  ' + bld.name : '');
   document.getElementById('floor-detail-body').innerHTML = `
-    <div style="display:flex;border-bottom:1px solid var(--border);padding:0 18px">
-      <button id="fdtab-inspect" style="${tabActiveS}"   onclick="floorDetailTab('inspect')">Inspect (${fInsp.length})</button>
-      <button id="fdtab-tickets" style="${tabStyle}"   onclick="floorDetailTab('tickets')">Tickets (${fTix.length})</button>
+    <div style="display:flex;align-items:center;border-bottom:1px solid var(--border);padding:0 18px;gap:8px">
+      <button id="fdtab-inspect" style="${tabActiveS}"   onclick="floorDetailTab('inspect')">Inspect</button>
+      <button id="fdtab-tickets" style="${tabStyle}"   onclick="floorDetailTab('tickets')">Tickets</button>
+      <button id="fdtoggle-closed" style="${toggleOff}" onclick="window._fdToggleClosed()">Closed</button>
     </div>
-    <div id="fdpanel-inspect" style="padding:0 18px 8px">${inspHTML}</div>
-    <div id="fdpanel-tickets" style="display:none;padding:4px 18px 8px">${ticketsHTML}</div>
+    <div id="fdpanel-inspect" style="padding:0 18px 8px"></div>
+    <div id="fdpanel-tickets" style="display:none;padding:4px 18px 8px"></div>
     ${can('canManageBuildings') ? `
     <div style="padding:8px 18px 0;display:flex;gap:9px">
       <button onclick="editFloor('${f.id}')" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> Edit</button>
     </div>` : ''}
     <div style="height:24px"></div>`;
+
+  window._fdToggleClosed=()=>{ showClosed=!showClosed; renderFdPanels(); };
+  renderFdPanels();
   openMo('mo-floor-detail');
 }
 
