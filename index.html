@@ -2286,7 +2286,7 @@ function renderDash(){
 
       const workload = openTixPts + closedTixPts + inspItemPts + closedInspPts;
       const pressure = workload / per100;
-      const health   = Math.max(0, Math.min(100, Math.round(100 - pressure * 8)));
+      const health   = Math.max(0, Math.min(100, Math.round(100 - pressure)));
 
       const openTixCount  = openTix.length;
       const inspItemCount = periodItems.length;
@@ -2330,7 +2330,7 @@ function renderDash(){
                 <div class="wl-tip-row"><span style="color:var(--sub)">Size (per100)</span><span style="font-weight:700">${Math.round(s.effSqm/100*10)/10}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(s.workload*10)/10}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${hc}">${s.health}%</span></div>
-                <div class="wl-tip-formula">Open ticket ×2 · Pending item ×2 (both × age factor) · Approved/Failed ×1 · Skipped ×0 · Closed −1<br>Age factor = min(1 + days÷30, 4) — caps at ×4 after 90 days<br>Pressure = workload ÷ (m² ÷ 100) · Health = 100 − pressure × 8</div>
+                <div class="wl-tip-formula">Open ticket ×2 · Pending item ×2 (both × age factor) · Approved/Failed ×1 · Skipped ×0 · Closed −1<br>Age factor = min(1 + days÷30, 4) — caps at ×4 after 90 days<br>Pressure = workload ÷ (m² ÷ 100) · Health = 100 − pressure</div>
               </div>
             </div>
           </div>
@@ -2365,7 +2365,7 @@ function renderDash(){
           <span>Closed inspection</span><span style="font-weight:700;color:var(--text)">−1 pt</span>
           <span style="color:var(--muted)">Age factor</span><span style="font-weight:700;color:var(--text)">min(1+days÷30, 4)</span>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Counts tickets (dateOpened) and inspection items (inspection dateStart) within the selected period. Open tickets and pending items are weighted by age: min(1 + days÷30, 4), capping at ×4 after 90 days. Resolved items carry no age factor. Pressure = workload ÷ (m² ÷ 100). Health = 100 − pressure × 8. Falls back to unit count × 50 m² if no size is set.</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Counts tickets (dateOpened) and inspection items (inspection dateStart) within the selected period. Open tickets and pending items are weighted by age: min(1 + days÷30, 4), capping at ×4 after 90 days. Resolved items carry no age factor. Pressure = workload ÷ (m² ÷ 100). Health = 100 − pressure. Falls back to unit count × 50 m² if no size is set.</div>
       </div>`;
 
       statsEl.innerHTML = `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">${rows}${howCalc}</div>`;
@@ -4614,7 +4614,7 @@ function renderFloors(){
 
     const workload = tixPts + itemPts + closedInspPts;
     const pressure = workload / per100;
-    const health   = Math.max(0, Math.min(100, Math.round(100 - pressure * 5)));
+    const health   = Math.max(0, Math.min(100, Math.round(100 - pressure)));
     const color    = hc(health);
 
     const fTixCount  = fTixOpen.length;
