@@ -1421,6 +1421,8 @@ let pendingDelete = null;
 const PAGE_SIZE = 10;
 const pages = { tix:1, ast:1, usr:1, bld:1, sup:1, insp:1, log:1 };
 const today = new Date();
+const _MS_DAY = 86400000;
+const ageMult = d => d ? Math.min(1 + (today - new Date(d)) / (30 * _MS_DAY), 4) : 1;
 const d=(n)=>{const x=new Date(today);x.setDate(x.getDate()-n);return x.toISOString().split('T')[0];};
 const df=(s)=>s?new Date(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';
 const daysSince=(s)=>s?Math.floor((today-new Date(s))/86400000):0;
@@ -3619,10 +3621,20 @@ function astCardHTML(a, onclick){
   const inspCount=(DB.inspectionItems||[]).filter(i=>i.assetId===a.id).length;
   const floorLabel = a.floor ? `<span style="display:inline-block;width:3px;height:3px;border-radius:50%;background:currentColor;vertical-align:middle;margin:0 5px;opacity:.4"></span>${a.floor}` : '';
   const aHcFn  = h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
+  const openTixArr   = (DB.tickets||[]).filter(t=>t.assetId===a.id&&t.status!=='Closed');
   const closedAstTix = (DB.tickets||[]).filter(t=>t.assetId===a.id&&t.status==='Closed').length;
-  const totalItems = inspCount+openTix+closedAstTix||1;
-  const pressure   = (openTix*3+inspCount*2+closedAstTix*0.5)/totalItems*10;
-  const aHealth    = Math.max(0,Math.min(100,Math.round(100-pressure)));
+  // Open tickets: +2 × age factor (capped ×4 at 90 days)
+  const openTixPtsA  = openTixArr.reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0);
+  // Inspection items: pending +2×age, approved/failed +1, skipped 0
+  const astInspItems = (DB.inspectionItems||[]).filter(i=>i.assetId===a.id);
+  const astInspMap   = {};
+  astInspItems.forEach(i=>{ if(!astInspMap[i.inspectionId]) { const insp=DB.inspections.find(x=>x.id===i.inspectionId); astInspMap[i.inspectionId]=insp?.dateStart||null; } });
+  const inspItemPtsA = astInspItems.reduce((s,i)=>{ const ds=astInspMap[i.inspectionId]; return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):1); },0);
+  const closedInspA  = new Set(astInspItems.map(i=>i.inspectionId));
+  const closedInspPtsA = [...closedInspA].filter(id=>{ const insp=DB.inspections.find(x=>x.id===id); return insp&&insp.status==='Completed'; }).length * -1;
+  const workloadA    = openTixPtsA + (closedAstTix * -1) + inspItemPtsA + closedInspPtsA;
+  const pressure     = workloadA;
+  const aHealth      = Math.max(0,Math.min(100,Math.round(100-pressure)));
   const aColor     = aHcFn(aHealth);
   return`<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;overflow:hidden" onclick="${onclick}" onmouseenter="this.style.borderColor='rgba(37,99,235,.4)';this.style.boxShadow='0 2px 8px rgba(37,99,235,.08)'" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
     <div style="padding:12px 14px 6px">
@@ -3637,12 +3649,12 @@ function astCardHTML(a, onclick){
             <div class="wl-tip">
               <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">Health — ${a.name}</div>
               <div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;padding-bottom:8px;border-bottom:0.5px solid var(--border)">
-                <span style="color:var(--sub)">Open tickets</span><span style="font-weight:700;text-align:right;color:${aColor}">${openTix} × 3 = ${Math.round(openTix*3*10)/10} pts</span>
-                <span style="color:var(--sub)">Active insp.</span><span style="font-weight:700;text-align:right">${inspCount} × 2 = ${Math.round(inspCount*2*10)/10} pts</span>
-<span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedAstTix} × 0.5 = ${Math.round(closedAstTix*0.5*10)/10} pts</span>
-                <span style="font-weight:600;color:var(--text)">Total pressure</span><span style="font-weight:700;text-align:right">${Math.round(pressure*10)/10} pts</span>
+                <span style="color:var(--sub)">Open tickets (×2×age)</span><span style="font-weight:700;text-align:right;color:${aColor}">${openTixArr.length} = ${Math.round(openTixPtsA*10)/10} pts</span>
+                <span style="color:var(--sub)">Insp. items</span><span style="font-weight:700;text-align:right">${astInspItems.length} = ${Math.round(inspItemPtsA*10)/10} pts</span>
+                <span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedAstTix} = ${closedAstTix*-1} pts</span>
+                <span style="font-weight:600;color:var(--text)">Workload</span><span style="font-weight:700;text-align:right">${Math.round(workloadA*10)/10} pts</span>
               </div>
-              <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − (pressure ÷ items × 10)<br>= 100 − (${Math.round(pressure*10)/10} ÷ ${totalItems} × 10) = <strong>${aHealth}%</strong></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − workload = <strong>${aHealth}%</strong></div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border)">
                 <span style="font-size:11px;font-weight:700;color:var(--text)">Health score</span>
                 <span style="font-size:14px;font-weight:800;color:${aColor}">${aHealth}%</span>
@@ -4320,9 +4332,18 @@ function renderUnits(){
     const uHcFn  = h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
     const inspCount = DB.inspectionItems.filter(i=>i.unitId===u.id).length;
     const closedUnitTix = DB.tickets.filter(t=>t.unit===u.label&&t.building===(bld?.name||'')&&t.status==='Closed').length;
-    const totalItems = inspCount+openTix.length+closedUnitTix||1;
-    const pressure   = (openTix.length*3+inspCount*2+closedUnitTix*0.5)/totalItems*10;
-    const uHealth    = Math.max(0,Math.min(100,Math.round(100-pressure)));
+    // Open tickets: +2 × age factor
+    const openTixPtsU  = openTix.reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0);
+    // Inspection items: pending +2×age, approved/failed +1, skipped 0
+    const unitInspItems = DB.inspectionItems.filter(i=>i.unitId===u.id);
+    const unitInspMap   = {};
+    unitInspItems.forEach(i=>{ if(!unitInspMap[i.inspectionId]){ const insp=DB.inspections.find(x=>x.id===i.inspectionId); unitInspMap[i.inspectionId]=insp?.dateStart||null; } });
+    const inspItemPtsU  = unitInspItems.reduce((s,i)=>{ const ds=unitInspMap[i.inspectionId]; return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):1); },0);
+    const closedInspU   = new Set(unitInspItems.map(i=>i.inspectionId));
+    const closedInspPtsU = [...closedInspU].filter(id=>{ const insp=DB.inspections.find(x=>x.id===id); return insp&&insp.status==='Completed'; }).length * -1;
+    const workloadU    = openTixPtsU + (closedUnitTix * -1) + inspItemPtsU + closedInspPtsU;
+    const pressure     = workloadU;
+    const uHealth      = Math.max(0,Math.min(100,Math.round(100-pressure)));
     const uColor     = uHcFn(uHealth);
     return `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;overflow:hidden" onclick="openUnitDetail('${u.id}')" onmouseenter="this.style.borderColor='rgba(37,99,235,.4)';this.style.boxShadow='0 2px 8px rgba(37,99,235,.08)'" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
       <div style="padding:12px 14px 6px">
@@ -4337,12 +4358,12 @@ function renderUnits(){
             <div class="wl-tip">
               <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">Health — ${u.label}</div>
               <div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;padding-bottom:8px;border-bottom:0.5px solid var(--border)">
-                <span style="color:var(--sub)">Open tickets</span><span style="font-weight:700;text-align:right;color:${uColor}">${openTix.length} × 3 = ${Math.round(openTix.length*3*10)/10} pts</span>
-                <span style="color:var(--sub)">Active insp.</span><span style="font-weight:700;text-align:right">${inspCount} × 2 = ${Math.round(inspCount*2*10)/10} pts</span>
-<span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedUnitTix} × 0.5 = ${Math.round(closedUnitTix*0.5*10)/10} pts</span>
-                <span style="font-weight:600;color:var(--text)">Total pressure</span><span style="font-weight:700;text-align:right">${Math.round(pressure*10)/10} pts</span>
+                <span style="color:var(--sub)">Open tickets (×2×age)</span><span style="font-weight:700;text-align:right;color:${uColor}">${openTix.length} = ${Math.round(openTixPtsU*10)/10} pts</span>
+                <span style="color:var(--sub)">Insp. items</span><span style="font-weight:700;text-align:right">${unitInspItems.length} = ${Math.round(inspItemPtsU*10)/10} pts</span>
+                <span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedUnitTix} = ${closedUnitTix*-1} pts</span>
+                <span style="font-weight:600;color:var(--text)">Workload</span><span style="font-weight:700;text-align:right">${Math.round(workloadU*10)/10} pts</span>
               </div>
-              <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − (pressure ÷ items × 10)<br>= 100 − (${Math.round(pressure*10)/10} ÷ ${totalItems} × 10) = <strong>${uHealth}%</strong></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − workload = <strong>${uHealth}%</strong></div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border)">
                 <span style="font-size:11px;font-weight:700;color:var(--text)">Health score</span>
                 <span style="font-size:14px;font-weight:800;color:${uColor}">${uHealth}%</span>
@@ -4592,7 +4613,6 @@ function renderFloors(){
   }
 
   const hc=h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
-  const flItemPt = r => r==='Pending'?2:r==='Skipped'?0:1;
   c.innerHTML = '<div style="padding:0 14px 8px">' + list.map(f => {
     const bld     = DB.buildings.find(b=>b.id===f.buildingId);
     const floorItems = i => DB.assets.some(a=>a.floorId===f.id&&a.id===i.assetId)||DB.units.some(u=>u.floorId===f.id&&u.id===i.unitId);
@@ -4601,14 +4621,16 @@ function renderFloors(){
     const effSqm    = sqm>0 ? sqm : unitCount*50;
     const per100    = Math.max(effSqm/100, 0.5);
 
-    // Tickets
+    // Tickets: open +2×age, closed −1
     const fTixOpen   = DB.tickets.filter(t=>t.floorId===f.id&&t.status!=='Closed');
     const fTixClosed = DB.tickets.filter(t=>t.floorId===f.id&&t.status==='Closed');
-    const tixPts     = fTixOpen.length*2 + fTixClosed.length*-1;
+    const tixPts     = fTixOpen.reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0) + fTixClosed.length*-1;
 
-    // Inspection items (all, not period-filtered — floors have no period selector)
+    // Inspection items: pending +2×age, approved/failed +1, skipped 0
     const fInspItems = DB.inspectionItems.filter(floorItems);
-    const itemPts    = fInspItems.reduce((s,i)=>s+flItemPt(i.result),0);
+    const fInspDateMap = {};
+    fInspItems.forEach(i=>{ if(!fInspDateMap[i.inspectionId]){ const insp=DB.inspections.find(x=>x.id===i.inspectionId); fInspDateMap[i.inspectionId]=insp?.dateStart||null; } });
+    const itemPts    = fInspItems.reduce((s,i)=>{ const ds=fInspDateMap[i.inspectionId]; return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):1); }, 0);
     // Closed inspections touching this floor
     const closedInspPts = DB.inspections.filter(i=>i.status==='Completed'&&DB.inspectionItems.some(it=>it.inspectionId===i.id&&floorItems(it))).length * -1;
 
