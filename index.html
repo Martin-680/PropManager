@@ -796,58 +796,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div id="floor-list"></div>
   </div>
 
-  <!-- ═══════ LOGBOOK ═══════ -->
-  <div id="screen-logbook" class="screen">
-    <div class="topbar">
-      <div class="topbar-inner">
-        <div class="topbar-left"><div class="topbar-title">Logbook</div><div class="topbar-sub" id="log-lbl"></div></div>
-        <div class="topbar-actions">
-          <button class="ib" id="log-clear-btn" onclick="clearLogFilters()" title="Clear filters" style="opacity:.35;pointer-events:none;transition:opacity .2s" style="background:#E6F1FB;border:1px solid #B5D4F4;"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          <button class="ib" id="log-filter-btn" onclick="openLogFilterModal()" title="Filters" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg><span id="log-filter-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--blue);color:#fff;font-size:9px;font-weight:800;padding:1px 4px;border-radius:20px;pointer-events:none"></span></button>
-          <button class="ib" id="log-sort-btn" onclick="toggleLogSort()" title="Sort order" style="font-size:11px;font-weight:700;color:var(--sub)">A–Z</button>
-          <button class="ib" onclick="openNewLogEntry()" title="Add Entry"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
-        </div>
-      </div>
-    </div>
-    <!-- hidden selects that drive filtering (values set from modal) -->
-    <select id="sel-log-type"   style="display:none" onchange="setPage('log',1);renderLogbook()">
-      <option value="All">All Types</option>
-      <option value="onderhoud">Onderhoud</option>
-      <option value="keuring">Keuring</option>
-      <option value="her-keuring">Her-keuring</option>
-      <option value="ontvangen">Ontvangen</option>
-      <option value="bestelling">Bestelling</option>
-      <option value="bezoek">Bezoek</option>
-      <option value="evaluatie">Evaluatie</option>
-    </select>
-    <select id="sel-log-status" style="display:none" onchange="setPage('log',1);renderLogbook()">
-      <option value="All">All</option>
-      <option value="open">Open</option>
-      <option value="gesloten">Gesloten</option>
-    </select>
-    <select id="sel-log-bldg"  style="display:none" onchange="onLogBldgChange()"><option value="All">All Buildings</option></select>
-    <select id="sel-log-floor" style="display:none" onchange="onLogFloorChange()"><option value="All">All Floors</option></select>
-    <select id="sel-log-unit"  style="display:none" onchange="onLogUnitChange()"><option value="All">All Units</option></select>
-    <select id="sel-log-asset" style="display:none" onchange="setPage('log',1);renderLogbook()"><option value="All">All Assets</option></select>
-    <select id="sel-log-sup"   style="display:none" onchange="setPage('log',1);renderLogbook()"><option value="All">All Suppliers</option></select>
-    <select id="sel-log-cat"   style="display:none" onchange="setPage('log',1);renderLogbook()"><option value="All">All Categories</option></select>
-    <input type="hidden" id="sel-log-date-from" value="">
-    <input type="hidden" id="sel-log-date-to" value="">
 
-    <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input type="text" id="log-search" placeholder="Search entries…" oninput="setPage('log',1);renderLogbook()"/></div>
-
-    <div id="log-filter-chips" style="padding:0 14px 10px;display:none;flex-wrap:wrap;gap:6px"></div>
-    <div id="log-bldg-btns" style="display:none;padding:8px 14px 10px;gap:8px"></div>
-    <div id="log-hide-strip" class="hide-strip">
-      <span id="log-hide-label"></span>
-      <div class="hide-strip-toggle" onclick="toggleShowGesloten()">
-        <span>Show gesloten</span>
-        <div class="hide-strip-toggle-track" id="log-hide-track"></div>
-      </div>
-    </div>
-    <div id="log-list"></div>
-  </div>
 
 
   <!-- ═══════ STATS SCREEN ═══════ -->
@@ -907,7 +856,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div style="display:flex;flex-direction:column;gap:6px;padding:0 14px 16px;font-size:12px;color:var(--sub)">
       <div style="display:flex;align-items:center;gap:7px">
         <div style="width:16px;height:16px;border-radius:5px;background:#EAF3DE;border:1px solid #97C459;flex-shrink:0"></div>
-        Tickets / logbook match
+        Tickets match
       </div>
       <div id="cal-insp-legend" style="display:none;align-items:center;gap:7px">
         <div style="width:16px;height:16px;border-radius:5px;background:#EEEDFE;border:1px solid #AFA9EC;flex-shrink:0"></div>
@@ -952,9 +901,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div class="info-row" onclick="openInfoSub('inspections')">
       <div style="display:flex;align-items:center;gap:12px"><div class="info-icon-wrap" style="background:#E1F5EE"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F6E56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div><div style="font-size:14px;font-weight:600;color:var(--text)">Inspections</div><div style="font-size:11px;color:var(--sub)">Rounds, items &amp; results</div></div></div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
-    <div class="info-row" onclick="openInfoSub('logbook')">
-      <div style="display:flex;align-items:center;gap:12px"><div class="info-icon-wrap" style="background:#EEEDFE"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3C3489" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div><div style="font-size:14px;font-weight:600;color:var(--text)">Logbook</div><div style="font-size:11px;color:var(--sub)">Events, notes &amp; observations</div></div></div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+
     <div class="info-row" onclick="openInfoSub('buildings')">
       <div style="display:flex;align-items:center;gap:12px"><div class="info-icon-wrap" style="background:#F0FDF4"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F6E46" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></div><div><div style="font-size:14px;font-weight:600;color:var(--text)">Buildings</div><div style="font-size:11px;color:var(--sub)">Health score, size &amp; workload</div></div></div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
@@ -977,7 +924,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start">
           <span style="font-size:15px;flex-shrink:0">📋</span>
-          <div style="font-size:12px;color:var(--sub);line-height:1.55"><strong style="color:var(--text)">Recent logbook entries</strong> from the last 90 days give a sense of how much activity the building has seen lately. Older entries fade out automatically.</div>
+          <div style="font-size:12px;color:var(--sub);line-height:1.55"></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start">
           <span style="font-size:15px;flex-shrink:0">🔴</span>
@@ -1023,7 +970,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start">
           <span style="font-size:15px;flex-shrink:0">📋</span>
-          <div style="font-size:12px;color:var(--sub);line-height:1.55"><strong style="color:var(--text)">A recent logbook entry</strong> (last 90 days) adds +1 point — it shows the item has been on the radar lately.</div>
+          <div style="font-size:12px;color:var(--sub);line-height:1.55"></div>
         </div>
       </div>
       <div class="info-section-lbl" style="padding:0 0 6px">Priority bands</div>
@@ -1087,33 +1034,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     </div>
   </div>
 
-  <!-- SUB: Logbook -->
-  <div class="info-subscreen" id="info-sub-logbook">
-    <div class="topbar"><div class="topbar-inner"><button class="info-back-btn" onclick="closeInfoSub('logbook')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><polyline points="15 18 9 12 15 6"/></svg> Info</button><div style="font-size:14px;font-weight:600;color:var(--text)">Logbook</div><div style="width:60px"></div></div></div>
-    <div style="padding:14px 18px">
-      <div class="info-desc">The Logbook records events that don't need follow-up action — a meter reading, a tenant visit, a delivery. It's your property diary.</div>
-      <div class="info-section-lbl" style="padding:14px 0 6px">Entry types</div>
-      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--rs);padding:0 14px">
-        <div class="info-status-row"><div style="display:flex;align-items:center;gap:8px"><div class="info-dot" style="background:#185FA5"></div><span style="font-size:13px;color:var(--text)">Onderhoud</span></div><span style="font-size:11px;color:var(--sub)">Routine maintenance done</span></div>
-        <div class="info-status-row"><div style="display:flex;align-items:center;gap:8px"><div class="info-dot" style="background:#BA7517"></div><span style="font-size:13px;color:var(--text)">Keuring</span></div><span style="font-size:11px;color:var(--sub)">Certification or check</span></div>
-        <div class="info-status-row"><div style="display:flex;align-items:center;gap:8px"><div class="info-dot" style="background:#A32D2D"></div><span style="font-size:13px;color:var(--text)">Reparatie</span></div><span style="font-size:11px;color:var(--sub)">Repair completed</span></div>
-        <div class="info-status-row"><div style="display:flex;align-items:center;gap:8px"><div class="info-dot" style="background:#534AB7"></div><span style="font-size:13px;color:var(--text)">Inspectie</span></div><span style="font-size:11px;color:var(--sub)">Observation recorded</span></div>
-      </div>
-      <div class="info-section-lbl" style="padding:14px 0 6px">Dashboard score</div>
-      <div class="info-formula">Score = avg % of entries + assets + suppliers across all buildings.<br><br>Reflects how actively each building is being logged and maintained.</div>
-      <div class="info-section-lbl" style="padding:14px 0 6px">Logbook vs Tickets</div>
-      <div class="info-desc">Logbook = something happened (past, no action needed). Ticket = something needs to happen (future, assigned &amp; tracked). Logbook entries have no status lifecycle or assignee.</div>
-      <div class="info-section-lbl" style="padding:14px 0 6px">How are Logbook entries' workload calculated</div>
-      <div class="info-desc">Each logbook card shows a Workload % that reflects how much of the total logging activity is concentrated in that entry's building.</div>
-      <div class="info-formula">Workload % = Logbook entries in this building ÷ Total logbook entries across your accessible buildings × 100</div>
-      <div class="info-desc">A building with more logbook entries gets a higher, redder bar. All entries from the same building share the same workload %. Only buildings you have access to are included in the denominator — so workload reflects your own portfolio, not the entire system.</div>
-      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--rs);padding:0 14px;margin-top:4px">
-        <div class="info-field-row"><span style="color:var(--sub)">≥ 40% of total</span><span style="font-weight:600;color:#dc2626">Red — high activity</span></div>
-        <div class="info-field-row"><span style="color:var(--sub)">20 – 39%</span><span style="font-weight:600;color:#d97706">Amber — moderate</span></div>
-        <div class="info-field-row"><span style="color:var(--sub)">&lt; 20%</span><span style="font-weight:600;color:#059669">Green — low activity</span></div>
-      </div>
-    </div>
-  </div>
+
 
   <!-- SUB: Buildings -->
   <div class="info-subscreen" id="info-sub-buildings">
@@ -1137,7 +1058,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
   <nav class="bottom-nav" style="grid-template-columns:repeat(4,1fr)">
     <button class="ni active" onclick="navTo('dashboard')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dash</button>
     <button class="ni" onclick="navTo('inspections')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>Inspect</button>
-    <button class="ni" onclick="navTo('logbook')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>Logbook</button>
+
     <button class="ni" onclick="navTo('tickets')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></span>Tickets<span class="ni-badge" id="open-badge" style="display:none"></span></button>
   </nav>
 
@@ -1770,24 +1691,6 @@ async function loadAllData(){
       category    : cat ? cat.category : r.categoryId,
     };
   });
-  DB.logs = rowsToObjects(logs, COLS.logs).map(r=>{
-    const bld = DB.buildings.find(b=>b.id===r.buildingId);
-    const flr = DB.floors.find(f=>f.id===r.floorId);
-    const unt = DB.units.find(u=>u.id===r.unitId);
-    const ast = DB.assets.find(a=>a.id===r.assetId);
-    const sup = DB.suppliers.find(s=>s.id===r.supplierId);
-    const cat = DB.categories.find(c=>c.id===r.categoryId) || DB.categories.find(c=>c.category.toLowerCase()===(r.categoryId||'').toLowerCase());
-    return {
-      ...r,
-      categoryId  : cat ? cat.id : r.categoryId,
-      building    : bld ? bld.name  : r.buildingId,
-      floor       : flr ? flr.label : r.floorId,
-      unit        : unt ? unt.label : r.unitId,
-      assetLabel  : ast ? ast.label : r.assetId,
-      supplierName: sup ? sup.name  : r.supplierId,
-      categoryName: cat ? cat.category : r.categoryId,
-    };
-  });
 }
 
 async function loadSheet(key){
@@ -1980,7 +1883,7 @@ function navTo(s){
   document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
   scr.classList.add('active');
-  const idx=['dashboard','inspections','logbook','tickets'].indexOf(s);
+  const idx=['dashboard','inspections','tickets'].indexOf(s);
   if(idx>=0) document.querySelectorAll('.ni')[idx]?.classList.add('active');
   prevScreen=currentScreen;
   currentScreen=s;
@@ -1994,7 +1897,6 @@ function navTo(s){
   if(s==='inspections') { inspActiveBldg=null; inspSort='date'; showCompletedInsp=false; const _sb=document.getElementById('insp-sort-btn');if(_sb){_sb.textContent='A–Z';_sb.style.color='';_sb.style.borderColor='';_sb.style.background='';} renderInspections(); }
   if(s==='units')       renderUnits();
   if(s==='floors')      renderFloors();
-  if(s==='logbook')     { logActiveBldg=null; logSort='date'; showGeslotenLog=false; renderLogbook(); }
 
 
   if(s==='calendar')    renderCalendar();
@@ -2358,21 +2260,18 @@ function renderDash(){
       const closedTix  = DB.tickets.filter(t=>t.buildingId===b.id&&t.status==='Closed'&&inPeriod(t.dateClosed||t.date)).length;
       const activeInsp = DB.inspections.filter(i=>i.buildingId===b.id&&i.status==='In Progress'&&inPeriod(i.dateStart)).length;
       const doneInsp   = DB.inspections.filter(i=>i.buildingId===b.id&&i.status==='Completed'&&inPeriod(i.dateEnd||i.dateStart)).length;
-      const recentLogs = DB.logs.filter(r=>r.buildingId===b.id&&inPeriod(r.date)).length;
-
-      const pressure   = (openTix*3 + activeInsp*2 + recentLogs*1 + closedTix*0.5 + doneInsp*0.5) / per100;
-      // log×1, inspection×2, open ticket×3, closed/completed×0.5
+      const pressure   = (openTix*3 + activeInsp*2 + closedTix*0.5 + doneInsp*0.5) / per100;
+      // inspection×2, open ticket×3, closed/completed×0.5
       const health     = Math.max(0, Math.min(100, Math.round(100 - pressure * 9.0)));
-      const workload   = openTix*3 + activeInsp*2 + recentLogs*1 + closedTix*0.5 + doneInsp*0.5;
-      return {b, sqm:effSqm, openTix, activeInsp, recentLogs, health, workload};
+      const workload   = openTix*3 + activeInsp*2 + closedTix*0.5 + doneInsp*0.5;
+      return {b, sqm:effSqm, openTix, activeInsp, health, workload};
     }).filter(s=>s.workload>0).sort((a,z)=>a.health-z.health).slice(0,5);
 
     if(!bldgStats.length){
-      statsEl.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:0 0 8px">No data yet — add some tickets, inspections or logbook entries ✓</div>';
+      statsEl.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:0 0 8px">No data yet — add some tickets or inspections ✓</div>';
     } else {
       const totalTix  = bldgStats.reduce((a,s)=>a+s.openTix,0)  || 1;
       const totalInsp = bldgStats.reduce((a,s)=>a+s.activeInsp,0)|| 1;
-      const totalLogs = bldgStats.reduce((a,s)=>a+s.recentLogs,0)|| 1;
       const maxHealth = Math.max(...bldgStats.map(s=>s.health)) || 1;
 
       const healthColor = h => h>=70?'#059669':h>=40?'#d97706':'#dc2626';
@@ -2384,12 +2283,10 @@ function renderDash(){
         const border  = i<bldgStats.length-1?'border-bottom:1px solid var(--border);':'';
         const pTix    = Math.round(s.openTix/totalTix*100);
         const pInsp   = Math.round(s.activeInsp/totalInsp*100);
-        const pLogs   = Math.round(s.recentLogs/totalLogs*100);
         const sqmStr  = s.sqm ? Number(s.sqm).toLocaleString('nl-NL')+' m²' : '—';
         const goB     = `navTo('buildings');setTimeout(()=>openBldDetail('${bldId}'),150)`;
         const goTix   = `navTo('tickets');setTimeout(()=>{const e=document.getElementById('sel-tix-bldg');if(e){e.value='${bldName}';setPage('tix',1);renderTix();}},150)`;
         const goInsp  = `navTo('inspections');setTimeout(()=>{const e=document.getElementById('sel-insp-bldg');if(e){e.value='${bldId}';setPage('insp',1);renderInspections();}},150)`;
-        const goLog   = `navTo('logbook');setTimeout(()=>{const e=document.getElementById('sel-log-bldg');if(e){e.value='${bldId}';setPage('log',1);renderLogbook();}},150)`;
         const cellBase = 'text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;cursor:pointer;';
         return `<div style="${border}padding:12px 14px;cursor:pointer" onclick="${goB}">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
@@ -2404,7 +2301,6 @@ function renderDash(){
                 <div class="wl-tip-title">${s.b.name} · health score</div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Open tickets</span><span style="font-weight:700;color:${s.openTix>0?'var(--red)':'var(--text)'}">${s.openTix}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Active inspections</span><span style="font-weight:700">${s.activeInsp}</span></div>
-                <div class="wl-tip-row"><span style="color:var(--sub)">Recent log entries</span><span style="font-weight:700">${s.recentLogs}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${hc}">${s.health}%</span></div>
                 <div class="wl-tip-formula">Pressure = (open tickets×3 + active inspections×2 + log entries×1 + closed×0.5) ÷ size<br>Health = 100 − pressure × 9</div>
               </div>
@@ -2414,7 +2310,7 @@ function renderDash(){
           <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px">
             <div style="height:100%;width:${Math.round(s.health/maxHealth*100)}%;background:${hc};border-radius:3px;transition:width .4s ease"></div>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px">
             <div style="${cellBase}" onclick="event.stopPropagation();${goTix}">
               <div style="font-size:13px;font-weight:800;color:${s.openTix>0?'var(--red)':'var(--text)'}">${s.openTix}</div>
               <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Tickets</div>
@@ -2425,11 +2321,7 @@ function renderDash(){
               <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspect</div>
               <div style="font-size:10px;font-weight:700;color:var(--muted);margin-top:2px">${pInsp}% of total</div>
             </div>
-            <div style="${cellBase}" onclick="event.stopPropagation();${goLog}">
-              <div style="font-size:13px;font-weight:800;color:var(--text)">${s.recentLogs}</div>
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Logbook</div>
-              <div style="font-size:10px;font-weight:700;color:var(--muted);margin-top:2px">${pLogs}% of total</div>
-            </div>
+
           </div>
         </div>`;
       }).join('');
@@ -2440,10 +2332,9 @@ function renderDash(){
         <div style="display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:12px;color:var(--sub)">
           <span>Open ticket</span><span style="font-weight:700;color:var(--text)">× 3 pts</span>
           <span>Active inspection</span><span style="font-weight:700;color:var(--text)">× 2 pts</span>
-          <span>Logbook entry</span><span style="font-weight:700;color:var(--text)">× 1 pt</span>
           <span>Closed / completed</span><span style="font-weight:700;color:var(--text)">× 0.5 pts</span>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Pressure per 100 m² = (open tickets×3 + active inspections×2 + log entries×1 + closed/completed×0.5) ÷ (m² ÷ 100). Health = 100 − pressure × 9. If no m² is set, unit count × 50 m² is used as an estimate.</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Pressure per 100 m² = (open tickets×3 + active inspections×2 + closed/completed×0.5) ÷ (m² ÷ 100). Health = 100 − pressure × 9. If no m² is set, unit count × 50 m² is used as an estimate.</div>
       </div>`;
 
       statsEl.innerHTML = `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">${rows}${howCalc}</div>`;
@@ -2464,9 +2355,6 @@ function renderDash(){
       // Referenced in open ticket
       const openTix=DB.tickets.filter(t=>t.assetId===a.id&&t.status!=='Closed').length;
       if(openTix){pts+=3;reasons.push('open ticket');}
-      // Mentioned in logbook last 90d
-      const recentLog=DB.logs.some(r=>r.assetId===a.id&&r.date&&new Date(r.date)>=cutoff90);
-      if(recentLog){pts+=1;reasons.push('recent logbook');}
       // Asset status
       if(a.status==='Decommissioned'){pts+=3;reasons.push('decommissioned');}
       else if(a.status==='Under Maintenance'){pts+=2;reasons.push('maintenance');}
@@ -2491,9 +2379,6 @@ function renderDash(){
       // Referenced in open ticket (match by label+building+floor)
       const openTix=DB.tickets.filter(t=>t.status!=='Closed'&&(t.unit||'').trim()===u.label&&(t.building||'').trim()===(bld?.name||'')).length;
       if(openTix){pts+=3;reasons.push('open ticket');}
-      // Mentioned in logbook last 90d
-      const recentLog=DB.logs.some(r=>r.unitId===u.id&&r.date&&new Date(r.date)>=cutoff90);
-      if(recentLog){pts+=1;reasons.push('recent logbook');}
       if(!pts) return null;
       return{id:u.id,name:u.label,building:bld?.name||'',pts,reasons,type:'unit'};
     }).filter(Boolean);
@@ -3202,7 +3087,6 @@ let tixSort = 'date'; // 'date' | 'alpha'
 let tixActiveBldg = null;
 let showClosedTix = false;
 let showCompletedInsp = false;
-let showGeslotenLog = false;
 let dashPeriod = 'quarter';
 
 function setDashPeriod(p){
@@ -3225,10 +3109,6 @@ function toggleShowClosed(){
 function toggleShowCompleted(){
   showCompletedInsp = !showCompletedInsp;
   setPage('insp',1); renderInspections();
-}
-function toggleShowGesloten(){
-  showGeslotenLog = !showGeslotenLog;
-  setPage('log',1); renderLogbook();
 }
 
 function toggleInspSort(){
@@ -3695,24 +3575,6 @@ function duplicateTix(){
   });
 }
 
-function duplicateLog(){
-  if(!editingId.log) return;
-  const src=DB.logs.find(x=>x.id===editingId.log); if(!src) return;
-  const newId=nextId(DB.logs,'LOG');
-  const dup={
-    ...src,
-    id: newId,
-    date: today.toISOString().split('T')[0],
-    createdBy: currentUser.name
-  };
-  DB.logs.unshift(dup);
-  closeMo('mo-log');
-  writeSheet('logs').then(()=>{
-    toast(`Duplicated as ${newId}`);
-    if(currentScreen==='logbook') renderLogbook();
-    setTimeout(()=>editLogEntry(newId), 150);
-  });
-}
 
 /* Quick Ticket */
 /* ══════════════════════════════════════════════════════════
@@ -3723,13 +3585,12 @@ function goAstPage(p){setPage('ast',p);renderAst();}
 /* ── Shared asset card HTML — used in Assets view, Building view, Floor view ── */
 function astCardHTML(a, onclick){
   const openTix=(DB.tickets||[]).filter(t=>t.assetId===a.id&&t.status!=='Closed').length;
-  const logCount=(DB.logs||[]).filter(r=>r.assetId===a.id).length;
   const inspCount=(DB.inspectionItems||[]).filter(i=>i.assetId===a.id).length;
   const floorLabel = a.floor ? `<span style="display:inline-block;width:3px;height:3px;border-radius:50%;background:currentColor;vertical-align:middle;margin:0 5px;opacity:.4"></span>${a.floor}` : '';
   const aHcFn  = h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
   const closedAstTix = (DB.tickets||[]).filter(t=>t.assetId===a.id&&t.status==='Closed').length;
-  const totalItems = logCount+inspCount+openTix+closedAstTix||1;
-  const pressure   = (openTix*3+inspCount*2+logCount*1+closedAstTix*0.5)/totalItems*10;
+  const totalItems = inspCount+openTix+closedAstTix||1;
+  const pressure   = (openTix*3+inspCount*2+closedAstTix*0.5)/totalItems*10;
   const aHealth    = Math.max(0,Math.min(100,Math.round(100-pressure)));
   const aColor     = aHcFn(aHealth);
   return`<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;overflow:hidden" onclick="${onclick}" onmouseenter="this.style.borderColor='rgba(37,99,235,.4)';this.style.boxShadow='0 2px 8px rgba(37,99,235,.08)'" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
@@ -3747,8 +3608,7 @@ function astCardHTML(a, onclick){
               <div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;padding-bottom:8px;border-bottom:0.5px solid var(--border)">
                 <span style="color:var(--sub)">Open tickets</span><span style="font-weight:700;text-align:right;color:${aColor}">${openTix} × 3 = ${Math.round(openTix*3*10)/10} pts</span>
                 <span style="color:var(--sub)">Active insp.</span><span style="font-weight:700;text-align:right">${inspCount} × 2 = ${Math.round(inspCount*2*10)/10} pts</span>
-                <span style="color:var(--sub)">Log entries</span><span style="font-weight:700;text-align:right">${logCount} × 1 = ${logCount} pts</span>
-                <span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedAstTix} × 0.5 = ${Math.round(closedAstTix*0.5*10)/10} pts</span>
+<span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedAstTix} × 0.5 = ${Math.round(closedAstTix*0.5*10)/10} pts</span>
                 <span style="font-weight:600;color:var(--text)">Total pressure</span><span style="font-weight:700;text-align:right">${Math.round(pressure*10)/10} pts</span>
               </div>
               <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − (pressure ÷ items × 10)<br>= 100 − (${Math.round(pressure*10)/10} ÷ ${totalItems} × 10) = <strong>${aHealth}%</strong></div>
@@ -3764,11 +3624,7 @@ function astCardHTML(a, onclick){
         <div style="height:100%;width:${aHealth}%;background:${aColor};border-radius:3px;transition:width .4s ease"></div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
-      <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
-        <div style="font-size:13px;font-weight:800;color:var(--text)">${logCount}</div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Logbook</div>
-      </div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
       <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
         <div style="font-size:13px;font-weight:800;color:var(--text)">${inspCount}</div>
         <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspect</div>
@@ -3974,7 +3830,6 @@ function openAstDetail(id){
   const sc={Active:'var(--green)','Under Maintenance':'var(--amber)',Decommissioned:'var(--red)'}[a.status]||'var(--green)';
   const relTix=DB.tickets.filter(t=>t.assetId===a.id&&t.status!=='Closed');
   const relInsp=DB.inspectionItems.filter(i=>i.assetId===a.id);
-  const relLogs=DB.logs.filter(r=>r.assetId===a.id).sort((a,z)=>new Date(z.date)-new Date(a.date));
   const rCol={Approved:'var(--green)',Failed:'var(--red)',Pending:'var(--amber)',Skipped:'var(--muted)',Open:'var(--muted)'};
   document.getElementById('ast-detail-title').textContent = a.name;
   document.getElementById('ast-detail-sub').textContent = a.id + (a.building ? '  ·  ' + a.building : '') + (a.floor ? '  ·  ' + a.floor : '');
@@ -3982,9 +3837,6 @@ function openAstDetail(id){
   const tabStyle  = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:color .15s,border-color .15s';
   const tabActive = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);transition:color .15s,border-color .15s';
 
-  const logHTML = relLogs.length
-    ? relLogs.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.subject||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${df(r.date)}${r.type?' · '+r.type:''}</div></div><span style="font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;margin-left:8px">${r.status||''}</span></div>`).join('')
-    : '<div style="font-size:12px;color:var(--muted);padding:12px 0">No logbook entries</div>';
 
   const inspHTML = relInsp.length
     ? relInsp.map(i=>{const insp=DB.inspections.find(r=>r.id===i.inspectionId);return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600;color:var(--text)">${i.label||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${insp?df(insp.dateStart):'—'}</div></div><span style="font-size:11px;font-weight:700;color:${rCol[i.result]||'var(--muted)'}">${i.result||'—'}</span></div>`;}).join('')
@@ -3996,12 +3848,10 @@ function openAstDetail(id){
 
   document.getElementById('ast-detail-body').innerHTML=`
     <div style="display:flex;border-bottom:1px solid var(--border);padding:0 18px">
-      <button id="adtab-log"     style="${tabActive}" onclick="astDetailTab('log')">Logbook (${relLogs.length})</button>
-      <button id="adtab-inspect" style="${tabStyle}"  onclick="astDetailTab('inspect')">Inspect (${relInsp.length})</button>
+      <button id="adtab-inspect" style="${tabActive}"  onclick="astDetailTab('inspect')">Inspect (${relInsp.length})</button>
       <button id="adtab-tickets" style="${tabStyle}"  onclick="astDetailTab('tickets')">Tickets (${relTix.length})</button>
     </div>
-    <div id="adpanel-log"     style="padding:0 18px 8px">${logHTML}</div>
-    <div id="adpanel-inspect" style="display:none;padding:0 18px 8px">${inspHTML}</div>
+    <div id="adpanel-inspect" style="padding:0 18px 8px">${inspHTML}</div>
     <div id="adpanel-tickets" style="display:none;padding:4px 18px 8px">${tixHTML}</div>
     <div style="padding:8px 18px 0;display:flex;gap:9px;flex-wrap:wrap">
       ${can('canEditAssets')?`<button onclick="editAst('${a.id}')" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> Edit</button>`:''}
@@ -4427,7 +4277,6 @@ function renderUnits(){
     const bld  = DB.buildings.find(b=>b.id===u.buildingId);
     const flr  = DB.floors.find(f=>f.id===u.floorId);
     const assets = DB.assets.filter(a=>a.unitId===u.id && a.floorId===u.floorId);
-    const logCount = DB.logs.filter(r=>r.unitId===u.id).length;
     const openTix = DB.tickets.filter(t=>
       t.status!=='Closed' &&
       (t.building||'').trim() === (bld?.name||'') &&
@@ -4440,8 +4289,8 @@ function renderUnits(){
     const uHcFn  = h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
     const inspCount = DB.inspectionItems.filter(i=>i.unitId===u.id).length;
     const closedUnitTix = DB.tickets.filter(t=>t.unit===u.label&&t.building===(bld?.name||'')&&t.status==='Closed').length;
-    const totalItems = logCount+inspCount+openTix.length+closedUnitTix||1;
-    const pressure   = (openTix.length*3+inspCount*2+logCount*1+closedUnitTix*0.5)/totalItems*10;
+    const totalItems = inspCount+openTix.length+closedUnitTix||1;
+    const pressure   = (openTix.length*3+inspCount*2+closedUnitTix*0.5)/totalItems*10;
     const uHealth    = Math.max(0,Math.min(100,Math.round(100-pressure)));
     const uColor     = uHcFn(uHealth);
     return `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;overflow:hidden" onclick="openUnitDetail('${u.id}')" onmouseenter="this.style.borderColor='rgba(37,99,235,.4)';this.style.boxShadow='0 2px 8px rgba(37,99,235,.08)'" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
@@ -4459,8 +4308,7 @@ function renderUnits(){
               <div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;padding-bottom:8px;border-bottom:0.5px solid var(--border)">
                 <span style="color:var(--sub)">Open tickets</span><span style="font-weight:700;text-align:right;color:${uColor}">${openTix.length} × 3 = ${Math.round(openTix.length*3*10)/10} pts</span>
                 <span style="color:var(--sub)">Active insp.</span><span style="font-weight:700;text-align:right">${inspCount} × 2 = ${Math.round(inspCount*2*10)/10} pts</span>
-                <span style="color:var(--sub)">Log entries</span><span style="font-weight:700;text-align:right">${logCount} × 1 = ${logCount} pts</span>
-                <span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedUnitTix} × 0.5 = ${Math.round(closedUnitTix*0.5*10)/10} pts</span>
+<span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedUnitTix} × 0.5 = ${Math.round(closedUnitTix*0.5*10)/10} pts</span>
                 <span style="font-weight:600;color:var(--text)">Total pressure</span><span style="font-weight:700;text-align:right">${Math.round(pressure*10)/10} pts</span>
               </div>
               <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − (pressure ÷ items × 10)<br>= 100 − (${Math.round(pressure*10)/10} ÷ ${totalItems} × 10) = <strong>${uHealth}%</strong></div>
@@ -4476,11 +4324,7 @@ function renderUnits(){
           <div style="height:100%;width:${uHealth}%;background:${uColor};border-radius:3px;transition:width .4s ease"></div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
-        <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
-          <div style="font-size:13px;font-weight:800;color:var(--text)">${logCount}</div>
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Logbook</div>
-        </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
         <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
           <div style="font-size:13px;font-weight:800;color:var(--text)">${inspCount}</div>
           <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspect</div>
@@ -4500,7 +4344,6 @@ function openUnitDetail(id){
   const flr  = DB.floors.find(f=>f.id===u.floorId);
   const assets  = DB.assets.filter(a=>a.unitId===u.id && a.floorId===u.floorId);
   const openTix = DB.tickets.filter(t=>t.unit===u.label && t.building===(bld?.name||'') && t.status!=='Closed');
-  const uLogs   = DB.logs.filter(r=>r.unitId===u.id).sort((a,z)=>new Date(z.date)-new Date(a.date));
   const uInsp   = DB.inspectionItems.filter(i=>i.unitId===u.id);
   const rCol    = {Approved:'var(--green)',Failed:'var(--red)',Pending:'var(--amber)',Skipped:'var(--muted)',Open:'var(--muted)'};
 
@@ -4509,10 +4352,6 @@ function openUnitDetail(id){
 
   const tabStyle  = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:color .15s,border-color .15s';
   const tabActive = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);transition:color .15s,border-color .15s';
-
-  const logHTML = uLogs.length
-    ? uLogs.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.subject||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${df(r.date)}${r.type?' · '+r.type:''}</div></div><span style="font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;margin-left:8px">${r.status||''}</span></div>`).join('')
-    : '<div style="font-size:12px;color:var(--muted);padding:12px 0">No logbook entries</div>';
 
   const inspHTML = uInsp.length
     ? uInsp.map(i=>{const insp=DB.inspections.find(r=>r.id===i.inspectionId);return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600;color:var(--text)">${i.label||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${insp?df(insp.dateStart):'—'}</div></div><span style="font-size:11px;font-weight:700;color:${rCol[i.result]||'var(--muted)'}">${i.result||'—'}</span></div>`;}).join('')
@@ -4524,12 +4363,10 @@ function openUnitDetail(id){
 
   document.getElementById('unit-detail-body').innerHTML = `
     <div style="display:flex;border-bottom:1px solid var(--border);padding:0 18px">
-      <button id="udtab-log"     style="${tabActive}" onclick="unitDetailTab('log')">Logbook (${uLogs.length})</button>
-      <button id="udtab-inspect" style="${tabStyle}"  onclick="unitDetailTab('inspect')">Inspect (${uInsp.length})</button>
+      <button id="udtab-inspect" style="${tabActive}"  onclick="unitDetailTab('inspect')">Inspect (${uInsp.length})</button>
       <button id="udtab-tickets" style="${tabStyle}"  onclick="unitDetailTab('tickets')">Tickets (${openTix.length})</button>
     </div>
-    <div id="udpanel-log"     style="padding:0 18px 8px">${logHTML}</div>
-    <div id="udpanel-inspect" style="display:none;padding:0 18px 8px">${inspHTML}</div>
+    <div id="udpanel-inspect" style="padding:0 18px 8px">${inspHTML}</div>
     <div id="udpanel-tickets" style="display:none;padding:4px 18px 8px">${tixHTML}</div>
     ${can('canManageBuildings') ? `
     <div style="padding:8px 18px 0;display:flex;gap:9px;flex-wrap:wrap">
@@ -4726,13 +4563,12 @@ function renderFloors(){
   const hc=h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
   c.innerHTML = '<div style="padding:0 14px 8px">' + list.map(f => {
     const bld     = DB.buildings.find(b=>b.id===f.buildingId);
-    const fLogs   = DB.logs.filter(r=>r.floorId===f.id).length;
     const fInsp   = DB.inspectionItems.filter(i=>DB.assets.some(a=>a.floorId===f.id&&a.id===i.assetId)||DB.units.some(u=>u.floorId===f.id&&u.id===i.unitId)).length;
     const fTix    = DB.tickets.filter(t=>t.floorId===f.id&&t.status!=='Closed').length;
     const fTixClosed = DB.tickets.filter(t=>t.floorId===f.id&&t.status==='Closed').length;
     const fInspDone  = DB.inspectionItems.filter(i=>(DB.assets.some(a=>a.floorId===f.id&&a.id===i.assetId)||DB.units.some(u=>u.floorId===f.id&&u.id===i.unitId))&&i.result==='Approved').length;
-    const totalItems = fLogs+fInsp+fTix+fTixClosed+fInspDone||1;
-    const pressure   = (fTix*3+fInsp*2+fLogs*1+fTixClosed*0.5+fInspDone*0.5)/totalItems*10;
+    const totalItems = fInsp+fTix+fTixClosed+fInspDone||1;
+    const pressure   = (fTix*3+fInsp*2+fTixClosed*0.5+fInspDone*0.5)/totalItems*10;
     const health     = Math.max(0,Math.min(100,Math.round(100-pressure)));
     const color      = hc(health);
     return `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;overflow:hidden" onclick="openFloorDetail('${f.id}')" onmouseenter="this.style.borderColor='rgba(37,99,235,.4)';this.style.boxShadow='0 2px 8px rgba(37,99,235,.08)'" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
@@ -4750,8 +4586,7 @@ function renderFloors(){
               <div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;padding-bottom:8px;border-bottom:0.5px solid var(--border)">
                 <span style="color:var(--sub)">Open tickets</span><span style="font-weight:700;text-align:right;color:${color}">${fTix} × 3 = ${Math.round(fTix*3*10)/10} pts</span>
                 <span style="color:var(--sub)">Active insp.</span><span style="font-weight:700;text-align:right">${fInsp} × 2 = ${Math.round(fInsp*2*10)/10} pts</span>
-                <span style="color:var(--sub)">Log entries</span><span style="font-weight:700;text-align:right">${fLogs} × 1 = ${fLogs} pts</span>
-                <span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${fTixClosed} × 0.5 = ${Math.round(fTixClosed*0.5*10)/10} pts</span>
+<span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${fTixClosed} × 0.5 = ${Math.round(fTixClosed*0.5*10)/10} pts</span>
                 <span style="font-weight:600;color:var(--text)">Total pressure</span><span style="font-weight:700;text-align:right">${Math.round(pressure*10)/10} pts</span>
               </div>
               <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − (pressure ÷ items × 10)<br>= 100 − (${Math.round(pressure*10)/10} ÷ ${totalItems} × 10) = <strong>${health}%</strong></div>
@@ -4767,11 +4602,7 @@ function renderFloors(){
           <div style="height:100%;width:${health}%;background:${color};border-radius:3px;transition:width .4s ease"></div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
-        <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
-          <div style="font-size:13px;font-weight:800;color:var(--text)">${fLogs}</div>
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Logbook</div>
-        </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
         <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
           <div style="font-size:13px;font-weight:800;color:var(--text)">${fInsp}</div>
           <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspect</div>
@@ -4792,13 +4623,8 @@ function openFloorDetail(id){
   const fAssets = DB.assets.filter(a=>a.floorId===f.id);
   const fTix    = DB.tickets.filter(t=>t.floorId===f.id && t.status!=='Closed');
 
-  const fLogs = DB.logs.filter(r=>r.floorId===f.id).sort((a,z)=>new Date(z.date)-new Date(a.date));
   const fInsp = DB.inspectionItems.filter(i=>fAssets.some(a=>a.id===i.assetId)||units.some(u=>u.id===i.unitId));
   const rCol  = {Approved:'var(--green)',Failed:'var(--red)',Pending:'var(--amber)',Skipped:'var(--muted)',Open:'var(--muted)'};
-
-  const logHTML = fLogs.length
-    ? fLogs.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.subject||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${df(r.date)}${r.type?' · '+r.type:''}</div></div><span style="font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;margin-left:8px">${r.status||''}</span></div>`).join('')
-    : '<div style="font-size:12px;color:var(--muted);padding:12px 0">No logbook entries</div>';
 
   const inspHTML = fInsp.length
     ? fInsp.map(i=>{const insp=DB.inspections.find(r=>r.id===i.inspectionId);return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600;color:var(--text)">${i.label||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${insp?df(insp.dateStart):'—'}</div></div><span style="font-size:11px;font-weight:700;color:${rCol[i.result]||'var(--muted)'}">${i.result||'—'}</span></div>`;}).join('')
@@ -4814,12 +4640,10 @@ function openFloorDetail(id){
   document.getElementById('floor-detail-sub').textContent = f.id + (bld ? '  ·  ' + bld.name : '');
   document.getElementById('floor-detail-body').innerHTML = `
     <div style="display:flex;border-bottom:1px solid var(--border);padding:0 18px">
-      <button id="fdtab-log"     style="${tabActiveS}" onclick="floorDetailTab('log')">Logbook (${fLogs.length})</button>
-      <button id="fdtab-inspect" style="${tabStyle}"   onclick="floorDetailTab('inspect')">Inspect (${fInsp.length})</button>
+      <button id="fdtab-inspect" style="${tabActiveS}"   onclick="floorDetailTab('inspect')">Inspect (${fInsp.length})</button>
       <button id="fdtab-tickets" style="${tabStyle}"   onclick="floorDetailTab('tickets')">Tickets (${fTix.length})</button>
     </div>
-    <div id="fdpanel-log"     style="padding:0 18px 8px">${logHTML}</div>
-    <div id="fdpanel-inspect" style="display:none;padding:0 18px 8px">${inspHTML}</div>
+    <div id="fdpanel-inspect" style="padding:0 18px 8px">${inspHTML}</div>
     <div id="fdpanel-tickets" style="display:none;padding:4px 18px 8px">${ticketsHTML}</div>
     ${can('canManageBuildings') ? `
     <div style="padding:8px 18px 0;display:flex;gap:9px">
@@ -4848,7 +4672,7 @@ function fvAccordion(secId, chevId){
 }
 
 function unitDetailTab(tab){
-  const tabs=['log','inspect','tickets'];
+  const tabs=['inspect','tickets'];
   const activeS='flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);transition:color .15s,border-color .15s';
   const inactS ='flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:color .15s,border-color .15s';
   tabs.forEach(t=>{
@@ -4860,7 +4684,7 @@ function unitDetailTab(tab){
 }
 
 function astDetailTab(tab){
-  const tabs=['log','inspect','tickets'];
+  const tabs=['inspect','tickets'];
   const activeS='flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);transition:color .15s,border-color .15s';
   const inactS ='flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:color .15s,border-color .15s';
   tabs.forEach(t=>{
@@ -4872,7 +4696,7 @@ function astDetailTab(tab){
 }
 
 function floorDetailTab(tab){
-  const tabs = ['log','inspect','tickets'];
+  const tabs = ['inspect','tickets'];
   const activeS = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);transition:color .15s,border-color .15s';
   const inactS  = 'flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:color .15s,border-color .15s';
   tabs.forEach(t=>{
@@ -6303,818 +6127,6 @@ async function doConfirmedDelete(){
 }
 
 /* ══════════════════════════════════════════════════════════
-   LOGBOOK
-══════════════════════════════════════════════════════════ */
-const LOG_STATUS_COLORS = {
-  'open'    : { bg:'rgba(239,68,68,.12)',   color:'var(--red)'   },
-  'gesloten': { bg:'rgba(16,185,129,.12)',  color:'var(--green)' },
-};
-
-/* ── Logbook filter modal helpers ── */
-
-function openLogFilterModal(){
-  // Populate supplier
-  const mSup = document.getElementById('mf-log-sup');
-  if(mSup){
-    const curSup = document.getElementById('sel-log-sup')?.value || 'All';
-    mSup.innerHTML = '<option value="All">All Suppliers</option>' +
-      [...DB.suppliers].sort((a,z)=>a.name.localeCompare(z.name))
-        .map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
-    mSup.value = curSup;
-  }
-  // Sync type & status
-  const mType   = document.getElementById('mf-log-type');
-  const mStatus = document.getElementById('mf-log-status');
-  if(mType)   mType.value   = document.getElementById('sel-log-type')?.value   || 'All';
-  if(mStatus) mStatus.value = document.getElementById('sel-log-status')?.value || 'All';
-  // Populate and sync category
-  const mCat = document.getElementById('mf-log-cat');
-  if(mCat){
-    const curCat = document.getElementById('sel-log-cat')?.value || 'All';
-    mCat.innerHTML = '<option value="All">All Categories</option>' +
-      [...DB.categories].sort((a,z)=>a.category.localeCompare(z.category))
-        .map(c=>`<option value="${c.id}">${c.category}</option>`).join('');
-    mCat.value = curCat;
-  }
-  // Sync date range
-  const dtFrom = document.getElementById('mf-log-date-from');
-  const dtTo   = document.getElementById('mf-log-date-to');
-  if(dtFrom) dtFrom.value = document.getElementById('sel-log-date-from')?.value || '';
-  if(dtTo)   dtTo.value   = document.getElementById('sel-log-date-to')?.value   || '';
-  openMo('mo-log-filter');
-}
-
-function onMfLogBldgChange(silent){
-  const bldgId = document.getElementById('mf-log-bldg')?.value || 'All';
-  const fSel = document.getElementById('mf-log-floor');
-  if(fSel){
-    const floors = bldgId==='All' ? [] : DB.floors.filter(f=>f.buildingId===bldgId).sort((a,z)=>a.sortOrder-z.sortOrder);
-    fSel.innerHTML = '<option value="All">All Floors</option>' + floors.map(f=>`<option value="${f.id}">${f.label}</option>`).join('');
-  }
-  const uSel = document.getElementById('mf-log-unit');
-  if(uSel) uSel.innerHTML = '<option value="All">All Units</option>';
-  const aSel = document.getElementById('mf-log-asset');
-  if(aSel) aSel.innerHTML = '<option value="All">All Assets</option>';
-}
-
-function onMfLogFloorChange(silent){
-  const floorId = document.getElementById('mf-log-floor')?.value || 'All';
-  const bldgId  = document.getElementById('mf-log-bldg')?.value  || 'All';
-  const uSel = document.getElementById('mf-log-unit');
-  if(uSel){
-    const units = (floorId==='All'&&bldgId==='All') ? [] :
-      DB.units.filter(u=>(floorId!=='All'?u.floorId===floorId:(bldgId!=='All'?u.buildingId===bldgId:true))).sort((a,z)=>a.label.localeCompare(z.label));
-    uSel.innerHTML = '<option value="All">All Units</option>' + units.map(u=>`<option value="${u.id}">${u.label}</option>`).join('');
-  }
-  const aSel = document.getElementById('mf-log-asset');
-  if(aSel) aSel.innerHTML = '<option value="All">All Assets</option>';
-}
-
-function onMfLogUnitChange(silent){
-  const unitId  = document.getElementById('mf-log-unit')?.value  || 'All';
-  const floorId = document.getElementById('mf-log-floor')?.value || 'All';
-  const bldgId  = document.getElementById('mf-log-bldg')?.value  || 'All';
-  const aSel = document.getElementById('mf-log-asset');
-  if(aSel){
-    const assets = DB.assets.filter(a=>{
-      if(unitId !=='All') return a.unitId===unitId;
-      if(floorId!=='All') return a.floorId===floorId;
-      if(bldgId !=='All') return a.buildingId===bldgId;
-      return false;
-    }).sort((a,z)=>a.label.localeCompare(z.label));
-    aSel.innerHTML = '<option value="All">All Assets</option>' + assets.map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
-  }
-}
-
-function applyLogFilterModal(){
-  // Push modal values into the hidden selects
-  ['type','status','bldg','floor','unit','asset','sup','cat'].forEach(k=>{
-    const mVal = document.getElementById('mf-log-'+k)?.value || 'All';
-    const hSel = document.getElementById('sel-log-'+k);
-    if(!hSel) return;
-    // Ensure the option exists in the hidden select before setting value
-    if(mVal !== 'All' && !hSel.querySelector(`option[value="${mVal}"]`)){
-      const mEl = document.getElementById('mf-log-'+k);
-      const label = mEl?.querySelector(`option[value="${mVal}"]`)?.textContent || mVal;
-      const opt = document.createElement('option');
-      opt.value = mVal; opt.textContent = label;
-      hSel.appendChild(opt);
-    }
-    hSel.value = mVal;
-  });
-  // Apply date range
-  const hFrom = document.getElementById('sel-log-date-from');
-  const hTo   = document.getElementById('sel-log-date-to');
-  if(hFrom) hFrom.value = document.getElementById('mf-log-date-from')?.value || '';
-  if(hTo)   hTo.value   = document.getElementById('mf-log-date-to')?.value   || '';
-  closeMo('mo-log-filter');
-  setPage('log',1);
-  renderLogbook();
-}
-
-function populateLogBldgFilter(){
-  // Keep hidden select in sync (used by onLogBldgChange cascade chain)
-  const bSel = document.getElementById('sel-log-bldg');
-  if(!bSel) return;
-  const cur = bSel.value;
-  bSel.innerHTML = '<option value="All">All Buildings</option>' +
-    [...DB.buildings].sort((a,z)=>a.name.localeCompare(z.name))
-      .map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
-  if(bSel.querySelector(`option[value="${cur}"]`)) bSel.value = cur;
-}
-function onLogBldgChange(){
-  const bldgId = document.getElementById('sel-log-bldg')?.value || 'All';
-  const fSel = document.getElementById('sel-log-floor');
-  if(fSel){
-    const floors = bldgId==='All' ? [] : DB.floors.filter(f=>f.buildingId===bldgId).sort((a,z)=>a.sortOrder-z.sortOrder);
-    fSel.innerHTML = '<option value="All">All Floors</option>' + floors.map(f=>`<option value="${f.id}">${f.label}</option>`).join('');
-  }
-  const uSel = document.getElementById('sel-log-unit');
-  if(uSel) uSel.innerHTML = '<option value="All">All Units</option>';
-  const aSel = document.getElementById('sel-log-asset');
-  if(aSel) aSel.innerHTML = '<option value="All">All Assets</option>';
-  setPage('log',1); renderLogbook();
-}
-function onLogFloorChange(){
-  const floorId = document.getElementById('sel-log-floor')?.value || 'All';
-  const bldgId  = document.getElementById('sel-log-bldg')?.value  || 'All';
-  const uSel = document.getElementById('sel-log-unit');
-  if(uSel){
-    const units = (floorId==='All'&&bldgId==='All') ? [] :
-      DB.units.filter(u=>(floorId!=='All'?u.floorId===floorId:(bldgId!=='All'?u.buildingId===bldgId:true))).sort((a,z)=>a.label.localeCompare(z.label));
-    uSel.innerHTML = '<option value="All">All Units</option>' + units.map(u=>`<option value="${u.id}">${u.label}</option>`).join('');
-  }
-  const aSel = document.getElementById('sel-log-asset');
-  if(aSel) aSel.innerHTML = '<option value="All">All Assets</option>';
-  setPage('log',1); renderLogbook();
-}
-function onLogUnitChange(){
-  const unitId  = document.getElementById('sel-log-unit')?.value  || 'All';
-  const floorId = document.getElementById('sel-log-floor')?.value || 'All';
-  const bldgId  = document.getElementById('sel-log-bldg')?.value  || 'All';
-  const aSel = document.getElementById('sel-log-asset');
-  if(aSel){
-    const assets = DB.assets.filter(a=>{
-      if(unitId !=='All') return a.unitId===unitId;
-      if(floorId!=='All') return a.floorId===floorId;
-      if(bldgId !=='All') return a.buildingId===bldgId;
-      return false;
-    }).sort((a,z)=>a.label.localeCompare(z.label));
-    aSel.innerHTML = '<option value="All">All Assets</option>' + assets.map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
-  }
-  setPage('log',1); renderLogbook();
-}
-
-function updateLogFilterBadge(){
-  const filters = ['sel-log-type','sel-log-status','sel-log-bldg','sel-log-floor','sel-log-unit','sel-log-asset','sel-log-sup','sel-log-cat'];
-  const logDateFrom = document.getElementById('sel-log-date-from')?.value || '';
-  const logDateTo   = document.getElementById('sel-log-date-to')?.value   || '';
-  const activeCount = filters.filter(id => (document.getElementById(id)?.value||'All') !== 'All').length
-                    + (logDateFrom ? 1 : 0) + (logDateTo ? 1 : 0);
-  const countEl = document.getElementById('log-filter-count');
-  const btnEl   = document.getElementById('log-filter-btn');
-  const clearEl = document.getElementById('log-clear-btn');
-  if(countEl){
-    if(activeCount > 0){
-      countEl.textContent = activeCount;
-      countEl.style.display = 'inline';
-    } else {
-      countEl.style.display = 'none';
-    }
-  }
-  if(btnEl){
-    btnEl.style.borderColor = activeCount > 0 ? 'var(--blue)' : 'var(--border)';
-    btnEl.style.color       = activeCount > 0 ? 'var(--blue)' : 'var(--sub)';
-    btnEl.style.background  = activeCount > 0 ? 'rgba(37,99,235,.06)' : '#fff';
-  }
-  if(clearEl){ clearEl.style.opacity=activeCount>0?'1':'0.35'; clearEl.style.pointerEvents=activeCount>0?'auto':'none'; }
-
-  // Render active-filter chips
-  const chipsEl = document.getElementById('log-filter-chips');
-  if(!chipsEl) return;
-  if(activeCount === 0){ chipsEl.style.display = 'none'; chipsEl.innerHTML = ''; return; }
-  chipsEl.style.display = 'flex';
-  const labels = {
-    'sel-log-type'  : v => v,
-    'sel-log-status': v => v,
-    'sel-log-bldg'  : v => DB.buildings.find(b=>b.id===v)?.name || v,
-    'sel-log-floor' : v => DB.floors.find(f=>f.id===v)?.label  || v,
-    'sel-log-unit'  : v => DB.units.find(u=>u.id===v)?.label   || v,
-    'sel-log-asset' : v => DB.assets.find(a=>a.id===v)?.label  || v,
-    'sel-log-sup'   : v => DB.suppliers.find(s=>s.id===v)?.name || v,
-    'sel-log-cat'   : v => DB.categories.find(c=>c.id===v)?.category || v,
-  };
-  let chips = filters
-    .filter(id => (document.getElementById(id)?.value||'All') !== 'All')
-    .map(id => {
-      const val = document.getElementById(id).value;
-      const lbl = labels[id](val);
-      return `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);border-radius:20px;font-size:12px;font-weight:600;color:var(--blue)">
-        ${lbl}
-        <button onclick="removeLogFilter('${id}')" style="font-size:12px;line-height:1;color:var(--blue);opacity:.7;padding:0 0 0 2px">&times;</button>
-      </span>`;
-    });
-  if(logDateFrom) chips.push(`<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);border-radius:20px;font-size:12px;font-weight:600;color:var(--blue)">From: ${logDateFrom}<button onclick="removeLogFilter('sel-log-date-from')" style="font-size:12px;line-height:1;color:var(--blue);opacity:.7;padding:0 0 0 2px">&times;</button></span>`);
-  if(logDateTo)   chips.push(`<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);border-radius:20px;font-size:12px;font-weight:600;color:var(--blue)">To: ${logDateTo}<button onclick="removeLogFilter('sel-log-date-to')" style="font-size:12px;line-height:1;color:var(--blue);opacity:.7;padding:0 0 0 2px">&times;</button></span>`);
-  chipsEl.innerHTML = chips.join('');
-}
-
-function removeLogFilter(id){
-  const el = document.getElementById(id);
-  if(el) el.value = id.includes('date') ? '' : 'All';
-  // Reset downstream cascades
-  if(id==='sel-log-bldg'){ onLogBldgChange(); return; }
-  if(id==='sel-log-floor'){ onLogFloorChange(); return; }
-  if(id==='sel-log-unit'){ onLogUnitChange(); return; }
-  setPage('log',1); renderLogbook();
-}
-
-/* ── Quick-filter helpers: click a card value to filter the list ── */
-function _ensureOption(el, value, label){
-  if(!el || value === 'All') return;
-  if(![...el.options].some(o => o.value === value)){
-    const opt = document.createElement('option');
-    opt.value = value; opt.textContent = label || value;
-    el.appendChild(opt);
-  }
-}
-
-function quickFilterLog(field, value, label, e){
-  if(e) e.stopPropagation();
-  const el = document.getElementById(field);
-  if(!el) return;
-  _ensureOption(el, value, label);
-  el.value = value;
-  if(field === 'sel-log-bldg') onLogBldgChange();
-  setPage('log', 1);
-  renderLogbook();
-}
-
-function quickFilterTix(field, value, label, e){
-  if(e) e.stopPropagation();
-  const el = document.getElementById(field);
-  if(!el) return;
-  _ensureOption(el, value, label);
-  el.value = value;
-  setPage('tix', 1);
-  renderTix();
-}
-
-let logActiveBldg = null;
-let logSort = 'date'; // 'date' | 'alpha'
-
-function toggleLogSort(){
-  logSort = logSort === 'date' ? 'alpha' : 'date';
-  const btn = document.getElementById('log-sort-btn');
-  if(btn){
-    btn.textContent = logSort === 'alpha' ? 'A–Z' : '0–9';
-    btn.style.color = logSort === 'alpha' ? 'var(--blue)' : 'var(--sub)';
-    btn.style.borderColor = logSort === 'alpha' ? 'rgba(37,99,235,.4)' : '';
-    btn.style.background  = logSort === 'alpha' ? 'rgba(37,99,235,.08)' : '';
-  }
-  setPage('log',1); renderLogbook();
-}
-
-function setLogSeg(v){
-  const sel = document.getElementById('sel-log-status');
-  if(sel) sel.value = v;
-  const styles = {
-    'All':      { border:'1.5px solid var(--border)',              background:'var(--card)',             color:'var(--sub)' },
-    'open':     { border:'1.5px solid rgba(239,68,68,.35)',        background:'rgba(239,68,68,.1)',       color:'var(--red)' },
-    'gesloten': { border:'1.5px solid rgba(16,185,129,.35)',       background:'rgba(16,185,129,.1)',      color:'var(--green)' }
-  };
-  ['All','open','gesloten'].forEach(k=>{
-    const btn = document.getElementById('log-seg-'+k);
-    if(!btn) return;
-    Object.assign(btn.style, k===v ? styles[k] : { border:'1.5px solid var(--border)', background:'var(--card)', color:'var(--sub)' });
-  });
-  setPage('log',1); renderLogbook();
-}
-
-function renderLogBldgBtns(){
-  const wrap = document.getElementById('log-bldg-btns');
-  if(!wrap) return;
-  if(!currentUser){ wrap.style.display = 'none'; return; }
-  const raw = (currentUser.buildings||'').trim();
-  if(!raw){ wrap.style.display = 'none'; return; }
-  const names = raw.split(',').map(s=>s.trim()).filter(Boolean);
-  if(names.length === 0 || names.length > 3){ wrap.style.display = 'none'; return; }
-  wrap.style.display = 'flex';
-  wrap.innerHTML = names.map(name=>{
-    const bld = DB.buildings.find(b=>b.name.trim().toLowerCase()===name.toLowerCase());
-    const bldId = bld?.id;
-    const count = bldId ? DB.logs.filter(r=>r.buildingId===bldId).length : 0;
-    const isActive = logActiveBldg === name;
-    const activeStyle = isActive
-      ? 'background:rgba(37,99,235,.12);border-color:rgba(37,99,235,.4);color:var(--blue);'
-      : 'background:var(--card);border-color:var(--border);color:var(--sub);';
-    return `<button onclick="toggleLogBldgBtn('${name.replace(/'/g,"\\'")}',this)" style="flex:1;min-width:0;padding:7px 8px;border-radius:var(--rs);font-size:12px;font-weight:600;border:1.5px solid;cursor:pointer;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${activeStyle}">${name} <span style="opacity:.55;font-size:10px">${count}</span></button>`;
-  }).join('');
-}
-
-function toggleLogBldgBtn(name, btn){
-  logActiveBldg = logActiveBldg === name ? null : name;
-  renderLogBldgBtns();
-  setPage('log',1); renderLogbook();
-}
-
-function renderLogbook(){
-  populateLogBldgFilter();
-  renderLogBldgBtns();
-
-  const typeF   = (document.getElementById('sel-log-type')?.value   || 'All');
-  const statusF = (document.getElementById('sel-log-status')?.value || 'All');
-  const bldgF   = (document.getElementById('sel-log-bldg')?.value   || 'All');
-  const floorF  = (document.getElementById('sel-log-floor')?.value  || 'All');
-  const unitF   = (document.getElementById('sel-log-unit')?.value   || 'All');
-  const assetF  = (document.getElementById('sel-log-asset')?.value  || 'All');
-  const supF    = (document.getElementById('sel-log-sup')?.value    || 'All');
-  const catF    = (document.getElementById('sel-log-cat')?.value    || 'All');
-  const searchF = (document.getElementById('log-search')?.value     || '').toLowerCase().trim();
-
-  // Update filter badge + chips
-  updateLogFilterBadge();
-
-
-  let rows = DB.logs.slice().sort((a,z)=>
-    logSort === 'alpha'
-      ? (a.subject||'').localeCompare(z.subject||'')
-      : (z.date||'').localeCompare(a.date||'')
-  );
-  const _logBldIds=getUserBuildingIds(); if(_logBldIds.size) rows=rows.filter(r=>_logBldIds.has(r.buildingId));
-  if(logActiveBldg){ const _ab=DB.buildings.find(b=>b.name.trim().toLowerCase()===logActiveBldg.toLowerCase()); if(_ab) rows=rows.filter(r=>r.buildingId===_ab.id); }
-  if(typeF   !== 'All') rows = rows.filter(r=>r.type===typeF);
-  if(statusF !== 'All') rows = rows.filter(r=>r.status===statusF);
-  if(bldgF   !== 'All') rows = rows.filter(r=>r.buildingId===bldgF);
-  if(floorF  !== 'All') rows = rows.filter(r=>r.floorId===floorF);
-  if(unitF   !== 'All') rows = rows.filter(r=>r.unitId===unitF);
-  if(assetF  !== 'All') rows = rows.filter(r=>r.assetId===assetF);
-  if(supF    !== 'All') rows = rows.filter(r=>r.supplierId===supF);
-  if(catF    !== 'All') rows = rows.filter(r=>r.categoryId===catF);
-  const logDateFrom = (document.getElementById('sel-log-date-from')?.value || '');
-  const logDateTo   = (document.getElementById('sel-log-date-to')?.value   || '');
-  if(logDateFrom) rows = rows.filter(r=>(r.date||'')>=logDateFrom);
-  if(logDateTo)   rows = rows.filter(r=>(r.date||'')<=logDateTo);
-  if(searchF) rows = rows.filter(r=>
-    (r.subject||'').toLowerCase().includes(searchF) ||
-    (r.note||'').toLowerCase().includes(searchF) ||
-    (r.building||'').toLowerCase().includes(searchF) ||
-    (r.floor||'').toLowerCase().includes(searchF) ||
-    (r.unit||'').toLowerCase().includes(searchF) ||
-    (r.assetLabel||'').toLowerCase().includes(searchF)
-  );
-  // Hide-gesloten strip: only applies when status filter is 'All'
-  const logHideActive = (statusF === 'All');
-  const geslotenCount = logHideActive ? rows.filter(r=>r.status==='gesloten').length : 0;
-  if(logHideActive && !showGeslotenLog) rows = rows.filter(r=>r.status!=='gesloten');
-  const logStrip = document.getElementById('log-hide-strip');
-  const logLabel = document.getElementById('log-hide-label');
-  const logTrack = document.getElementById('log-hide-track');
-  if(logStrip){
-    logStrip.style.display = (logHideActive && geslotenCount > 0) ? 'flex' : 'none';
-    if(logLabel) logLabel.textContent = showGeslotenLog ? `${geslotenCount} gesloten shown` : `${geslotenCount} gesloten hidden`;
-    if(logTrack) logTrack.classList.toggle('on', showGeslotenLog);
-  }
-
-  const total = rows.length;
-  document.getElementById('log-lbl').textContent = total + ' entr' + (total===1?'y':'ies');
-
-  const ps = PAGE_SIZE;
-  const p  = pages.log;
-  const slice = rows.slice((p-1)*ps, p*ps);
-
-  const el = document.getElementById('log-list');
-  if(!el) return;
-
-  if(!slice.length){
-    el.innerHTML = `<div style="text-align:center;padding:48px 24px;color:var(--muted)">
-      <div style="font-size:32px;margin-bottom:8px">📒</div>
-      <div style="font-size:14px;font-weight:600">No log entries found</div>
-    </div>`;
-    return;
-  }
-
-  const _ubLog   = getUserBuildingIds();
-  const _scopeLog = (DB.logs||[]).filter(x=>!_ubLog.size||_ubLog.has(x.buildingId));
-  const totalLogs = _scopeLog.length || 1;
-  let html = '<div style="padding:0 14px 8px">';
-  slice.forEach(r=>{
-    const dim  = showGeslotenLog && r.status==='gesloten' ? 'opacity:.4;' : '';
-    const rFloor = r.floor || DB.floors.find(f=>f.id===r.floorId)?.label || '';
-    const rUnit  = r.unit  || DB.units.find(u=>u.id===r.unitId)?.label  || '';
-    const sub  = [r.building, rFloor, rUnit].filter(Boolean).join(' · ');
-    const bldLogs = r.building ? _scopeLog.filter(x=>x.building===r.building).length : 0;
-    const wPct = Math.round(bldLogs/totalLogs*100);
-    const hc   = wPct>=40?'#dc2626':wPct>=20?'#d97706':'#059669';
-    html += `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;overflow:hidden;transition:border-color .15s,box-shadow .15s;${dim}" onclick="editLogEntry('${r.id}')" onmouseenter="this.style.borderColor='rgba(37,99,235,.4)';this.style.boxShadow='0 2px 8px rgba(37,99,235,.08)'" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
-      <div style="padding:12px 14px 8px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:2px">
-          <div class="ct" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.subject||'—'}</div>
-          <div class="wl-tooltip-wrap">
-            <div class="wl-tooltip-chip">
-              <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">Workload</span>
-              <span style="font-size:12px;font-weight:800;color:${hc}">${wPct}%</span>
-              <span class="wl-info">ⓘ</span>
-            </div>
-            <div class="wl-tip">
-              <div class="wl-tip-title">${r.building||'—'} · logbook workload</div>
-              <div class="wl-tip-row"><span style="color:var(--sub)">Log entries here</span><span style="font-weight:700">${bldLogs}</span></div>
-              <div class="wl-tip-row"><span style="color:var(--sub)">Total log entries</span><span style="font-weight:700">${totalLogs}</span></div>
-              <div class="wl-tip-row"><span style="color:var(--sub)">Workload share</span><span style="font-weight:700;color:${hc}">${wPct}%</span></div>
-              <div class="wl-tip-formula">${bldLogs} ÷ ${totalLogs} × 100 = ${wPct}%<br>Share of log entries across your accessible buildings. Weights: log entry×1.</div>
-            </div>
-          </div>
-        </div>
-        <div class="cm" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>
-        <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px">
-          <div style="height:100%;width:${wPct}%;background:${hc};border-radius:3px;transition:width .4s ease"></div>
-        </div>
-      </div>
-    </div>`;
-  });
-  html += '</div>';
-  html += renderPagination('log', total, 'goLogPage');
-  el.innerHTML = html;
-}
-
-function goLogPage(p){ setPage('log',p); renderLogbook(); }
-
-(function(){
-  const G = document.createElement('div');
-  G.id = 'wl-tip-global';
-  G.style.display = 'none';
-  document.body.appendChild(G);
-  document.addEventListener('click', e=>{
-    const chip = e.target.closest('.wl-tooltip-chip');
-    if(chip){
-      e.stopPropagation();
-      e.preventDefault();
-      const src = chip.closest('.wl-tooltip-wrap')?.querySelector('.wl-tip');
-      if(!src) return;
-      if(G._src === src && G.style.display !== 'none'){ G.style.display='none'; G._src=null; return; }
-      G.innerHTML = src.innerHTML;
-      G.style.display = 'block';
-      G._src = src;
-      const r = chip.getBoundingClientRect();
-      const vw = window.innerWidth;
-      const tw = 220;
-      let left = r.right - tw;
-      if(left < 8) left = 8;
-      if(left + tw > vw - 8) left = vw - tw - 8;
-      let top = r.bottom + 7;
-      if(top + G.offsetHeight > window.innerHeight - 8) top = r.top - G.offsetHeight - 7;
-      G.style.left = left + 'px';
-      G.style.top  = top  + 'px';
-    } else {
-      G.style.display = 'none';
-      G._src = null;
-    }
-  }, true);
-})();
-
-function clearLogFilters(){
-  logActiveBldg = null;
-  logSort = 'date';
-  const sortBtn = document.getElementById('log-sort-btn');
-  if(sortBtn){ sortBtn.textContent='A–Z'; sortBtn.style.color=''; sortBtn.style.borderColor=''; sortBtn.style.background=''; }
-  ['sel-log-type','sel-log-status','sel-log-bldg','sel-log-floor','sel-log-unit','sel-log-asset','sel-log-sup','sel-log-cat'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='All';
-  });
-  const s=document.getElementById('log-search'); if(s) s.value='';
-  const fSel=document.getElementById('sel-log-floor'); if(fSel) fSel.innerHTML='<option value="All">All Floors</option>';
-  const uSel=document.getElementById('sel-log-unit');  if(uSel) uSel.innerHTML='<option value="All">All Units</option>';
-  const aSel=document.getElementById('sel-log-asset'); if(aSel) aSel.innerHTML='<option value="All">All Assets</option>';
-  const dfrom=document.getElementById('sel-log-date-from');if(dfrom)dfrom.value='';
-  const dto=document.getElementById('sel-log-date-to');if(dto)dto.value='';
-  const mfCat=document.getElementById('mf-log-cat');if(mfCat)mfCat.value='All';
-  const mfFrom=document.getElementById('mf-log-date-from');if(mfFrom)mfFrom.value='';
-  const mfTo=document.getElementById('mf-log-date-to');if(mfTo)mfTo.value='';
-  closeMo('mo-log-filter');
-  setPage('log',1);
-  renderLogbook();
-}
-
-function openNewLogEntry(){
-  editingId.log = null;
-  document.getElementById('log-modal-title').textContent = 'Add Log Entry';
-  const tixBtn = document.getElementById('log-modal-tix-btn');
-  if(tixBtn) tixBtn.style.display = 'none';
-  const dupBtn = document.getElementById('btn-dup-log');
-  if(dupBtn) dupBtn.style.display = 'none';
-  // Default date = today
-  document.getElementById('lf-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('lf-subject').value = '';
-  document.getElementById('lf-type').value = '';
-  document.getElementById('lf-status').value = 'open';
-  document.getElementById('lf-note').value = '';
-  // Populate building
-  const bSel = document.getElementById('lf-bldg');
-  bSel.innerHTML = '<option value="">— Select —</option>' +
-    [...DB.buildings].sort((a,z)=>a.name.localeCompare(z.name))
-      .map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
-  autoSelect('lf-bldg', ()=>{
-    lfOnBldgChange();
-    autoSelect('lf-floor', ()=>{
-      lfOnFloorChange();
-      autoSelect('lf-unit', ()=>{
-        lfOnUnitChange();
-        autoSelect('lf-asset');
-      });
-    });
-  });
-  // Reset remaining cascades if building not auto-selected
-  if(!document.getElementById('lf-bldg').value){
-    document.getElementById('lf-floor').innerHTML = '<option value="">— None —</option>';
-    document.getElementById('lf-unit').innerHTML  = '<option value="">— None —</option>';
-    document.getElementById('lf-asset').innerHTML = '<option value="">— None —</option>';
-  }
-  lfSupPopulate(DB.suppliers.filter(s=>s.status!=='Inactive').sort((a,z)=>a.name.localeCompare(z.name)), '');
-  document.getElementById('lf-category').innerHTML = '<option value="">— Select —</option>' +
-    [...DB.categories].sort((a,z)=>(a.category||'').localeCompare(z.category||''))
-      .map(c=>`<option value="${c.id}">${c.category}</option>`).join('');
-  document.getElementById('lf-category').value = '';
-  openMo('mo-log');
-}
-
-/* ── Generic form supplier search (tf = ticket form, af = asset form) ── */
-const _fSupData = {}; // keyed by prefix
-function fSupPopulate(prefix, suppliers, selectedId='', noneLabel='— None —'){
-  _fSupData[prefix] = [{id:'', name: noneLabel}, ...suppliers];
-  const srch  = document.getElementById(prefix+'-supplier-search') || document.getElementById(prefix+'-cat-search');
-  const hidden = document.getElementById(prefix+'-supplier') || document.getElementById(prefix+'-cat');
-  const found  = _fSupData[prefix].find(s=>s.id===selectedId);
-  if(srch)  srch.value  = found && found.id ? found.name : '';
-  if(hidden) hidden.value = selectedId || '';
-  fSupRender(prefix, '');
-}
-function fSupFilter(prefix){
-  const srch = document.getElementById(prefix+'-supplier-search') || document.getElementById(prefix+'-cat-search');
-  const q = (srch?.value||'').toLowerCase();
-  fSupRender(prefix, q);
-  fSupOpen(prefix);
-}
-function fSupRender(prefix, q){
-  const listId = prefix===('af') ? prefix+'-cat-list' : prefix+'-supplier-list';
-  const list = document.getElementById(listId); if(!list) return;
-  const data = _fSupData[prefix] || [];
-  const filtered = q ? data.filter(s=>s.name.toLowerCase().includes(q)) : data;
-  list.innerHTML = filtered.map(s=>
-    `<div onclick="fSupSelect('${prefix}','${s.id}','${s.name.replace(/'/g,"\\'")}');event.stopPropagation()"
-      style="padding:10px 14px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border)"
-      onmousedown="event.preventDefault()">${s.name}</div>`
-  ).join('') || '<div style="padding:10px 14px;font-size:13px;color:var(--muted)">No results</div>';
-}
-function fSupOpen(prefix){
-  const listId = prefix==='af' ? prefix+'-cat-list' : prefix+'-supplier-list';
-  const list = document.getElementById(listId); if(list) list.style.display='block';
-}
-function fSupClose(prefix){
-  const listId = prefix==='af' ? prefix+'-cat-list' : prefix+'-supplier-list';
-  const list = document.getElementById(listId); if(list) list.style.display='none';
-}
-function fSupSelect(prefix, id, name){
-  const hiddenId = prefix==='af' ? prefix+'-cat' : prefix+'-supplier';
-  const searchId = prefix==='af' ? prefix+'-cat-search' : prefix+'-supplier-search';
-  const hidden = document.getElementById(hiddenId);
-  const srch   = document.getElementById(searchId);
-  if(hidden) hidden.value = id;
-  if(srch)   srch.value  = id ? name : '';
-  fSupClose(prefix);
-}
-function fSupGetValue(prefix){
-  const hiddenId = prefix==='af' ? prefix+'-cat' : prefix+'-supplier';
-  return document.getElementById(hiddenId)?.value || '';
-}
-function fSupSetValue(prefix, id){
-  const data = _fSupData[prefix] || [];
-  const found = data.find(s=>s.id===id);
-  const hiddenId = prefix==='af' ? prefix+'-cat' : prefix+'-supplier';
-  const searchId = prefix==='af' ? prefix+'-cat-search' : prefix+'-supplier-search';
-  const hidden = document.getElementById(hiddenId);
-  const srch   = document.getElementById(searchId);
-  if(hidden) hidden.value = id || '';
-  if(srch)   srch.value  = found && found.id ? found.name : '';
-}
-function fSupClear(prefix){
-  fSupSetValue(prefix, '');
-}
-
-let _lfSuppliers = [];
-function lfSupPopulate(suppliers, selectedId){
-  _lfSuppliers = [{id:'', name:'— None —'}, ...suppliers];
-  const srch = document.getElementById('lf-supplier-search');
-  const hidden = document.getElementById('lf-supplier');
-  const found = _lfSuppliers.find(s=>s.id===selectedId);
-  if(srch) srch.value = found && found.id ? found.name : '';
-  if(hidden) hidden.value = selectedId || '';
-  lfSupRender('');
-}
-
-function lfSupFilter(){
-  const q = (document.getElementById('lf-supplier-search')?.value||'').toLowerCase();
-  lfSupRender(q);
-  lfSupOpen();
-}
-
-function lfSupRender(q){
-  const list = document.getElementById('lf-supplier-list'); if(!list) return;
-  const filtered = q ? _lfSuppliers.filter(s=>s.name.toLowerCase().includes(q)) : _lfSuppliers;
-  if(!filtered.length){ list.innerHTML='<div style="padding:9px 12px;font-size:13px;color:var(--muted)">No results</div>'; return; }
-  list.innerHTML = filtered.map(s=>`
-    <div onclick="lfSupSelect('${s.id}','${s.name.replace(/'/g,"\\'")}');event.stopPropagation()"
-      style="padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);color:${s.id?'var(--text)':'var(--muted)'};"
-      onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background=''">
-      ${s.name}
-    </div>`).join('');
-}
-
-function lfSupOpen(){
-  const list = document.getElementById('lf-supplier-list'); if(list) list.style.display='block';
-}
-
-function lfSupClose(){
-  const list = document.getElementById('lf-supplier-list'); if(list) list.style.display='none';
-}
-
-function lfSupSelect(id, name){
-  document.getElementById('lf-supplier').value = id;
-  document.getElementById('lf-supplier-search').value = id ? name : '';
-  lfSupClose();
-}
-
-function lfOnBldgChange(){
-  const bldgId = document.getElementById('lf-bldg').value;
-  const floors = bldgId ? DB.floors.filter(f=>f.buildingId===bldgId).sort((a,z)=>a.sortOrder-z.sortOrder) : [];
-  document.getElementById('lf-floor').innerHTML = '<option value="">— None —</option>' +
-    floors.map(f=>`<option value="${f.id}">${f.label}</option>`).join('');
-  document.getElementById('lf-unit').innerHTML  = '<option value="">— None —</option>';
-  document.getElementById('lf-asset').innerHTML = '<option value="">— None —</option>';
-}
-
-function lfOnFloorChange(){
-  const floorId = document.getElementById('lf-floor').value;
-  const units = floorId ? DB.units.filter(u=>u.floorId===floorId).sort((a,z)=>a.sortOrder-z.sortOrder) : [];
-  document.getElementById('lf-unit').innerHTML  = '<option value="">— None —</option>' +
-    units.map(u=>`<option value="${u.id}">${u.label}</option>`).join('');
-  document.getElementById('lf-asset').innerHTML = '<option value="">— None —</option>';
-}
-
-function lfOnUnitChange(){
-  const bldgId  = document.getElementById('lf-bldg').value;
-  const floorId = document.getElementById('lf-floor').value;
-  const unitId  = document.getElementById('lf-unit').value;
-  const assets  = DB.assets.filter(a=>{
-    if(bldgId  && a.buildingId !== bldgId)  return false;
-    if(floorId && a.floorId   !== floorId)  return false;
-    if(unitId  && a.unitId    !== unitId)   return false;
-    return true;
-  }).sort((a,z)=>a.label.localeCompare(z.label));
-  document.getElementById('lf-asset').innerHTML = '<option value="">— None —</option>' +
-    assets.map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
-}
-
-async function saveLogEntry(){
-  const date    = document.getElementById('lf-date').value.trim();
-  const subject = document.getElementById('lf-subject').value.trim();
-  const type    = document.getElementById('lf-type').value;
-  if(!date)    { toast('Date required','err'); return; }
-  if(!subject) { toast('Subject required','err'); return; }
-  if(!type)    { toast('Type required','err'); return; }
-  const bldgId     = document.getElementById('lf-bldg').value;
-  const floorId    = document.getElementById('lf-floor').value;
-  const unitId     = document.getElementById('lf-unit').value;
-  const assetId    = document.getElementById('lf-asset').value;
-  const supplierId = document.getElementById('lf-supplier').value;
-  const categoryId = document.getElementById('lf-category').value;
-  const bld = DB.buildings.find(b=>b.id===bldgId);
-  const flr = DB.floors.find(f=>f.id===floorId);
-  const unt = DB.units.find(u=>u.id===unitId);
-  const ast = DB.assets.find(a=>a.id===assetId);
-  const sup = DB.suppliers.find(s=>s.id===supplierId);
-  const cat = DB.categories.find(c=>c.id===categoryId);
-  const data = {
-    date, subject, type,
-    status      : document.getElementById('lf-status').value,
-    supplierId  : supplierId  || '',
-    buildingId  : bldgId      || '',
-    floorId     : floorId     || '',
-    unitId      : unitId      || '',
-    assetId     : assetId     || '',
-    categoryId  : categoryId  || '',
-    note        : document.getElementById('lf-note').value.trim(),
-    building    : bld ? bld.name  : '',
-    floor       : flr ? flr.label : '',
-    unit        : unt ? unt.label : '',
-    assetLabel  : ast ? ast.label : '',
-    supplierName: sup ? sup.name  : '',
-    categoryName: cat ? cat.category : '',
-  };
-  if(editingId.log){
-    Object.assign(DB.logs.find(x=>x.id===editingId.log), data);
-  } else {
-    DB.logs.push({ id: nextId(DB.logs,'LOG'), ...data });
-  }
-  closeMo('mo-log');
-  await writeSheet('logs');
-  toast(editingId.log ? 'Entry updated' : 'Entry added');
-  if(currentScreen==='logbook') renderLogbook();
-}
-
-function editLogEntry(id){
-  const r = DB.logs.find(x=>x.id===id); if(!r) return;
-  editingId.log = id;
-  document.getElementById('log-modal-title').textContent = 'Edit Log Entry';
-  const tixBtn = document.getElementById('log-modal-tix-btn');
-  if(tixBtn) tixBtn.style.display = can('canCreateTickets') ? 'inline-block' : 'none';
-  const dupBtn = document.getElementById('btn-dup-log');
-  if(dupBtn) dupBtn.style.display = '';
-  document.getElementById('lf-date').value    = r.date    || '';
-  document.getElementById('lf-subject').value = r.subject || '';
-  document.getElementById('lf-type').value    = r.type    || '';
-  document.getElementById('lf-status').value  = r.status  || 'open';
-  document.getElementById('lf-note').value    = r.note    || '';
-  // Building
-  const bSel = document.getElementById('lf-bldg');
-  bSel.innerHTML = '<option value="">— Select —</option>' +
-    [...DB.buildings].sort((a,z)=>a.name.localeCompare(z.name))
-      .map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
-  bSel.value = r.buildingId || '';
-  // Floor cascade
-  const floors = r.buildingId ? DB.floors.filter(f=>f.buildingId===r.buildingId).sort((a,z)=>a.sortOrder-z.sortOrder) : [];
-  document.getElementById('lf-floor').innerHTML = '<option value="">— None —</option>' +
-    floors.map(f=>`<option value="${f.id}">${f.label}</option>`).join('');
-  document.getElementById('lf-floor').value = r.floorId || '';
-  // Unit cascade
-  const units = r.floorId ? DB.units.filter(u=>u.floorId===r.floorId).sort((a,z)=>a.sortOrder-z.sortOrder) : [];
-  document.getElementById('lf-unit').innerHTML = '<option value="">— None —</option>' +
-    units.map(u=>`<option value="${u.id}">${u.label}</option>`).join('');
-  document.getElementById('lf-unit').value = r.unitId || '';
-  // Asset cascade
-  const assets = DB.assets.filter(a=>{
-    if(r.buildingId && a.buildingId!==r.buildingId) return false;
-    if(r.floorId    && a.floorId!==r.floorId)       return false;
-    if(r.unitId     && a.unitId!==r.unitId)          return false;
-    return true;
-  }).sort((a,z)=>a.label.localeCompare(z.label));
-  document.getElementById('lf-asset').innerHTML = '<option value="">— None —</option>' +
-    assets.map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
-  document.getElementById('lf-asset').value = r.assetId || '';
-  // Supplier
-  lfSupPopulate(DB.suppliers.filter(s=>s.status!=='Inactive').sort((a,z)=>a.name.localeCompare(z.name)), r.supplierId || '');
-  // Category
-  document.getElementById('lf-category').innerHTML = '<option value="">— Select —</option>' +
-    [...DB.categories].sort((a,z)=>(a.category||'').localeCompare(z.category||''))
-      .map(c=>`<option value="${c.id}">${c.category}</option>`).join('');
-  document.getElementById('lf-category').value = r.categoryId || '';
-  openMo('mo-log');
-}
-
-function quickTicketFromLog(logId){
-  if(!can('canCreateTickets')){ toast('No permission','err'); return; }
-  const r = DB.logs.find(x=>x.id===logId); if(!r) return;
-  editingId.tix = null;
-  document.getElementById('tix-modal-title').textContent = 'New Ticket';
-  document.getElementById('btn-dup-tix').style.display = 'none';
-  // Pre-fill subject and notes from log entry
-  document.getElementById('tf-subj').value    = r.subject || '';
-  document.getElementById('tf-notes').value   = r.note    || '';
-  document.getElementById('tf-reporter').value = currentUser ? currentUser.name : '';
-  document.getElementById('tf-status').value  = 'Open';
-  document.getElementById('tf-pri').value     = 'Medium';
-  populateCatSelect('tf-cat');
-  populateAssignSelect('tf-assign');
-  // Cascade building → floor → unit → asset
-  populateBldSelect('tf-bldg','— Select —');
-  const bld = DB.buildings.find(b=>b.id===r.buildingId);
-  document.getElementById('tf-bldg').value = bld ? bld.name : '';
-  tfOnBldgChange();
-  if(r.floorId){
-    const flr = DB.floors.find(f=>f.id===r.floorId);
-    if(flr) document.getElementById('tf-sub').value = flr.id;
-    tfOnFloorChange();
-  }
-  if(r.unitId){
-    const unt = DB.units.find(u=>u.id===r.unitId);
-    const unitSel = document.getElementById('tf-unit');
-    if(unt && [...unitSel.options].some(o=>o.value===unt.label)) unitSel.value = unt.label;
-    tfOnUnitChange();
-  }
-  if(r.assetId){
-    const astSel = document.getElementById('tf-asset');
-    if(r.assetId && ![...astSel.options].some(o=>o.value===r.assetId)){
-      const a = DB.assets.find(x=>x.id===r.assetId);
-      if(a){ const opt=document.createElement('option'); opt.value=a.id; opt.textContent=`${a.label}${a.unit?' · '+a.unit:''}`; astSel.appendChild(opt); }
-    }
-    astSel.value = r.assetId;
-    tfOnAssetChange();
-  }
-  if(r.supplierId){
-    setTimeout(()=>fSupSetValue('tf', r.supplierId), 0);
-  }
-  openMo('mo-tix');
-}
-
-/* ══════════════════════════════════════════════════════════
    CATEGORIES
 ══════════════════════════════════════════════════════════ */
 let editingCatId = null;
@@ -7293,10 +6305,6 @@ function calGetMatched(){
   const typ     = document.getElementById('cal-type')?.value || '';
   const showInsp= document.getElementById('cal-show-insp')?.checked || false;
   const entries = [];
-  DB.logs.forEach(r=>{
-    if(!r.date) return;
-    entries.push({ date:r.date, supplierId:r.supplierId, type:r.type, source:'log', id:r.id, subject:r.subject||'—' });
-  });
   DB.tickets.forEach(t=>{
     if(!t.dateOpened) return;
     entries.push({ date:t.dateOpened, supplierId:t.supplierId, type:t.type||'', source:'ticket', id:t.id, subject:t.subject||'—' });
@@ -7364,13 +6372,8 @@ function renderCalendar(){
 function calOpenEntry(type, id){
   closeMo('mo-cal-day');
   setTimeout(()=>{
-    if(type==='log'){
-      const r = DB.logs.find(x=>x.id===id); if(!r) return;
-      editLogEntry(id);
-    } else {
-      const t = DB.tickets.find(x=>x.id===id); if(!t) return;
+    const t = DB.tickets.find(x=>x.id===id); if(!t) return;
       editTix(id);
-    }
   }, 250);
 }
 function calDayClick(dateStr){
@@ -7386,13 +6389,11 @@ function calDayClick(dateStr){
   let html = '';
   entries.forEach(e=>{
     const supName = DB.suppliers.find(s=>s.id===e.supplierId)?.name || '—';
-    const srcBadge = e.source==='log'
-      ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(99,153,34,.15);color:#3B6D11">Log</span>`
-      : e.source==='insp'
+    const srcBadge = e.source==='insp'
       ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(139,92,246,.12);color:#6D28D9">Inspectie</span>`
       : `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(37,99,235,.12);color:var(--blue)">Ticket</span>`;
     const typBadge = e.type && e.source!=='insp' ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(100,116,139,.12);color:var(--sub)">${e.type}</span>` : '';
-    const editFn = e.source==='log' ? `calOpenEntry('log','${e.id}')` : e.source==='insp' ? `openInspDetail('${e.id}')` : `calOpenEntry('tix','${e.id}')`;
+    const editFn = e.source==='insp' ? `openInspDetail('${e.id}')` : `calOpenEntry('tix','${e.id}')`;
     html += `<div onclick="${editFn}" style="padding:11px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s" onmousedown="this.style.background='var(--card2)'" onmouseup="this.style.background=''" onmouseleave="this.style.background=''">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px">
         <div style="font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.subject}</div>
@@ -7453,491 +6454,6 @@ function calDayClick(dateStr){
   </div>
 </div>
 
-<!-- ═══════ LOGBOOK MODAL ═══════ -->
-<div class="mo" id="mo-log" onclick="mcClick(event,'mo-log')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt"><span id="log-modal-title">Add Log Entry</span><div style="display:flex;align-items:center;gap:8px"><button id="log-modal-tix-btn" onclick="quickTicketFromLog(editingId.log)" style="display:none;padding:4px 10px;background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.3);border-radius:var(--rs);font-size:12px;font-weight:700;color:var(--green);line-height:1.4">+ Ticket</button><button class="mt-close" onclick="closeMo('mo-log')">✕</button></div></div>
-    <div class="mb">
-      <div class="fg"><label>Subject <span style="color:var(--red)">*</span></label><input class="fi2" id="lf-subject" placeholder="Short description…"/></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-        <div class="fg" style="padding:0"><label>Building</label>
-          <select class="fi2" id="lf-bldg" onchange="lfOnBldgChange()">
-            <option value="">— Select —</option>
-          </select>
-        </div>
-        <div class="fg" style="padding:0"><label>Floor</label>
-          <select class="fi2" id="lf-floor" onchange="lfOnFloorChange()">
-            <option value="">— None —</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-        <div class="fg" style="padding:0"><label>Unit</label>
-          <select class="fi2" id="lf-unit" onchange="lfOnUnitChange()">
-            <option value="">— None —</option>
-          </select>
-        </div>
-        <div class="fg" style="padding:0"><label>Asset</label>
-          <select class="fi2" id="lf-asset">
-            <option value="">— None —</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-        <div class="fg" style="padding:0"><label>Type <span style="color:var(--red)">*</span></label>
-          <select class="fi2" id="lf-type">
-            <option value="">— Select —</option>
-            <option value="bestelling">Bestelling</option>
-            <option value="bezoek">Bezoek</option>
-            <option value="evaluatie">Evaluatie</option>
-            <option value="her-keuring">Her-keuring</option>
-            <option value="keuring">Keuring</option>
-            <option value="onderhoud">Onderhoud</option>
-            <option value="ontvangen">Ontvangen</option>
-            <option value="arbo">Arbo</option>
-            <option value="storing">Storing</option>
-            <option value="verhuizing">Verhuizing</option>
-          </select>
-        </div>
-        <div class="fg" style="padding:0"><label>Category</label>
-          <select class="fi2" id="lf-category">
-            <option value="">— Select —</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-        <div class="fg" style="padding:0"><label>Date <span style="color:var(--red)">*</span></label><input class="fi2" type="date" id="lf-date"/></div>
-        <div class="fg" style="padding:0"><label>Status</label>
-          <select class="fi2" id="lf-status">
-            <option value="open">Open</option>
-            <option value="gesloten">Gesloten</option>
-          </select>
-        </div>
-      </div>
-      <div class="fg"><label>Supplier</label>
-        <div id="lf-supplier-wrap" style="position:relative">
-          <input id="lf-supplier-search" class="fi2" placeholder="Search supplier…" autocomplete="off"
-            oninput="lfSupFilter()"
-            onfocus="lfSupOpen()"
-            onblur="setTimeout(()=>lfSupClose(),180)"
-            style="padding-right:28px"/>
-          <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:11px">▾</span>
-          <div id="lf-supplier-list" style="display:none;position:absolute;top:calc(100% + 2px);left:0;right:0;background:var(--card);border:1.5px solid var(--blue);border-radius:var(--rs);z-index:9999;max-height:180px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.13)"></div>
-        </div>
-        <input type="hidden" id="lf-supplier"/>
-      </div>
-      <div class="fg"><label>Note</label><textarea class="fi2" id="lf-note" rows="3" placeholder="Additional details…" style="resize:vertical"></textarea></div>
-    </div>
-    <button class="btn-p" onclick="saveLogEntry()">Save Log Entry</button>
-    <button class="btn-s" id="btn-dup-log" onclick="duplicateLog()" style="display:none;background:#EEF2FF;border-color:#C7D2FE;color:var(--indigo);font-weight:700">Duplicate Entry</button>
-    <button class="btn-s" onclick="closeMo('mo-log')">Cancel</button>
-  </div>
-</div>
-
-<!-- ═══════ INSPECTION MODALS ═══════ -->
-
-<!-- Start Inspection Round -->
-<div class="mo" id="mo-insp-start" onclick="mcClick(event,'mo-insp-start')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt"><span>Start Inspection Round</span><button class="mt-close" onclick="closeMo('mo-insp-start')">✕</button></div>
-    <!-- Step 1: Building -->
-    <div class="fg"><label>Building *</label><select class="fs2" id="insp-bldg" onchange="inspOnBldgChange()"><option value="">Select building…</option></select></div>
-    <div id="insp-filters-wrap" style="display:none">
-      <!-- Step 2: Type -->
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:4px 18px 8px">Inspect *</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 18px 12px">
-        <button id="insp-type-units"    onclick="inspSetType('units')"    style="padding:11px 4px;border-radius:var(--rs);border:1.5px solid var(--border);font-size:13px;font-weight:700;color:var(--sub);background:var(--card);transition:all .15s">Units</button>
-        <button id="insp-type-assets"   onclick="inspSetType('assets')"   style="padding:11px 4px;border-radius:var(--rs);border:1.5px solid var(--border);font-size:13px;font-weight:700;color:var(--sub);background:var(--card);transition:all .15s">Assets</button>
-        <button id="insp-type-category" onclick="inspSetType('category')" style="padding:11px 4px;border-radius:var(--rs);border:1.5px solid var(--border);font-size:13px;font-weight:700;color:var(--sub);background:var(--card);transition:all .15s">Category</button>
-      </div>
-      <!-- Step 3: Filters (shown after type selected) -->
-      <div id="insp-type-filters" style="display:none">
-        <div class="fg"><label>Floor</label><select class="fs2" id="insp-floor" onchange="updateInspPreview()"><option value="">All floors</option></select></div>
-        <div class="fg" id="insp-cat-wrap" style="display:none"><label>Category</label><select class="fs2" id="insp-cat" onchange="updateInspPreview()"><option value="All">All categories</option></select></div>
-      </div>
-    </div>
-    <div id="insp-asset-preview" style="margin:0 18px 12px;padding:12px 14px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--sub)">Select a building to preview items</div>
-    <button class="btn-p" onclick="launchInspectionRound()">Start Round →</button>
-    <div style="height:8px"></div>
-  </div>
-</div>
-
-<!-- Inspection Round Summary -->
-<div class="mo" id="mo-insp-summary" onclick="mcClick(event,'mo-insp-summary')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt"><span>Round Complete</span><button class="mt-close" onclick="closeMo('mo-insp-summary')">✕</button></div>
-    <div id="insp-summary-body" style="padding:0 18px 12px"></div>
-    <button class="btn-p" id="insp-save-btn" onclick="saveInspectionRound()">Save Round</button>
-    <button class="btn-s" onclick="closeMo('mo-insp-summary')">Keep Reviewing</button>
-    <div style="height:8px"></div>
-  </div>
-</div>
-
-<!-- Inspection Detail -->
-<div class="mo" id="mo-insp-detail" onclick="mcClick(event,'mo-insp-detail')">
-  <div class="ms" style="max-height:88vh">
-    <div class="mh"></div>
-    <div class="mt"><span id="insp-detail-title">Inspection</span><button class="mt-close" onclick="closeMo('mo-insp-detail')">✕</button></div>
-    <div id="insp-detail-body" style="overflow-y:auto;padding-bottom:24px"></div>
-  </div>
-</div>
-
-<!-- Categories modal -->
-<div class="mo" id="mo-categories" onclick="mcClick(event,'mo-categories')">
-  <div class="ms" style="max-height:88vh">
-    <div class="mh"></div>
-    <div class="mt">
-      <span style="display:flex;align-items:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--indigo)"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-        Manage Categories
-      </span>
-      <button class="mt-close" onclick="closeMo('mo-categories')">✕</button>
-    </div>
-
-    <!-- Category list -->
-    <div id="cat-list-body" style="max-height:340px;overflow-y:auto;border-top:1px solid var(--border)"></div>
-
-    <!-- Add button bar -->
-    <div style="padding:14px 18px 4px">
-      <button onclick="openAddCategory()" style="width:100%;padding:12px;background:#EEF2FF;border:1.5px solid #C7D2FE;border-radius:var(--rs);font-size:14px;font-weight:700;color:var(--indigo);display:flex;align-items:center;justify-content:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Category
-      </button>
-    </div>
-
-    <!-- Inline add/edit form (hidden by default) -->
-    <div id="cat-form-section" style="display:none;padding:0 18px 4px;border-top:1px solid var(--border);margin-top:8px">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:14px 0 8px" id="cat-form-title">Add Category</div>
-      <input class="fi2" id="cat-inp" placeholder="e.g. Fire Safety" onkeydown="if(event.key==='Enter'){event.preventDefault();saveCategory();}" style="margin-bottom:10px"/>
-      <input class="fi2" id="cat-notes" placeholder="Helper text (optional)…" style="margin-bottom:10px;font-size:12px"/>
-      <div style="display:flex;gap:9px">
-        <button onclick="saveCategory()" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:14px;font-weight:700;color:#fff">Save</button>
-        <button onclick="cancelCategoryForm()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Cancel</button>
-      </div>
-    </div>
-
-    <div style="height:12px"></div>
-  </div>
-</div>
-
-<!-- ═══════ TICKETS FILTER MODAL ═══════ -->
-<div class="mo" id="mo-tix-filter" onclick="mcClick(event,'mo-tix-filter')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt">
-      <span style="display:flex;align-items:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filter Tickets
-      </span>
-      <button class="mt-close" onclick="closeMo('mo-tix-filter')">&#x2715;</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-      <div class="fg" style="padding:0"><label>Type</label>
-        <select class="fi2" id="mf-tix-type">
-          <option value="All">All Types</option>
-          <option value="arbo">Arbo</option>
-          <option value="bestelling">Bestelling</option>
-          <option value="bezoek">Bezoek</option>
-          <option value="evaluatie">Evaluatie</option>
-          <option value="her-keuring">Her-keuring</option>
-          <option value="keuring">Keuring</option>
-          <option value="onderhoud">Onderhoud</option>
-          <option value="ontvangen">Ontvangen</option>
-          <option value="storing">Storing</option>
-          <option value="verhuizing">Verhuizing</option>
-        </select>
-      </div>
-      <div class="fg" style="padding:0"><label>Category</label>
-        <select class="fi2" id="mf-tix-cat"><option value="All">All Categories</option></select>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-      <div class="fg" style="padding:0"><label>Status</label>
-        <select class="fi2" id="mf-tix-status">
-          <option value="All">All Statuses</option>
-          <option value="Open">Open</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Closed">Closed</option>
-          <option value="Planned">Planned</option>
-          <option value="Requested">Requested</option>
-          <option value="Ordered">Ordered</option>
-          <option value="mine">Assigned to Me</option>
-        </select>
-      </div>
-      <div class="fg" style="padding:0"><label>Supplier</label>
-        <select class="fi2" id="mf-tix-sup"><option value="All">All Suppliers</option></select>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-      <div class="fg" style="padding:0"><label>Date from</label>
-        <input type="date" class="fi2" id="mf-tix-date-from" style="font-size:14px">
-      </div>
-      <div class="fg" style="padding:0"><label>Date to</label>
-        <input type="date" class="fi2" id="mf-tix-date-to" style="font-size:14px">
-      </div>
-    </div>
-    <div style="display:flex;gap:10px;padding:4px 18px 18px">
-      <button onclick="clearTixFilters()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Clear All</button>
-      <button onclick="applyTixFilterModal()" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff">Apply</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════ INSPECTIONS FILTER MODAL ═══════ -->
-<div class="mo" id="mo-insp-filter" onclick="mcClick(event,'mo-insp-filter')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt">
-      <span style="display:flex;align-items:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filter Inspections
-      </span>
-      <button class="mt-close" onclick="closeMo('mo-insp-filter')">&#x2715;</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-      <div class="fg" style="padding:0"><label>Inspector</label>
-        <select class="fi2" id="mf-insp-inspector"><option value="All">All Inspectors</option></select>
-      </div>
-      <div class="fg" style="padding:0"><label>Failed / Pending</label>
-        <select class="fi2" id="mf-insp-result">
-          <option value="All">All</option>
-          <option value="hasFailed">Has Failed</option>
-          <option value="hasPending">Has Pending</option>
-          <option value="allClear">All Clear</option>
-        </select>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-      <div class="fg" style="padding:0"><label>Status</label>
-        <select class="fi2" id="mf-insp-status">
-          <option value="All">All</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-      </div>
-      <div class="fg" style="padding:0"><label>Category</label>
-        <select class="fi2" id="mf-insp-cat"><option value="All">All Categories</option></select>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-      <div class="fg" style="padding:0"><label>Date from</label>
-        <input type="date" class="fi2" id="mf-insp-date-from" style="font-size:14px">
-      </div>
-      <div class="fg" style="padding:0"><label>Date to</label>
-        <input type="date" class="fi2" id="mf-insp-date-to" style="font-size:14px">
-      </div>
-    </div>
-    <div style="display:flex;gap:10px;padding:4px 18px 18px">
-      <button onclick="clearInspFilters()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Clear All</button>
-      <button onclick="applyInspFilterModal()" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff">Apply</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════ BUILDINGS FILTER MODAL ═══════ -->
-<div class="mo" id="mo-bld-filter" onclick="mcClick(event,'mo-bld-filter')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt">
-      <span style="display:flex;align-items:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filter Buildings
-      </span>
-      <button class="mt-close" onclick="closeMo('mo-bld-filter')">&#x2715;</button>
-    </div>
-    <div class="fg"><label>Status</label>
-      <select class="fi2" id="mf-bld-status">
-        <option value="All">All</option>
-        <option value="Active">Normal (no open tickets)</option>
-        <option value="Issues">Has Open Tickets</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:10px;padding:4px 18px 18px">
-      <button onclick="clearBldFilters()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Clear All</button>
-      <button onclick="applyBldFilterModal()" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff">Apply</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════ SUPPLIERS FILTER MODAL ═══════ -->
-<div class="mo" id="mo-sup-filter" onclick="mcClick(event,'mo-sup-filter')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt">
-      <span style="display:flex;align-items:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filter Suppliers
-      </span>
-      <button class="mt-close" onclick="closeMo('mo-sup-filter')">&#x2715;</button>
-    </div>
-    <div class="fg"><label>Status</label>
-      <select class="fi2" id="mf-sup-status">
-        <option value="All">All Statuses</option>
-        <option value="Active">Active</option>
-        <option value="Preferred">Preferred</option>
-        <option value="Inactive">Inactive</option>
-      </select>
-    </div>
-    <div class="fg"><label>Expertise</label>
-      <select class="fi2" id="mf-sup-expertise"><option value="All">All Expertise</option></select>
-    </div>
-    <div class="fg"><label>Sort by Rate</label>
-      <select class="fi2" id="mf-sup-sort">
-        <option value="none">Default (alphabetical)</option>
-        <option value="asc">Rate &#x2191; Low &rarr; High</option>
-        <option value="desc">Rate &#x2193; High &rarr; Low</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:10px;padding:4px 18px 18px">
-      <button onclick="clearSupFilters()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Clear All</button>
-      <button onclick="applySupFilterModal()" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff">Apply</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════ ASSETS FILTER MODAL ═══════ -->
-<div class="mo" id="mo-ast-filter" onclick="mcClick(event,'mo-ast-filter')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt">
-      <span style="display:flex;align-items:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filter Assets
-      </span>
-      <button class="mt-close" onclick="closeMo('mo-ast-filter')">&#x2715;</button>
-    </div>
-    <div class="fg"><label>Building</label>
-      <select class="fi2" id="mf-ast-bldg" onchange="onMfAstBldgChange()"><option value="All">All Buildings</option></select>
-    </div>
-    <div class="fg"><label>Floor</label>
-      <select class="fi2" id="mf-ast-floor" onchange="onMfAstFloorChange()"><option value="All">All Floors</option></select>
-    </div>
-    <div class="fg"><label>Unit</label>
-      <select class="fi2" id="mf-ast-unit"><option value="All">All Units</option></select>
-    </div>
-    <div class="fg"><label>Status</label>
-      <select class="fi2" id="mf-ast-status">
-        <option value="All">All Statuses</option>
-        <option value="Active">Active</option>
-        <option value="Under Maintenance">Under Maintenance</option>
-        <option value="Decommissioned">Decommissioned</option>
-      </select>
-    </div>
-    <div class="fg"><label>Supplier</label>
-      <select class="fi2" id="mf-ast-cat"><option value="All">All Suppliers</option></select>
-    </div>
-    <div class="fg"><label>Category</label>
-      <select class="fi2" id="mf-ast-acat"><option value="All">All Categories</option></select>
-    </div>
-    <div class="fg"><label>Tickets</label>
-      <select class="fi2" id="mf-ast-tix-status">
-        <option value="All">All</option>
-        <option value="Active">Problem</option>
-        <option value="Available">Normal</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:10px;padding:4px 18px 18px">
-      <button onclick="clearAstFilters()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Clear All</button>
-      <button onclick="applyAstFilterModal()" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff">Apply</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════ UNITS FILTER MODAL ═══════ -->
-<div class="mo" id="mo-unit-filter" onclick="mcClick(event,'mo-unit-filter')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt">
-      <span style="display:flex;align-items:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filter Units
-      </span>
-      <button class="mt-close" onclick="closeMo('mo-unit-filter')">&#x2715;</button>
-    </div>
-    <div class="fg"><label>Building</label>
-      <select class="fi2" id="mf-unit-bldg" onchange="onMfUnitBldgChange()"><option value="All">All Buildings</option></select>
-    </div>
-    <div class="fg"><label>Floor</label>
-      <select class="fi2" id="mf-unit-floor"><option value="All">All Floors</option></select>
-    </div>
-    <div class="fg"><label>Status</label>
-      <select class="fi2" id="mf-unit-status">
-        <option value="All">All</option>
-        <option value="Active">Problem</option>
-        <option value="Available">Normal</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:10px;padding:4px 18px 18px">
-      <button onclick="clearUnitFilters()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Clear All</button>
-      <button onclick="applyUnitFilterModal()" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff">Apply</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════ LOGBOOK FILTER MODAL ═══════ -->
-<div class="mo" id="mo-log-filter" onclick="mcClick(event,'mo-log-filter')">
-  <div class="ms">
-    <div class="mh"></div>
-    <div class="mt">
-      <span style="display:flex;align-items:center;gap:8px">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filter Logbook
-      </span>
-      <button class="mt-close" onclick="closeMo('mo-log-filter')">&#x2715;</button>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-      <div class="fg" style="padding:0"><label>Type</label>
-        <select class="fi2" id="mf-log-type">
-          <option value="All">All Types</option>
-          <option value="bestelling">Bestelling</option>
-          <option value="bezoek">Bezoek</option>
-          <option value="evaluatie">Evaluatie</option>
-          <option value="her-keuring">Her-keuring</option>
-          <option value="keuring">Keuring</option>
-          <option value="onderhoud">Onderhoud</option>
-          <option value="ontvangen">Ontvangen</option>
-          <option value="arbo">Arbo</option>
-          <option value="storing">Storing</option>
-          <option value="verhuizing">Verhuizing</option>
-        </select>
-      </div>
-      <div class="fg" style="padding:0"><label>Category</label>
-        <select class="fi2" id="mf-log-cat">
-          <option value="All">All Categories</option>
-        </select>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-      <div class="fg" style="padding:0"><label>Status</label>
-        <select class="fi2" id="mf-log-status">
-          <option value="All">All Statuses</option>
-          <option value="open">Open</option>
-          <option value="gesloten">Gesloten</option>
-        </select>
-      </div>
-      <div class="fg" style="padding:0"><label>Supplier</label>
-        <select class="fi2" id="mf-log-sup"><option value="All">All Suppliers</option></select>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px">
-      <div class="fg" style="padding:0"><label>Date from</label>
-        <input type="date" class="fi2" id="mf-log-date-from" style="font-size:14px">
-      </div>
-      <div class="fg" style="padding:0"><label>Date to</label>
-        <input type="date" class="fi2" id="mf-log-date-to" style="font-size:14px">
-      </div>
-    </div>
-
-    <div style="display:flex;gap:10px;padding:4px 18px 18px">
-      <button onclick="clearLogFilters()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Clear All</button>
-      <button onclick="applyLogFilterModal()" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff">Apply</button>
-    </div>
-  </div>
-</div>
 
 <!-- Google Identity Services + GAPI -->
 <script src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
