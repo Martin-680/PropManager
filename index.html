@@ -2253,7 +2253,10 @@ function renderDash(){
     const _ubDash = getUserBuildingIds();
     const _bldgs  = _ubDash.size ? DB.buildings.filter(b=>_ubDash.has(b.id)) : DB.buildings;
     const bldgStats = _bldgs.map(b=>{
-      const floorCount = DB.floors.filter(f=>f.buildingId===b.id).length || 1;
+      const sqm      = parseFloat(b.size)||0;
+      const unitCount = DB.units.filter(u=>u.buildingId===b.id).length;
+      const effSqm    = sqm>0 ? sqm : unitCount*50;
+      const per100    = Math.max(effSqm/100, 1);
 
       // Tickets with dateOpened in period
       const periodTix = DB.tickets.filter(t=>t.buildingId===b.id&&inPeriod(t.dateOpened));
@@ -2270,12 +2273,12 @@ function renderDash(){
       const closedInspPts = DB.inspections.filter(i=>i.buildingId===b.id&&i.status==='Completed'&&inPeriod(i.dateStart)).length * -1;
 
       const workload = openTixPts + closedTixPts + inspItemPts + closedInspPts;
-      const pressure = workload / floorCount;
+      const pressure = workload / per100;
       const health   = Math.max(0, Math.min(100, Math.round(100 - pressure * 8)));
 
       const openTixCount  = periodTix.filter(t=>t.status!=='Closed').length;
       const inspItemCount = periodItems.length;
-      return {b, floorCount, openTixCount, inspItemCount, workload, pressure, health};
+      return {b, effSqm, openTixCount, inspItemCount, workload, pressure, health};
     }).filter(s=>s.workload>0).sort((a,z)=>a.health-z.health).slice(0,5);
 
     if(!bldgStats.length){
@@ -2294,7 +2297,7 @@ function renderDash(){
         const border  = i<bldgStats.length-1?'border-bottom:1px solid var(--border);':'';
         const pTix    = Math.round(s.openTixCount/totalTix*100);
         const pInsp   = Math.round(s.inspItemCount/totalInsp*100);
-        const sizeStr = s.floorCount + ' floor' + (s.floorCount!==1?'s':'');
+        const sizeStr = s.effSqm ? Number(s.effSqm).toLocaleString('nl-NL')+' m²' : '—';
         const goB     = `navTo('buildings');setTimeout(()=>openBldDetail('${bldId}'),150)`;
         const goTix   = `navTo('tickets');setTimeout(()=>{const e=document.getElementById('sel-tix-bldg');if(e){e.value='${bldName}';setPage('tix',1);renderTix();}},150)`;
         const goInsp  = `navTo('inspections');setTimeout(()=>{const e=document.getElementById('sel-insp-bldg');if(e){e.value='${bldId}';setPage('insp',1);renderInspections();}},150)`;
@@ -2312,10 +2315,10 @@ function renderDash(){
                 <div class="wl-tip-title">${s.b.name} · health score</div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;color:${s.openTixCount>0?'var(--red)':'var(--text)'}">${s.openTixCount}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Insp. items in period</span><span style="font-weight:700">${s.inspItemCount}</span></div>
-                <div class="wl-tip-row"><span style="color:var(--sub)">Floors (normaliser)</span><span style="font-weight:700">${s.floorCount}</span></div>
+                <div class="wl-tip-row"><span style="color:var(--sub)">Size (per100)</span><span style="font-weight:700">${Math.round(s.effSqm/100*10)/10}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(s.workload*10)/10}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${hc}">${s.health}%</span></div>
-                <div class="wl-tip-formula">Open ticket ×2 · Pending item ×2 · Approved/Failed item ×1 · Skipped ×0 · Closed ticket −1 · Closed inspection −1<br>Pressure = workload ÷ floors · Health = 100 − pressure × 8</div>
+                <div class="wl-tip-formula">Open ticket ×2 · Pending item ×2 · Approved/Failed item ×1 · Skipped ×0 · Closed ticket −1 · Closed inspection −1<br>Pressure = workload ÷ (m² ÷ 100) · Health = 100 − pressure × 8</div>
               </div>
             </div>
           </div>
@@ -2349,7 +2352,7 @@ function renderDash(){
           <span>Closed ticket</span><span style="font-weight:700;color:var(--text)">−1 pt</span>
           <span>Closed inspection</span><span style="font-weight:700;color:var(--text)">−1 pt</span>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Counts tickets (dateOpened) and inspection items (inspection dateStart) within the selected period. Pressure = workload ÷ floor count. Health = 100 − pressure × 8. Buildings with more floors absorb more activity naturally.</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Counts tickets (dateOpened) and inspection items (inspection dateStart) within the selected period. Pressure = workload ÷ (m² ÷ 100). Health = 100 − pressure × 8. Falls back to unit count × 50 m² if no size is set.</div>
       </div>`;
 
       statsEl.innerHTML = `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">${rows}${howCalc}</div>`;
