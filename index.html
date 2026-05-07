@@ -6127,6 +6127,43 @@ async function doConfirmedDelete(){
 }
 
 /* ══════════════════════════════════════════════════════════
+   TOOLTIP (global health chip)
+══════════════════════════════════════════════════════════ */
+function wlTip(){} // clicks handled by document listener below
+(function(){
+  const G = document.createElement('div');
+  G.id = 'wl-tip-global';
+  G.style.display = 'none';
+  document.body.appendChild(G);
+  document.addEventListener('click', e=>{
+    const chip = e.target.closest('.wl-tooltip-chip');
+    if(chip){
+      e.stopPropagation();
+      e.preventDefault();
+      const src = chip.closest('.wl-tooltip-wrap')?.querySelector('.wl-tip');
+      if(!src) return;
+      if(G._src === src && G.style.display !== 'none'){ G.style.display='none'; G._src=null; return; }
+      G.innerHTML = src.innerHTML;
+      G.style.display = 'block';
+      G._src = src;
+      const r = chip.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const tw = 220;
+      let left = r.right - tw;
+      if(left < 8) left = 8;
+      if(left + tw > vw - 8) left = vw - tw - 8;
+      let top = r.bottom + 7;
+      if(top + G.offsetHeight > window.innerHeight - 8) top = r.top - G.offsetHeight - 7;
+      G.style.left = left + 'px';
+      G.style.top  = top  + 'px';
+    } else {
+      G.style.display = 'none';
+      G._src = null;
+    }
+  }, true);
+})();
+
+/* ══════════════════════════════════════════════════════════
    CATEGORIES
 ══════════════════════════════════════════════════════════ */
 let editingCatId = null;
