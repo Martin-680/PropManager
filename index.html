@@ -1440,10 +1440,12 @@ const PAGE_SIZE = 10;
 const pages = { tix:1, ast:1, usr:1, bld:1, sup:1, insp:1, log:1 };
 const today = new Date();
 const _MS_DAY = 86400000;
-const ageMult = d => d ? Math.min(1 + (today - new Date(d)) / (30 * _MS_DAY), 4) : 1;
+// Parse YYYY-MM-DD as local midnight to avoid UTC offset shifting the date by ±1 day
+const parseDate=(s)=>{if(!s)return null;const p=s.split('-');if(p.length===3)return new Date(+p[0],+p[1]-1,+p[2]);return new Date(s);};
+const ageMult = d => d ? Math.min(1 + (today - parseDate(d)) / (30 * _MS_DAY), 4) : 1;
 const d=(n)=>{const x=new Date(today);x.setDate(x.getDate()-n);return x.toISOString().split('T')[0];};
-const df=(s)=>s?new Date(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';
-const daysSince=(s)=>s?Math.floor((today-new Date(s))/86400000):0;
+const df=(s)=>s?parseDate(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const daysSince=(s)=>s?Math.max(0,Math.floor((today-parseDate(s))/_MS_DAY)):0;
 function setPage(k,p){pages[k]=p;}
 function nextId(arr,prefix){ const nums=arr.map(x=>parseInt((x.id||'').split('-')[1]||0)).filter(n=>!isNaN(n)); return `${prefix}-${String((nums.length?Math.max(...nums):0)+1).padStart(3,'0')}`; }
 
