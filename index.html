@@ -2247,31 +2247,42 @@ function renderDash(){
     const days   = dashPeriod==='week'?7:dashPeriod==='month'?30:90;
     const cutoff = new Date(now.getTime()-days*24*60*60*1000);
     const inPeriod = d => d && new Date(d) >= cutoff;
+    // Inspection item weight: Approved/Failed=+1, Pending=+2, Skipped=0
+    const itemPt = r => r==='Pending'?2:r==='Skipped'?0:1;
 
     const _ubDash = getUserBuildingIds();
     const _bldgs  = _ubDash.size ? DB.buildings.filter(b=>_ubDash.has(b.id)) : DB.buildings;
     const bldgStats = _bldgs.map(b=>{
-      const sqm       = parseFloat(b.size)||0;
-      const unitCount = DB.units.filter(u=>u.buildingId===b.id).length;
-      const effSqm    = sqm>0 ? sqm : unitCount*50;
-      const per100    = effSqm>0 ? effSqm/100 : 1;
+      const floorCount = DB.floors.filter(f=>f.buildingId===b.id).length || 1;
 
-      const openTix    = DB.tickets.filter(t=>t.buildingId===b.id&&t.status!=='Closed'&&inPeriod(t.dateCreated||t.date)).length;
-      const closedTix  = DB.tickets.filter(t=>t.buildingId===b.id&&t.status==='Closed'&&inPeriod(t.dateClosed||t.date)).length;
-      const activeInsp = DB.inspections.filter(i=>i.buildingId===b.id&&i.status==='In Progress'&&inPeriod(i.dateStart)).length;
-      const doneInsp   = DB.inspections.filter(i=>i.buildingId===b.id&&i.status==='Completed'&&inPeriod(i.dateEnd||i.dateStart)).length;
-      const pressure   = (openTix*3 + activeInsp*2 + closedTix*0.5 + doneInsp*0.5) / per100;
-      // inspection×2, open ticket×3, closed/completed×0.5
-      const health     = Math.max(0, Math.min(100, Math.round(100 - pressure * 9.0)));
-      const workload   = openTix*3 + activeInsp*2 + closedTix*0.5 + doneInsp*0.5;
-      return {b, sqm:effSqm, openTix, activeInsp, health, workload};
+      // Tickets with dateOpened in period
+      const periodTix = DB.tickets.filter(t=>t.buildingId===b.id&&inPeriod(t.dateOpened));
+      const openTixPts   = periodTix.filter(t=>t.status!=='Closed').length * 2;
+      const closedTixPts = periodTix.filter(t=>t.status==='Closed').length * -1;
+
+      // Inspection items from inspections with dateStart in period
+      const periodInspIds = new Set(
+        DB.inspections.filter(i=>i.buildingId===b.id&&inPeriod(i.dateStart)).map(i=>i.id)
+      );
+      const periodItems = DB.inspectionItems.filter(i=>periodInspIds.has(i.inspectionId));
+      const inspItemPts = periodItems.reduce((s,i)=>s+itemPt(i.result),0);
+      // Closed inspection rounds in period: -1 pt each
+      const closedInspPts = DB.inspections.filter(i=>i.buildingId===b.id&&i.status==='Completed'&&inPeriod(i.dateStart)).length * -1;
+
+      const workload = openTixPts + closedTixPts + inspItemPts + closedInspPts;
+      const pressure = workload / floorCount;
+      const health   = Math.max(0, Math.min(100, Math.round(100 - pressure * 8)));
+
+      const openTixCount  = periodTix.filter(t=>t.status!=='Closed').length;
+      const inspItemCount = periodItems.length;
+      return {b, floorCount, openTixCount, inspItemCount, workload, pressure, health};
     }).filter(s=>s.workload>0).sort((a,z)=>a.health-z.health).slice(0,5);
 
     if(!bldgStats.length){
       statsEl.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:0 0 8px">No data yet — add some tickets or inspections ✓</div>';
     } else {
-      const totalTix  = bldgStats.reduce((a,s)=>a+s.openTix,0)  || 1;
-      const totalInsp = bldgStats.reduce((a,s)=>a+s.activeInsp,0)|| 1;
+      const totalTix  = bldgStats.reduce((a,s)=>a+s.openTixCount,0)  || 1;
+      const totalInsp = bldgStats.reduce((a,s)=>a+s.inspItemCount,0) || 1;
       const maxHealth = Math.max(...bldgStats.map(s=>s.health)) || 1;
 
       const healthColor = h => h>=70?'#059669':h>=40?'#d97706':'#dc2626';
@@ -2281,9 +2292,9 @@ function renderDash(){
         const bldId   = s.b.id.replace(/'/g,"\'");
         const bldName = s.b.name.replace(/'/g,"\'");
         const border  = i<bldgStats.length-1?'border-bottom:1px solid var(--border);':'';
-        const pTix    = Math.round(s.openTix/totalTix*100);
-        const pInsp   = Math.round(s.activeInsp/totalInsp*100);
-        const sqmStr  = s.sqm ? Number(s.sqm).toLocaleString('nl-NL')+' m²' : '—';
+        const pTix    = Math.round(s.openTixCount/totalTix*100);
+        const pInsp   = Math.round(s.inspItemCount/totalInsp*100);
+        const sizeStr = s.floorCount + ' floor' + (s.floorCount!==1?'s':'');
         const goB     = `navTo('buildings');setTimeout(()=>openBldDetail('${bldId}'),150)`;
         const goTix   = `navTo('tickets');setTimeout(()=>{const e=document.getElementById('sel-tix-bldg');if(e){e.value='${bldName}';setPage('tix',1);renderTix();}},150)`;
         const goInsp  = `navTo('inspections');setTimeout(()=>{const e=document.getElementById('sel-insp-bldg');if(e){e.value='${bldId}';setPage('insp',1);renderInspections();}},150)`;
@@ -2299,29 +2310,30 @@ function renderDash(){
               </div>
               <div class="wl-tip">
                 <div class="wl-tip-title">${s.b.name} · health score</div>
-                <div class="wl-tip-row"><span style="color:var(--sub)">Open tickets</span><span style="font-weight:700;color:${s.openTix>0?'var(--red)':'var(--text)'}">${s.openTix}</span></div>
-                <div class="wl-tip-row"><span style="color:var(--sub)">Active inspections</span><span style="font-weight:700">${s.activeInsp}</span></div>
+                <div class="wl-tip-row"><span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;color:${s.openTixCount>0?'var(--red)':'var(--text)'}">${s.openTixCount}</span></div>
+                <div class="wl-tip-row"><span style="color:var(--sub)">Insp. items in period</span><span style="font-weight:700">${s.inspItemCount}</span></div>
+                <div class="wl-tip-row"><span style="color:var(--sub)">Floors (normaliser)</span><span style="font-weight:700">${s.floorCount}</span></div>
+                <div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(s.workload*10)/10}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${hc}">${s.health}%</span></div>
-                <div class="wl-tip-formula">Pressure = (open tickets×3 + active inspections×2 + log entries×1 + closed×0.5) ÷ size<br>Health = 100 − pressure × 9</div>
+                <div class="wl-tip-formula">Open ticket ×2 · Pending item ×2 · Approved/Failed item ×1 · Skipped ×0 · Closed ticket −1 · Closed inspection −1<br>Pressure = workload ÷ floors · Health = 100 − pressure × 8</div>
               </div>
             </div>
           </div>
-          <div style="font-size:10px;color:var(--muted);margin-bottom:6px">${sqmStr}</div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:6px">${sizeStr}</div>
           <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px">
             <div style="height:100%;width:${Math.round(s.health/maxHealth*100)}%;background:${hc};border-radius:3px;transition:width .4s ease"></div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px">
             <div style="${cellBase}" onclick="event.stopPropagation();${goTix}">
-              <div style="font-size:13px;font-weight:800;color:${s.openTix>0?'var(--red)':'var(--text)'}">${s.openTix}</div>
+              <div style="font-size:13px;font-weight:800;color:${s.openTixCount>0?'var(--red)':'var(--text)'}">${s.openTixCount}</div>
               <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Tickets</div>
               <div style="font-size:10px;font-weight:700;color:var(--muted);margin-top:2px">${pTix}% of total</div>
             </div>
             <div style="${cellBase}" onclick="event.stopPropagation();${goInsp}">
-              <div style="font-size:13px;font-weight:800;color:var(--text)">${s.activeInsp}</div>
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspect</div>
+              <div style="font-size:13px;font-weight:800;color:var(--text)">${s.inspItemCount}</div>
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Insp. items</div>
               <div style="font-size:10px;font-weight:700;color:var(--muted);margin-top:2px">${pInsp}% of total</div>
             </div>
-
           </div>
         </div>`;
       }).join('');
@@ -2330,11 +2342,14 @@ function renderDash(){
       const howCalc = `<div style="margin-top:8px;padding:12px 14px;border-top:1px solid var(--border)">
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">How it\'s calculated</div>
         <div style="display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:12px;color:var(--sub)">
-          <span>Open ticket</span><span style="font-weight:700;color:var(--text)">× 3 pts</span>
-          <span>Active inspection</span><span style="font-weight:700;color:var(--text)">× 2 pts</span>
-          <span>Closed / completed</span><span style="font-weight:700;color:var(--text)">× 0.5 pts</span>
+          <span>Open ticket</span><span style="font-weight:700;color:var(--text)">+2 pts</span>
+          <span>Insp. item — Pending</span><span style="font-weight:700;color:var(--text)">+2 pts</span>
+          <span>Insp. item — Approved/Failed</span><span style="font-weight:700;color:var(--text)">+1 pt</span>
+          <span>Insp. item — Skipped</span><span style="font-weight:700;color:var(--text)">0 pts</span>
+          <span>Closed ticket</span><span style="font-weight:700;color:var(--text)">−1 pt</span>
+          <span>Closed inspection</span><span style="font-weight:700;color:var(--text)">−1 pt</span>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Pressure per 100 m² = (open tickets×3 + active inspections×2 + closed/completed×0.5) ÷ (m² ÷ 100). Health = 100 − pressure × 9. If no m² is set, unit count × 50 m² is used as an estimate.</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Counts tickets (dateOpened) and inspection items (inspection dateStart) within the selected period. Pressure = workload ÷ floor count. Health = 100 − pressure × 8. Buildings with more floors absorb more activity naturally.</div>
       </div>`;
 
       statsEl.innerHTML = `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">${rows}${howCalc}</div>`;
@@ -4561,16 +4576,34 @@ function renderFloors(){
   }
 
   const hc=h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
+  const hc=h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
+  const flItemPt = r => r==='Pending'?2:r==='Skipped'?0:1;
   c.innerHTML = '<div style="padding:0 14px 8px">' + list.map(f => {
     const bld     = DB.buildings.find(b=>b.id===f.buildingId);
-    const fInsp   = DB.inspectionItems.filter(i=>DB.assets.some(a=>a.floorId===f.id&&a.id===i.assetId)||DB.units.some(u=>u.floorId===f.id&&u.id===i.unitId)).length;
-    const fTix    = DB.tickets.filter(t=>t.floorId===f.id&&t.status!=='Closed').length;
-    const fTixClosed = DB.tickets.filter(t=>t.floorId===f.id&&t.status==='Closed').length;
-    const fInspDone  = DB.inspectionItems.filter(i=>(DB.assets.some(a=>a.floorId===f.id&&a.id===i.assetId)||DB.units.some(u=>u.floorId===f.id&&u.id===i.unitId))&&i.result==='Approved').length;
-    const totalItems = fInsp+fTix+fTixClosed+fInspDone||1;
-    const pressure   = (fTix*3+fInsp*2+fTixClosed*0.5+fInspDone*0.5)/totalItems*10;
-    const health     = Math.max(0,Math.min(100,Math.round(100-pressure)));
-    const color      = hc(health);
+    const floorItems = i => DB.assets.some(a=>a.floorId===f.id&&a.id===i.assetId)||DB.units.some(u=>u.floorId===f.id&&u.id===i.unitId);
+    const sqm       = parseFloat(f.sqm)||0;
+    const unitCount = DB.units.filter(u=>u.floorId===f.id).length;
+    const effSqm    = sqm>0 ? sqm : unitCount*50;
+    const per100    = Math.max(effSqm/100, 0.5);
+
+    // Tickets
+    const fTixOpen   = DB.tickets.filter(t=>t.floorId===f.id&&t.status!=='Closed');
+    const fTixClosed = DB.tickets.filter(t=>t.floorId===f.id&&t.status==='Closed');
+    const tixPts     = fTixOpen.length*2 + fTixClosed.length*-1;
+
+    // Inspection items (all, not period-filtered — floors have no period selector)
+    const fInspItems = DB.inspectionItems.filter(floorItems);
+    const itemPts    = fInspItems.reduce((s,i)=>s+flItemPt(i.result),0);
+    // Closed inspections touching this floor
+    const closedInspPts = DB.inspections.filter(i=>i.status==='Completed'&&DB.inspectionItems.some(it=>it.inspectionId===i.id&&floorItems(it))).length * -1;
+
+    const workload = tixPts + itemPts + closedInspPts;
+    const pressure = workload / per100;
+    const health   = Math.max(0, Math.min(100, Math.round(100 - pressure * 5)));
+    const color    = hc(health);
+
+    const fTixCount  = fTixOpen.length;
+    const fInspCount = fInspItems.length;
     return `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;overflow:hidden" onclick="openFloorDetail('${f.id}')" onmouseenter="this.style.borderColor='rgba(37,99,235,.4)';this.style.boxShadow='0 2px 8px rgba(37,99,235,.08)'" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
       <div style="padding:12px 14px 6px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
@@ -4584,12 +4617,13 @@ function renderFloors(){
             <div class="wl-tip">
               <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">Health — ${f.label}</div>
               <div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;padding-bottom:8px;border-bottom:0.5px solid var(--border)">
-                <span style="color:var(--sub)">Open tickets</span><span style="font-weight:700;text-align:right;color:${color}">${fTix} × 3 = ${Math.round(fTix*3*10)/10} pts</span>
-                <span style="color:var(--sub)">Active insp.</span><span style="font-weight:700;text-align:right">${fInsp} × 2 = ${Math.round(fInsp*2*10)/10} pts</span>
-<span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${fTixClosed} × 0.5 = ${Math.round(fTixClosed*0.5*10)/10} pts</span>
-                <span style="font-weight:600;color:var(--text)">Total pressure</span><span style="font-weight:700;text-align:right">${Math.round(pressure*10)/10} pts</span>
+                <span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;text-align:right;color:${color}">${fTixCount} = ${fTixCount*2} pts</span>
+                <span style="color:var(--sub)">Insp. items</span><span style="font-weight:700;text-align:right">${fInspCount} = ${itemPts} pts</span>
+                <span style="color:var(--sub)">Workload</span><span style="font-weight:700;text-align:right">${Math.round(workload*10)/10} pts</span>
+                <span style="color:var(--sub)">Size (per100)</span><span style="font-weight:700;text-align:right">${Math.round(per100*10)/10}</span>
+                <span style="font-weight:600;color:var(--text)">Pressure</span><span style="font-weight:700;text-align:right">${Math.round(pressure*10)/10}</span>
               </div>
-              <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − (pressure ÷ items × 10)<br>= 100 − (${Math.round(pressure*10)/10} ÷ ${totalItems} × 10) = <strong>${health}%</strong></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − pressure × 5<br>= <strong>${health}%</strong></div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border)">
                 <span style="font-size:11px;font-weight:700;color:var(--text)">Health score</span>
                 <span style="font-size:14px;font-weight:800;color:${color}">${health}%</span>
@@ -4604,19 +4638,17 @@ function renderFloors(){
       </div>
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
         <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
-          <div style="font-size:13px;font-weight:800;color:var(--text)">${fInsp}</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text)">${fInspCount}</div>
           <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspect</div>
         </div>
         <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
-          <div style="font-size:13px;font-weight:800;color:${fTix?'var(--red)':'var(--text)'}">${fTix}</div>
+          <div style="font-size:13px;font-weight:800;color:${fTixCount?'var(--red)':'var(--text)'}">${fTixCount}</div>
           <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Tickets</div>
         </div>
       </div>
     </div>`;
   }).join('') + '</div>';
 }
-
-function openFloorDetail(id){
   const f       = DB.floors.find(x=>x.id===id); if(!f) return;
   const bld     = DB.buildings.find(b=>b.id===f.buildingId);
   const units   = DB.units.filter(u=>u.floorId===f.id);
