@@ -6257,6 +6257,71 @@ async function doConfirmedDelete(){
 }
 
 /* ══════════════════════════════════════════════════════════
+   SUPPLIER WIDGET (fSup)
+══════════════════════════════════════════════════════════ */
+const _fSupData = {}; // keyed by prefix
+function fSupPopulate(prefix, suppliers, selectedId='', noneLabel='— None —'){
+  _fSupData[prefix] = [{id:'', name: noneLabel}, ...suppliers];
+  const srch  = document.getElementById(prefix+'-supplier-search') || document.getElementById(prefix+'-cat-search');
+  const hidden = document.getElementById(prefix+'-supplier') || document.getElementById(prefix+'-cat');
+  const found  = _fSupData[prefix].find(s=>s.id===selectedId);
+  if(srch)  srch.value  = found && found.id ? found.name : '';
+  if(hidden) hidden.value = selectedId || '';
+  fSupRender(prefix, '');
+}
+function fSupFilter(prefix){
+  const srch = document.getElementById(prefix+'-supplier-search') || document.getElementById(prefix+'-cat-search');
+  const q = (srch?.value||'').toLowerCase();
+  fSupRender(prefix, q);
+  fSupOpen(prefix);
+}
+function fSupRender(prefix, q){
+  const listId = prefix===('af') ? prefix+'-cat-list' : prefix+'-supplier-list';
+  const list = document.getElementById(listId); if(!list) return;
+  const data = _fSupData[prefix] || [];
+  const filtered = q ? data.filter(s=>s.name.toLowerCase().includes(q)) : data;
+  list.innerHTML = filtered.map(s=>
+    `<div onclick="fSupSelect('${prefix}','${s.id}','${s.name.replace(/'/g,"\\'")}');event.stopPropagation()"
+      style="padding:10px 14px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border)"
+      onmousedown="event.preventDefault()">${s.name}</div>`
+  ).join('') || '<div style="padding:10px 14px;font-size:13px;color:var(--muted)">No results</div>';
+}
+function fSupOpen(prefix){
+  const listId = prefix==='af' ? prefix+'-cat-list' : prefix+'-supplier-list';
+  const list = document.getElementById(listId); if(list) list.style.display='block';
+}
+function fSupClose(prefix){
+  const listId = prefix==='af' ? prefix+'-cat-list' : prefix+'-supplier-list';
+  const list = document.getElementById(listId); if(list) list.style.display='none';
+}
+function fSupSelect(prefix, id, name){
+  const hiddenId = prefix==='af' ? prefix+'-cat' : prefix+'-supplier';
+  const searchId = prefix==='af' ? prefix+'-cat-search' : prefix+'-supplier-search';
+  const hidden = document.getElementById(hiddenId);
+  const srch   = document.getElementById(searchId);
+  if(hidden) hidden.value = id;
+  if(srch)   srch.value  = id ? name : '';
+  fSupClose(prefix);
+}
+function fSupGetValue(prefix){
+  const hiddenId = prefix==='af' ? prefix+'-cat' : prefix+'-supplier';
+  return document.getElementById(hiddenId)?.value || '';
+}
+function fSupSetValue(prefix, id){
+  const data = _fSupData[prefix] || [];
+  const found = data.find(s=>s.id===id);
+  const hiddenId = prefix==='af' ? prefix+'-cat' : prefix+'-supplier';
+  const searchId = prefix==='af' ? prefix+'-cat-search' : prefix+'-supplier-search';
+  const hidden = document.getElementById(hiddenId);
+  const srch   = document.getElementById(searchId);
+  if(hidden) hidden.value = id || '';
+  if(srch)   srch.value  = found && found.id ? found.name : '';
+}
+function fSupClear(prefix){
+  fSupSetValue(prefix, '');
+}
+
+/* ══════════════════════════════════════════════════════════
    TOOLTIP (global health chip)
 ══════════════════════════════════════════════════════════ */
 function wlTip(){} // clicks handled by document listener below
