@@ -202,7 +202,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 .cal-day.cal-insp{background:#EEEDFE;color:#534AB7;font-weight:700;cursor:pointer}
 .cal-day.cal-selected{background:#3B6D11;color:#fff;font-weight:700;cursor:pointer}
 .cal-day.cal-today{outline:1.5px solid var(--blue);outline-offset:-1px}
-.cal-day.cal-empty{pointer-events:none}
+.cal-day.cal-empty{color:var(--muted);}
+.cal-day.cal-pad{pointer-events:none;}
 /* ── TICKET LIST ── */
 .tlist{display:flex;flex-direction:column;gap:8px;padding:0 14px 8px;}
 .ti{background:var(--card);border:1.5px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:var(--r);padding:13px 14px;display:flex;align-items:flex-start;gap:11px;cursor:pointer;transition:border-color .15s;}
@@ -240,10 +241,10 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 .rb-contractor{background:rgba(74,90,122,.2);color:var(--muted);}
 
 /* ── MODALS ── */
-.mo{position:fixed;inset:0;z-index:500;background:rgba(15,23,42,.5);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .22s;}
+.mo{position:fixed;inset:0;z-index:500;background:rgba(15,23,42,.5);display:flex;flex-direction:column;justify-content:flex-start;padding-top:env(safe-area-inset-top,0px);opacity:0;pointer-events:none;transition:opacity .22s;}
 .mo.open{opacity:1;pointer-events:all;}
-.ms{background:var(--surface);border-radius:22px 22px 0 0;border-top:1.5px solid var(--border);box-shadow:0 -8px 40px rgba(0,0,0,.12);max-height:92vh;overflow-y:auto;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);}
-.mh{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 8px;}
+.ms{background:var(--surface);border-radius:0 0 22px 22px;border-bottom:1.5px solid var(--border);border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);border-top:none;box-shadow:0 8px 40px rgba(0,0,0,.12);max-height:92vh;overflow-y:auto;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);}
+.mh{display:none;}
 .mt{display:flex;align-items:center;justify-content:space-between;padding:8px 18px 14px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;}
 .mt-close{width:30px;height:30px;border-radius:9px;background:#F1F5F9;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);}
 
@@ -544,6 +545,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Assets</div><div class="topbar-sub" id="ast-lbl"></div></div>
         <div class="topbar-actions">
+          <button class="ib" id="ast-clear-btn" onclick="clearAstFilters()" title="Clear filters" style="opacity:.35;pointer-events:none;transition:opacity .2s"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button class="ib" id="ast-filter-btn" onclick="openAstFilterModal()" title="Filters" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg><span id="ast-filter-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--blue);color:#fff;font-size:9px;font-weight:800;padding:1px 4px;border-radius:20px;pointer-events:none"></span></button>
           <button class="ib" id="ast-sort-btn" onclick="toggleAstSort()" title="Sort order" style="font-size:11px;font-weight:700;color:var(--sub)">A–Z</button>
           <button class="ib" onclick="openNewAsset()" id="btn-new-ast" style="display:none" title="New Asset"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
@@ -603,6 +606,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Buildings</div><div class="topbar-sub" id="bld-lbl"></div></div>
         <div class="topbar-actions">
+          <button class="ib" id="bld-clear-btn" onclick="clearBldFilters()" title="Clear filters" style="opacity:.35;pointer-events:none;transition:opacity .2s"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button class="ib" id="bld-filter-btn" onclick="openBldFilterModal()" title="Filters" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg><span id="bld-filter-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--blue);color:#fff;font-size:9px;font-weight:800;padding:1px 4px;border-radius:20px;pointer-events:none"></span></button>
           <button class="ib" onclick="openNewBuilding()" id="btn-new-bld" style="display:none" title="Add Building"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
         </div>
@@ -615,13 +620,6 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <option value="Issues">Issues</option>
     </select>
 
-    <div style="padding:0 14px 10px;display:flex;gap:8px;align-items:center;justify-content:flex-end">
-      <button class="btn-clear-filter" id="bld-clear-btn" onclick="clearBldFilters()" style="display:none"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Clear</button>
-      <button id="bld-filter-btn" onclick="openBldFilterModal()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;font-weight:600;color:var(--sub);box-shadow:0 1px 3px rgba(0,0,0,.06);transition:all .15s">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filters<span id="bld-filter-count" style="display:none;background:var(--blue);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:2px"></span>
-      </button>
-    </div>
     <div style="padding:0 14px 8px;display:flex;background:var(--surface);border-bottom:1px solid var(--border)">
       <div style="display:flex;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
         <button id="bld-seg-week"   onclick="setBldPeriod('week')"    style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Week</button>
@@ -709,6 +707,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Suppliers</div><div class="topbar-sub" id="sup-lbl"></div></div>
         <div class="topbar-actions">
+          <button class="ib" id="sup-clear-btn" onclick="clearSupFilters()" title="Clear filters" style="opacity:.35;pointer-events:none;transition:opacity .2s"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button class="ib" id="sup-filter-btn" onclick="openSupFilterModal()" title="Filters" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg><span id="sup-filter-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--blue);color:#fff;font-size:9px;font-weight:800;padding:1px 4px;border-radius:20px;pointer-events:none"></span></button>
           <button class="ib" onclick="openNewSupplier()" id="btn-new-sup" style="display:none" title="Add Supplier"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
         </div>
@@ -729,13 +729,6 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <option value="desc">Rate ↓ High → Low</option>
     </select>
 
-    <div style="padding:0 14px 10px;display:flex;gap:8px;align-items:center;justify-content:flex-end">
-      <button class="btn-clear-filter" id="sup-clear-btn" onclick="clearSupFilters()" style="display:none"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Clear</button>
-      <button id="sup-filter-btn" onclick="openSupFilterModal()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;font-weight:600;color:var(--sub);box-shadow:0 1px 3px rgba(0,0,0,.06);transition:all .15s">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filters<span id="sup-filter-count" style="display:none;background:var(--blue);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:2px"></span>
-      </button>
-    </div>
     <div id="sup-filter-chips" style="padding:0 14px 10px;display:none;flex-wrap:wrap;gap:6px"></div>
     <div id="sup-list"></div>
   </div>
@@ -763,6 +756,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Units</div><div class="topbar-sub" id="unit-lbl"></div></div>
         <div class="topbar-actions">
+          <button class="ib" id="unit-clear-btn" onclick="clearUnitFilters()" title="Clear filters" style="opacity:.35;pointer-events:none;transition:opacity .2s"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button class="ib" id="unit-filter-btn" onclick="openUnitFilterModal()" title="Filters" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg><span id="unit-filter-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--blue);color:#fff;font-size:9px;font-weight:800;padding:1px 4px;border-radius:20px;pointer-events:none"></span></button>
           <button class="ib" id="unit-sort-btn" onclick="toggleUnitSort()" title="Sort order" style="font-size:11px;font-weight:700;color:var(--sub)">A–Z</button>
           <button class="ib" onclick="openNewUnit()" id="btn-new-unit" style="display:none" title="Add Unit"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
@@ -794,6 +789,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="topbar-inner">
         <div class="topbar-left"><div class="topbar-title">Floors</div><div class="topbar-sub" id="floor-lbl"></div></div>
         <div class="topbar-actions">
+          <button class="ib" id="floor-clear-btn" onclick="clearFloorFilters()" title="Clear filters" style="opacity:.35;pointer-events:none;transition:opacity .2s"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button class="ib" id="floor-filter-btn" onclick="openFloorFilterModal()" title="Filters" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg><span id="floor-filter-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--blue);color:#fff;font-size:9px;font-weight:800;padding:1px 4px;border-radius:20px;pointer-events:none"></span></button>
           <button class="ib" id="floor-sort-btn" onclick="toggleFloorSort()" title="Sort order" style="font-size:11px;font-weight:700;color:var(--sub)">A–Z</button>
           <button class="ib" onclick="openNewFloor()" id="btn-new-floor" style="display:none" title="Add Floor"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <button class="burger" onclick="openDrawer()"><div class="burger-line"></div><div class="burger-line"></div><div class="burger-line"></div><div class="burger-dot"></div></button>
@@ -1073,8 +1070,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
   <nav class="bottom-nav" style="grid-template-columns:repeat(4,1fr)">
     <button class="ni active" onclick="navTo('dashboard')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dash</button>
     <button class="ni" onclick="navTo('inspections')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>Inspect</button>
-
     <button class="ni" onclick="navTo('tickets')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></span>Tickets<span class="ni-badge" id="open-badge" style="display:none"></span></button>
+    <button class="ni" onclick="navTo('calendar')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/><rect x="11" y="13" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/><rect x="15" y="13" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/><rect x="7" y="17" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/><rect x="11" y="17" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/></svg></span>Calendar</button>
   </nav>
 
 
@@ -1340,7 +1337,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 
 <!-- Supplier detail -->
 <div class="mo" id="mo-sup-detail" onclick="mcClick(event,'mo-sup-detail')">
-  <div class="ms"><div class="mh"></div><div id="sup-detail-body"></div></div>
+  <div class="ms"><div class="mt"><span>Supplier Detail</span><button class="mt-close" onclick="closeMo('mo-sup-detail')">✕</button></div><div id="sup-detail-body"></div></div>
 </div>
 
 <!-- Quick Ticket -->
@@ -1906,7 +1903,7 @@ function navTo(s){
   document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
   scr.classList.add('active');
-  const idx=['dashboard','inspections','tickets'].indexOf(s);
+  const idx=['dashboard','inspections','tickets','calendar'].indexOf(s);
   if(idx>=0) document.querySelectorAll('.ni')[idx]?.classList.add('active');
   prevScreen=currentScreen;
   currentScreen=s;
@@ -2606,7 +2603,7 @@ function updateBldFilterBadge(){
   const clearEl = document.getElementById('bld-clear-btn');
   if(countEl){ countEl.textContent=active; countEl.style.display=active?'inline':'none'; }
   if(btnEl){ btnEl.style.borderColor=active?'var(--blue)':'var(--border)'; btnEl.style.color=active?'var(--blue)':'var(--sub)'; btnEl.style.background=active?'rgba(37,99,235,.06)':'#fff'; }
-  if(clearEl) clearEl.style.display = active ? 'flex' : 'none';
+  if(clearEl){ clearEl.style.opacity=active?'1':'.35'; clearEl.style.pointerEvents=active?'all':'none'; }
   const chipsEl = document.getElementById('bld-filter-chips');
   if(!chipsEl) return;
   if(!active){ chipsEl.style.display='none'; chipsEl.innerHTML=''; return; }
@@ -2659,7 +2656,7 @@ function updateSupFilterBadge(){
   const clearEl=document.getElementById('sup-clear-btn');
   if(countEl){ countEl.textContent=active; countEl.style.display=active?'inline':'none'; }
   if(btnEl){ btnEl.style.borderColor=active?'var(--blue)':'var(--border)'; btnEl.style.color=active?'var(--blue)':'var(--sub)'; btnEl.style.background=active?'rgba(37,99,235,.06)':'#fff'; }
-  if(clearEl) clearEl.style.display=active?'flex':'none';
+  if(clearEl){ clearEl.style.opacity=active?'1':'.35'; clearEl.style.pointerEvents=active?'all':'none'; }
   const chipsEl=document.getElementById('sup-filter-chips');
   if(!chipsEl) return;
   if(!active){ chipsEl.style.display='none'; chipsEl.innerHTML=''; return; }
@@ -2692,7 +2689,35 @@ function clearBldFilters(){
 function clearFloorFilters(){
   const sel=document.getElementById('sel-floor-bldg');if(sel)sel.value='All';
   const s=document.getElementById('floor-search');if(s)s.value='';
+  closeMo('mo-floor-filter');
   renderFloors();
+}
+function openFloorFilterModal(){
+  const mBldg = document.getElementById('mf-floor-bldg');
+  if(mBldg){
+    const cur = document.getElementById('sel-floor-bldg')?.value || 'All';
+    mBldg.innerHTML = '<option value="All">All Buildings</option>' +
+      [...DB.buildings].sort((a,z)=>a.name.localeCompare(z.name))
+        .map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+    mBldg.value = cur;
+  }
+  openMo('mo-floor-filter');
+}
+function applyFloorFilterModal(){
+  const mVal = document.getElementById('mf-floor-bldg')?.value || 'All';
+  const hSel = document.getElementById('sel-floor-bldg');
+  if(hSel) hSel.value = mVal;
+  closeMo('mo-floor-filter');
+  renderFloors();
+}
+function updateFloorFilterBadge(){
+  const active = (document.getElementById('sel-floor-bldg')?.value||'All')!=='All' ? 1 : 0;
+  const countEl=document.getElementById('floor-filter-count');
+  const btnEl=document.getElementById('floor-filter-btn');
+  const clearEl=document.getElementById('floor-clear-btn');
+  if(countEl){ countEl.textContent=active; countEl.style.display=active?'inline':'none'; }
+  if(btnEl){ btnEl.style.borderColor=active?'var(--blue)':'var(--border)'; btnEl.style.color=active?'var(--blue)':'var(--sub)'; btnEl.style.background=active?'rgba(37,99,235,.06)':'#fff'; }
+  if(clearEl){ clearEl.style.opacity=active?'1':'.35'; clearEl.style.pointerEvents=active?'all':'none'; }
 }
 /* ── Assets filter modal ── */
 function openAstFilterModal(){
@@ -2833,7 +2858,7 @@ function updateAstFilterBadge(){
     btnEl.style.color       = active?'var(--blue)':'var(--sub)';
     btnEl.style.background  = active?'rgba(37,99,235,.06)':'#fff';
   }
-  if(clearEl) clearEl.style.display = active ? 'flex' : 'none';
+  if(clearEl){ clearEl.style.opacity=active?'1':'.35'; clearEl.style.pointerEvents=active?'all':'none'; }
   const chipsEl = document.getElementById('ast-filter-chips');
   if(!chipsEl) return;
   if(!active){ chipsEl.style.display='none'; chipsEl.innerHTML=''; return; }
@@ -2912,7 +2937,7 @@ function updateUnitFilterBadge(){
     btnEl.style.color       = active?'var(--blue)':'var(--sub)';
     btnEl.style.background  = active?'rgba(37,99,235,.06)':'#fff';
   }
-  if(clearEl) clearEl.style.display = active ? 'flex' : 'none';
+  if(clearEl){ clearEl.style.opacity=active?'1':'.35'; clearEl.style.pointerEvents=active?'all':'none'; }
   const chipsEl = document.getElementById('unit-filter-chips');
   if(!chipsEl) return;
   if(!active){ chipsEl.style.display='none'; chipsEl.innerHTML=''; return; }
@@ -4648,6 +4673,7 @@ function toggleFloorBldgBtn(name){
 
 function renderFloors(){
   if(!document.getElementById('floor-list')) return;
+  updateFloorFilterBadge();
   renderFloorBldgBtns();
   const q = (document.getElementById('floor-search')?.value||'').toLowerCase();
 
@@ -5625,8 +5651,37 @@ function openStartInspection(){
     const btn = document.getElementById('insp-type-' + t);
     if(btn){ btn.style.background='var(--card)'; btn.style.color='var(--sub)'; btn.style.borderColor='var(--border)'; }
   });
+  // Reset date
+  document.getElementById('insp-start-date').value = '';
+  document.getElementById('insp-date-display').textContent = 'Today';
+  document.getElementById('insp-date-display').style.color = 'var(--text)';
+  document.getElementById('insp-status-badge').style.display = 'none';
   document.getElementById('insp-asset-preview').textContent = 'Select a building to preview items';
   openMo('mo-insp-start');
+}
+function inspPickDate(){
+  const picker = document.getElementById('insp-date-picker');
+  if(!picker) return;
+  const todayStr = today.toISOString().split('T')[0];
+  picker.min = '';
+  picker.value = document.getElementById('insp-start-date').value || todayStr;
+  picker.style.cssText = 'position:fixed;opacity:0;pointer-events:none;top:0;left:0;width:1px;height:1px;';
+  document.body.appendChild(picker);
+  picker.focus();
+  picker.click();
+}
+function inspDateChosen(val){
+  if(!val) return;
+  const todayStr = today.toISOString().split('T')[0];
+  document.getElementById('insp-start-date').value = val;
+  const d = new Date(val+'T00:00:00');
+  const display = d.toLocaleDateString('nl-NL',{day:'numeric',month:'short',year:'numeric'});
+  const isFuture = val > todayStr;
+  const dispEl = document.getElementById('insp-date-display');
+  const badgeEl = document.getElementById('insp-status-badge');
+  dispEl.textContent = isFuture ? display : (val===todayStr ? 'Today' : display);
+  dispEl.style.color = isFuture ? 'var(--purple)' : 'var(--text)';
+  if(badgeEl){ badgeEl.style.display = isFuture ? 'inline-flex' : 'none'; }
 }
 
 function inspOnBldgChange(){
@@ -5773,13 +5828,17 @@ function launchInspectionRound(){
 
   if(!items.length){ toast('No items match this selection','err'); return; }
 
+  const todayStr = today.toISOString().split('T')[0];
+  const chosenDate = document.getElementById('insp-start-date')?.value || todayStr;
+  const isFuture = chosenDate > todayStr;
   const inspId = nextId(DB.inspections, 'INS');
   activeRound = {
     inspId,
     building  : bldg,
     floor     : floor,
     category  : inspType === 'category' ? cat : (inspType === 'units' ? 'Units' : 'Assets'),
-    dateStart : today.toISOString().split('T')[0],
+    dateStart : chosenDate,
+    status    : isFuture ? 'Planned' : 'In Progress',
     items,
   };
 
@@ -6105,7 +6164,9 @@ async function saveInspectionRound(){
   const inspCat = DB.categories.find(x=>x.category===activeRound.category);
   const todayStr = today.toISOString().split('T')[0];
   const hasSkipped = activeRound.items.some(i => i.result === 'Skipped');
-  const newStatus = allApproved && !hasSkipped ? 'Completed' : 'In Progress';
+  const newStatus = (activeRound.status === 'Planned')
+    ? 'Planned'
+    : (allApproved && !hasSkipped ? 'Completed' : 'In Progress');
   const inspRecord = {
     id         : activeRound.inspId,
     buildingId : inspBld ? inspBld.id : activeRound.building,
@@ -6646,7 +6707,7 @@ function renderCalendar(){
       <div class="cal-month-head">${CAL_MONTHS[mo]} ${yr}</div>
       <div class="cal-dow">${CAL_DOW.map(x=>`<span>${x}</span>`).join('')}</div>
       <div class="cal-days">`;
-    for(let e=0;e<dow;e++) html+=`<div class="cal-day cal-empty"></div>`;
+    for(let e=0;e<dow;e++) html+=`<div class="cal-day cal-pad"></div>`;
     for(let day=1;day<=daysInMonth;day++){
       const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
       const dayEntries = matched[ds] || [];
@@ -6661,8 +6722,8 @@ function renderCalendar(){
       else if(hasMatch){ cls.push('cal-match'); }
       else { cls.push('cal-empty'); }
       if(isToday) cls.push('cal-today');
-      const click = isAny ? `calDayClick('${ds}')` : '';
-      html+=`<div class="${cls.join(' ')}" style="${dayStyle}" data-date="${ds}" ${click?`onclick="${click}"`:''}>${day}</div>`;
+      const click = `calDayClick('${ds}')`;
+      html+=`<div class="${cls.join(' ')}" style="${dayStyle}cursor:pointer;" data-date="${ds}" onclick="${click}">${day}</div>`;
     }
     html+=`</div></div>`;
   }
@@ -6678,33 +6739,80 @@ function calOpenEntry(type, id){
 }
 function calDayClick(dateStr){
   // Update selected styling
-  document.querySelectorAll('.cal-day.cal-selected').forEach(el=>{ el.classList.remove('cal-selected'); el.classList.add('cal-match'); });
+  document.querySelectorAll('.cal-day.cal-selected').forEach(el=>{
+    el.classList.remove('cal-selected');
+    if(el.dataset.hasMatch==='1') el.classList.add('cal-match');
+    else if(el.dataset.hasInsp==='1') el.classList.add('cal-insp');
+  });
   const sel = document.querySelector(`.cal-day[data-date="${dateStr}"]`);
-  if(sel){ sel.classList.remove('cal-match'); sel.classList.add('cal-selected'); }
+  if(sel){
+    sel.dataset.hasMatch = sel.classList.contains('cal-match') ? '1' : '0';
+    sel.dataset.hasInsp  = sel.classList.contains('cal-insp')  ? '1' : '0';
+    sel.classList.remove('cal-match','cal-insp');
+    sel.classList.add('cal-selected');
+  }
   const matched = calGetMatched();
   const entries = matched[dateStr] || [];
   const d = new Date(dateStr+'T00:00:00');
-  const label = d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const label = d.toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('cal-day-title').textContent = label;
   let html = '';
-  entries.forEach(e=>{
-    const supName = DB.suppliers.find(s=>s.id===e.supplierId)?.name || '—';
-    const srcBadge = e.source==='insp'
-      ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(139,92,246,.12);color:#6D28D9">Inspectie</span>`
-      : `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(37,99,235,.12);color:var(--blue)">Ticket</span>`;
-    const typBadge = e.type && e.source!=='insp' ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(100,116,139,.12);color:var(--sub)">${e.type}</span>` : '';
-    const editFn = e.source==='insp' ? `openInspDetail('${e.id}')` : `calOpenEntry('tix','${e.id}')`;
-    html += `<div onclick="${editFn}" style="padding:11px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s" onmousedown="this.style.background='var(--card2)'" onmouseup="this.style.background=''" onmouseleave="this.style.background=''">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px">
-        <div style="font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.subject}</div>
-        <div style="display:flex;gap:4px;flex-shrink:0">${srcBadge}${typBadge}<span style="font-size:16px;color:var(--muted);line-height:1">›</span></div>
-      </div>
-      <div style="font-size:12px;color:var(--sub)">${supName} · ${e.id}</div>
+  if(entries.length){
+    entries.forEach(e=>{
+      const supName = DB.suppliers.find(s=>s.id===e.supplierId)?.name || '—';
+      const srcBadge = e.source==='insp'
+        ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(139,92,246,.12);color:#6D28D9">Inspectie</span>`
+        : `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(37,99,235,.12);color:var(--blue)">Ticket</span>`;
+      const typBadge = e.type && e.source!=='insp' ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(100,116,139,.12);color:var(--sub)">${e.type}</span>` : '';
+      const editFn = e.source==='insp' ? `openInspDetail('${e.id}')` : `calOpenEntry('tix','${e.id}')`;
+      html += `<div onclick="${editFn}" style="padding:11px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s" onmousedown="this.style.background='var(--card2)'" onmouseup="this.style.background=''" onmouseleave="this.style.background=''">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px">
+          <div style="font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.subject}</div>
+          <div style="display:flex;gap:4px;flex-shrink:0">${srcBadge}${typBadge}<span style="font-size:16px;color:var(--muted);line-height:1">›</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--sub)">${supName} · ${e.id}</div>
+      </div>`;
+    });
+  } else {
+    const todayStr = new Date().toISOString().slice(0,10);
+    html = `<div style="padding:20px 18px 8px;text-align:center;color:var(--sub);font-size:13px;line-height:1.6">
+      Nothing available yet.<br>Plan your appointment:
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 18px 18px">
+      <button onclick="closeMo('mo-cal-day');calPlanInsp('${dateStr}')" style="padding:13px 8px;background:#F5F3FF;border:1.5px solid #7C3AED;border-radius:var(--rs);font-size:13px;font-weight:700;color:#7C3AED;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>New Inspect</span>
+      </button>
+      <button onclick="closeMo('mo-cal-day');calPlanTicket('${dateStr}')" style="padding:13px 8px;background:#EBF2FF;border:1.5px solid #2563EB;border-radius:var(--rs);font-size:13px;font-weight:700;color:#2563EB;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg>
+        <span>New Ticket</span>
+      </button>
     </div>`;
-  });
-  if(!html) html=`<div style="padding:24px 18px;text-align:center;color:var(--muted);font-size:13px">No entries</div>`;
+  }
   document.getElementById('cal-day-body').innerHTML = html;
   openMo('mo-cal-day');
+}
+
+function calPlanInsp(dateStr){
+  // Open Start Inspection modal with the date pre-set to Planned
+  if(!can('canStartInspection')){ toast('No permission to start inspections','err'); return; }
+  openStartInspection();
+  // After modal opens, set the date
+  setTimeout(()=>{
+    document.getElementById('insp-start-date').value = dateStr;
+    inspDateChosen(dateStr);
+  }, 50);
+}
+
+function calPlanTicket(dateStr){
+  // Open new ticket form with date pre-filled and status = Planned
+  openNewTicket();
+  setTimeout(()=>{
+    const dateEl = document.getElementById('tf-date-opened');
+    if(dateEl) dateEl.value = dateStr;
+    const statusEl = document.getElementById('tf-status');
+    if(statusEl) statusEl.value = 'Planned';
+  }, 50);
 }
 </script>
 
@@ -6722,8 +6830,8 @@ function calDayClick(dateStr){
 </div>
 
 <!-- Floor detail modal -->
-<div class="mo" id="mo-floor-detail" onclick="mcClick(event,'mo-floor-detail')" style="justify-content:flex-start;padding-top:env(safe-area-inset-top,0px)">
-  <div class="ms" style="max-height:100vh;border-radius:0 0 22px 22px;border-top:none;border-bottom:1.5px solid var(--border)">
+<div class="mo" id="mo-floor-detail" onclick="mcClick(event,'mo-floor-detail')">
+  <div class="ms" style="max-height:100vh">
     <div class="mt"><div><span id="floor-detail-title" style="display:block">Floor</span><span id="floor-detail-sub" style="font-size:11px;font-weight:500;color:var(--muted);display:block;margin-top:1px"></span></div><button class="mt-close" onclick="closeMo('mo-floor-detail')">✕</button></div>
     <div id="floor-detail-body" style="overflow-y:auto;padding-bottom:24px"></div>
   </div>
@@ -6747,8 +6855,8 @@ function calDayClick(dateStr){
 </div>
 
 <!-- Unit detail -->
-<div class="mo" id="mo-unit-detail" onclick="mcClick(event,'mo-unit-detail')" style="justify-content:flex-start;padding-top:env(safe-area-inset-top,0px)">
-  <div class="ms" style="max-height:100vh;border-radius:0 0 22px 22px;border-top:none;border-bottom:1.5px solid var(--border)">
+<div class="mo" id="mo-unit-detail" onclick="mcClick(event,'mo-unit-detail')">
+  <div class="ms" style="max-height:100vh">
     <div class="mt"><div><span id="unit-detail-title" style="display:block">Unit</span><span id="unit-detail-sub" style="font-size:11px;font-weight:500;color:var(--muted);display:block;margin-top:1px"></span></div><button class="mt-close" onclick="closeMo('mo-unit-detail')">✕</button></div>
     <div id="unit-detail-body" style="overflow-y:auto;padding-bottom:24px"></div>
   </div>
@@ -6776,7 +6884,20 @@ function calDayClick(dateStr){
       </div>
     </div>
     <div id="insp-asset-preview" style="margin:0 18px 12px;padding:12px 14px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--sub)">Select a building to preview items</div>
-    <button class="btn-p" onclick="launchInspectionRound()">Start Round →</button>
+    <div id="insp-date-row" style="display:flex;align-items:center;gap:8px;padding:0 18px 12px">
+      <span style="font-size:12px;color:var(--sub);font-weight:600">Date:</span>
+      <span id="insp-date-display" style="font-size:13px;font-weight:700;color:var(--text)">Today</span>
+      <span id="insp-status-badge" style="display:none;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(124,58,237,.12);color:var(--purple)">Planned</span>
+      <input type="hidden" id="insp-start-date" value="">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 10px">
+      <button class="btn-p" style="margin:0" onclick="launchInspectionRound()">Start Round →</button>
+      <button style="padding:13px;background:#F5F3FF;border:1.5px solid #7C3AED;border-radius:var(--rs);font-size:14px;font-weight:700;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer" onclick="inspPickDate()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Set Date
+      </button>
+    </div>
+    <input type="date" id="insp-date-picker" style="display:none;position:absolute" onchange="inspDateChosen(this.value)">
     <div style="height:8px"></div>
   </div>
 </div>
@@ -7090,6 +7211,26 @@ function calDayClick(dateStr){
     <div style="display:flex;gap:10px;padding:4px 18px 18px">
       <button onclick="clearUnitFilters()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Clear All</button>
       <button onclick="applyUnitFilterModal()" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ FLOORS FILTER MODAL ═══════ -->
+<div class="mo" id="mo-floor-filter" onclick="mcClick(event,'mo-floor-filter')">
+  <div class="ms">
+    <div class="mt">
+      <span style="display:flex;align-items:center;gap:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        Filter Floors
+      </span>
+      <button class="mt-close" onclick="closeMo('mo-floor-filter')">&#x2715;</button>
+    </div>
+    <div class="fg"><label>Building</label>
+      <select class="fi2" id="mf-floor-bldg"><option value="All">All Buildings</option></select>
+    </div>
+    <div style="display:flex;gap:10px;padding:4px 18px 18px">
+      <button onclick="clearFloorFilters()" style="flex:1;padding:13px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:600;color:var(--sub)">Clear All</button>
+      <button onclick="applyFloorFilterModal()" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff">Apply</button>
     </div>
   </div>
 </div>
