@@ -459,12 +459,6 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     </div>
     <div id="dash-guest-banner"></div>
 
-    <div class="sh fu" style="display:flex;align-items:center;justify-content:space-between">
-      <span class="sh-title">Problem Assets</span>
-      <span id="dash-prob-ast-link" style="font-size:12px;color:var(--blue);font-weight:600;padding-right:14px;cursor:pointer;display:none" onclick="navTo('assets');setTimeout(()=>{const s=document.getElementById('sel-ast-tix-status');if(s){s.value='Active';setPage('ast',1);renderAst();}},150)">View all →</span>
-    </div>
-    <div id="dash-prob-ast" style="padding:0 14px 4px;display:flex;flex-direction:column;gap:6px"></div>
-
     <div class="sh fu" style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0">
       <span class="sh-title">Statistics</span>
       <span id="dash-stats-period-badge" style="font-size:10px;font-weight:600;color:var(--blue);background:rgba(37,99,235,.1);padding:2px 8px;border-radius:20px;margin-right:14px">last 90 days</span>
@@ -715,6 +709,11 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       </div>
     </div>
     <div class="sbar"><span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="ssearch" placeholder="Search suppliers…" oninput="setPage('sup',1);renderSuppliers()"/></div>
+    <div style="margin:4px 14px 6px;background:var(--card2,rgba(0,0,0,.04));border-radius:var(--rs);padding:3px;display:grid;grid-template-columns:repeat(3,1fr)">
+      <button id="sup-seg-week"    onclick="setSupPeriod('week')"    style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Week</button>
+      <button id="sup-seg-month"   onclick="setSupPeriod('month')"   style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Month</button>
+      <button id="sup-seg-quarter" onclick="setSupPeriod('quarter')" style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)">Quarter</button>
+    </div>
     <!-- hidden selects (drive filtering; values set from modal) -->
     <select id="sel-sup-status"    style="display:none" onchange="setPage('sup',1);renderSuppliers()">
       <option value="All">All Statuses</option>
@@ -1077,7 +1076,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--rs);padding:0 14px;margin-bottom:14px">
         <div class="info-field-row"><span style="color:var(--sub)">Open ticket</span><span style="font-weight:700;color:var(--text)">+2 pts × age factor</span></div>
         <div class="info-field-row"><span style="color:var(--sub)">Insp. item — Pending</span><span style="font-weight:700;color:var(--text)">+2 pts × age factor</span></div>
-        <div class="info-field-row"><span style="color:var(--sub)">Insp. item — Approved / Failed</span><span style="font-weight:700;color:var(--text)">+1 pt</span></div>
+        <div class="info-field-row"><span style="color:var(--sub)">Insp. item — Approved / Failed</span><span style="font-weight:700;color:var(--text)">+0.5 pt</span></div>
         <div class="info-field-row"><span style="color:var(--sub)">Insp. item — Skipped</span><span style="font-weight:700;color:var(--text)">0 pts</span></div>
         <div class="info-field-row"><span style="color:var(--sub)">Closed ticket</span><span style="font-weight:700;color:var(--text)">−1 pt</span></div>
         <div class="info-field-row"><span style="color:var(--sub)">Completed inspection</span><span style="font-weight:700;color:var(--text)">−1 pt</span></div>
@@ -1465,6 +1464,7 @@ let bldPeriod  = 'quarter';
 let astPeriod  = 'quarter';
 let unitPeriod = 'quarter';
 let flrPeriod  = 'quarter';
+let supPeriod  = 'quarter';
 let editingId = { tix:null, ast:null, usr:null, bld:null, sup:null, unit:null, floor:null, log:null };
 let pendingDelete = null;
 const PAGE_SIZE = 10;
@@ -2306,12 +2306,12 @@ function renderDash(){
     const MS_DAY = 86400000;
     const dMult  = d => d ? Math.min(1 + (now - new Date(d)) / (30 * MS_DAY), 4) : 1;
 
-    // Inspection item base weight: Pending=+2, Approved/Failed=+1, Skipped=0
+    // Inspection item base weight: Pending=+2, Approved/Failed=+0.5, Skipped=0
     // Duration factor only applies to open (Pending) items — resolved items don't accumulate
     const itemPt = (result, dateStart) => {
       if(result === 'Skipped') return 0;
       if(result === 'Pending') return 2 * dMult(dateStart);
-      return 1; // Approved / Failed — resolved, no duration factor
+      return 0.5; // Approved / Failed — resolved, no duration factor
     };
 
     const _ubDash = getUserBuildingIds();
@@ -2384,7 +2384,7 @@ function renderDash(){
                 <div class="wl-tip-row"><span style="color:var(--sub)">Size (per100)</span><span style="font-weight:700">${Math.round(s.effSqm/100*10)/10}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(s.workload*10)/10}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${hc}">${s.health}%</span></div>
-                <div class="wl-tip-formula">Open ticket ×2 · Pending item ×2 (both × age factor) · Approved/Failed ×1 · Skipped ×0 · Closed −1<br>Age factor = min(1 + days÷30, 4) — caps at ×4 after 90 days<br>Pressure = workload ÷ (m² ÷ 100) · Health = 100 − pressure</div>
+                <div class="wl-tip-formula">Open ticket ×2 · Pending item ×2 (both × age factor) · Approved/Failed ×0.5 · Skipped ×0 · Closed −1<br>Age factor = min(1 + days÷30, 4) — caps at ×4 after 90 days<br>Pressure = workload ÷ (m² ÷ 100) · Health = 100 − pressure</div>
               </div>
             </div>
           </div>
@@ -3700,12 +3700,12 @@ function astCardHTML(a, onclick){
   const closedAstTix = (DB.tickets||[]).filter(t=>t.assetId===a.id&&t.status==='Closed'&&_astInP(t.dateOpened)).length;
   // Open tickets: +2 × age factor (capped ×4 at 90 days)
   const openTixPtsA  = openTixArr.reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0);
-  // Inspection items: pending +2×age, approved/failed +1, skipped 0
+  // Inspection items: pending +2×age, approved/failed +0.5, skipped 0
   const _astInspIds = new Set(DB.inspections.filter(i=>_astInP(i.dateStart)).map(i=>i.id));
   const astInspItems = (DB.inspectionItems||[]).filter(i=>i.assetId===a.id&&_astInspIds.has(i.inspectionId));
   const astInspMap   = {};
   astInspItems.forEach(i=>{ if(!astInspMap[i.inspectionId]) { const insp=DB.inspections.find(x=>x.id===i.inspectionId); astInspMap[i.inspectionId]=insp?.dateStart||null; } });
-  const inspItemPtsA = astInspItems.reduce((s,i)=>{ const ds=astInspMap[i.inspectionId]; return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):1); },0);
+  const inspItemPtsA = astInspItems.reduce((s,i)=>{ const ds=astInspMap[i.inspectionId]; return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):0.5); },0);
   const closedInspA  = new Set(astInspItems.map(i=>i.inspectionId));
   const closedInspPtsA = [...closedInspA].filter(id=>{ const insp=DB.inspections.find(x=>x.id===id); return insp&&insp.status==='Completed'; }).length * -1;
   const workloadA    = openTixPtsA + (closedAstTix * -1) + inspItemPtsA + closedInspPtsA;
@@ -4432,12 +4432,12 @@ function renderUnits(){
     const closedUnitTix = DB.tickets.filter(t=>t.unit===u.label&&t.building===(bld?.name||'')&&t.status==='Closed'&&_unitInP(t.dateOpened)).length;
     // Open tickets: +2 × age factor (period-filtered)
     const openTixPtsU  = openTix.filter(t=>_unitInP(t.dateOpened)).reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0);
-    // Inspection items: pending +2×age, approved/failed +1, skipped 0
+    // Inspection items: pending +2×age, approved/failed +0.5, skipped 0
     const _unitInspIds = new Set(DB.inspections.filter(i=>_unitInP(i.dateStart)).map(i=>i.id));
     const unitInspItems = DB.inspectionItems.filter(i=>i.unitId===u.id&&_unitInspIds.has(i.inspectionId));
     const unitInspMap   = {};
     unitInspItems.forEach(i=>{ if(!unitInspMap[i.inspectionId]){ const insp=DB.inspections.find(x=>x.id===i.inspectionId); unitInspMap[i.inspectionId]=insp?.dateStart||null; } });
-    const inspItemPtsU  = unitInspItems.reduce((s,i)=>{ const ds=unitInspMap[i.inspectionId]; return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):1); },0);
+    const inspItemPtsU  = unitInspItems.reduce((s,i)=>{ const ds=unitInspMap[i.inspectionId]; return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):0.5); },0);
     const closedInspU   = new Set(unitInspItems.map(i=>i.inspectionId));
     const closedInspPtsU = [...closedInspU].filter(id=>{ const insp=DB.inspections.find(x=>x.id===id); return insp&&insp.status==='Completed'; }).length * -1;
     const workloadU    = openTixPtsU + (closedUnitTix * -1) + inspItemPtsU + closedInspPtsU;
@@ -4750,12 +4750,12 @@ function renderFloors(){
     const fTixClosed = DB.tickets.filter(t=>t.floorId===f.id&&t.status==='Closed'&&_flrInP(t.dateOpened));
     const tixPts     = fTixOpen.reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0) + fTixClosed.length*-1;
 
-    // Inspection items: pending +2×age, approved/failed +1, skipped 0 (period-filtered)
+    // Inspection items: pending +2×age, approved/failed +0.5, skipped 0 (period-filtered)
     const _flrInspIds = new Set(DB.inspections.filter(i=>_flrInP(i.dateStart)).map(i=>i.id));
     const fInspItems = DB.inspectionItems.filter(i=>floorItems(i)&&_flrInspIds.has(i.inspectionId));
     const fInspDateMap = {};
     fInspItems.forEach(i=>{ if(!fInspDateMap[i.inspectionId]){ const insp=DB.inspections.find(x=>x.id===i.inspectionId); fInspDateMap[i.inspectionId]=insp?.dateStart||null; } });
-    const itemPts    = fInspItems.reduce((s,i)=>{ const ds=fInspDateMap[i.inspectionId]; return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):1); }, 0);
+    const itemPts    = fInspItems.reduce((s,i)=>{ const ds=fInspDateMap[i.inspectionId]; return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):0.5); }, 0);
     // Closed inspections touching this floor
     const closedInspPts = DB.inspections.filter(i=>i.status==='Completed'&&_flrInP(i.dateStart)&&DB.inspectionItems.some(it=>it.inspectionId===i.id&&floorItems(it))).length * -1;
 
@@ -5107,6 +5107,16 @@ function setBldPeriod(p){
   });
   renderBlds();
 }
+function setSupPeriod(p){
+  supPeriod=p;
+  ['week','month','quarter'].forEach(k=>{
+    const btn=document.getElementById('sup-seg-'+k);
+    if(!btn) return;
+    if(k===p){btn.style.background='var(--card)';btn.style.color='var(--text)';btn.style.boxShadow='0 1px 3px rgba(0,0,0,.08)';}
+    else{btn.style.background='none';btn.style.color='var(--sub)';btn.style.boxShadow='none';}
+  });
+  renderSuppliers();
+}
 function setAstPeriod(p){
   astPeriod=p;
   ['week','month','quarter'].forEach(k=>{
@@ -5161,7 +5171,7 @@ function calcBldData(b){
   const periodItems   = DB.inspectionItems.filter(i=>periodInspIds.has(i.inspectionId));
   const inspItemPts   = periodItems.reduce((s,i)=>{
     const ds=inspDateMap[i.inspectionId];
-    return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):1);
+    return s+(i.result==='Skipped'?0:i.result==='Pending'?2*ageMult(ds):0.5);
   },0);
   const closedInspPts = periodInsps.filter(i=>i.status==='Completed').length * -1;
 
@@ -5309,6 +5319,27 @@ function renderSuppliers(){
   syncSelActive('sel-sup-expertise');
   syncSelActive('sel-sup-sort');
   updateSupFilterBadge();
+
+  // Activity % calculation — open tickets with a supplier assigned, in period
+  const now    = new Date();
+  const supDays = supPeriod==='week'?7:supPeriod==='month'?30:90;
+  const supCutoff = new Date(now.getTime()-supDays*24*60*60*1000);
+  const inSupPeriod = d => d && new Date(d) >= supCutoff;
+  // Denominator: all open tickets in period that have a supplierId assigned
+  const assignedOpenTix = DB.tickets.filter(t=>t.status!=='Closed'&&t.supplierId&&inSupPeriod(t.dateOpened));
+  const totalAssigned = assignedOpenTix.length;
+  // Per-supplier count
+  const supTixCount = {};
+  assignedOpenTix.forEach(t=>{ supTixCount[t.supplierId]=(supTixCount[t.supplierId]||0)+1; });
+  // Has this supplier ever had any ticket at all?
+  const supEverHadTix = new Set(DB.tickets.filter(t=>t.supplierId).map(t=>t.supplierId));
+  const actPct = id => {
+    if(!supEverHadTix.has(id)) return null; // never used — show nothing
+    if(!totalAssigned) return 0;
+    return Math.round((supTixCount[id]||0)/totalAssigned*100);
+  };
+  const actCol = pct => pct>=30?'var(--red)':pct>=15?'var(--amber)':'var(--green)';
+
   let list=[...DB.suppliers];
   if(statusVal!=='All') list=list.filter(s=>s.status===statusVal);
   if(expertiseVal!=='All'){
@@ -5318,7 +5349,6 @@ function renderSuppliers(){
     });
   }
   if(q) list=list.filter(s=>s.name.toLowerCase().includes(q)||(Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',')).join(' ').toLowerCase().includes(q));
-  // Sort: by rate if selected, otherwise alphabetical by name
   if(sortVal==='asc') list.sort((a,b)=>(a.ratePerHour||0)-(b.ratePerHour||0));
   else if(sortVal==='desc') list.sort((a,b)=>(b.ratePerHour||0)-(a.ratePerHour||0));
   else list.sort((a,b)=>a.name.localeCompare(b.name));
@@ -5331,11 +5361,12 @@ function renderSuppliers(){
   c.innerHTML=slice.map(s=>{
     const exp=Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',').map(x=>x.trim()).filter(Boolean);
     const activeExp=expertiseVal!=='All'?expertiseVal:null;
+    const pct=actPct(s.id);
+    const actBadge = pct===null ? '' : `<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;background:${actCol(pct)}18;color:${actCol(pct)};margin-top:4px;display:inline-block">${pct}% activity</span>`;
     return`<div class="sup-card" style="padding-bottom:${s.phone?'0':'14px'}" onclick="openSupDetail('${s.id}')">
       <div class="sup-hdr">
         <div style="flex:1;min-width:0">
           <div class="sup-name">${s.name}</div>
-          <div class="cm">${s.id}</div>
           ${exp.length?`<div style="font-size:11px;color:var(--sub);margin-top:2px;line-height:1.4">${exp.join(', ')}</div>`:''}
           <div style="display:flex;gap:16px;margin:6px 0 4px;align-items:flex-end">
             <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Rate/hr</div><div class="sup-rate">€ ${s.ratePerHour||0}</div></div>
@@ -5347,7 +5378,10 @@ function renderSuppliers(){
             <span class="sup-contact" style="margin:0">${s.contact||'—'}</span>
           </div>
         </div>
-        <span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'};flex-shrink:0">${s.status}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+          <span class="badge" style="background:${stCol[s.status]||'var(--green)'}18;color:${stCol[s.status]||'var(--green)'}">${s.status}</span>
+          ${actBadge}
+        </div>
       </div>
       ${s.phone?`<div style="display:flex;margin:10px -16px 0;border-top:1px solid var(--border);overflow:hidden;border-radius:0 0 var(--r) var(--r)" onclick="event.stopPropagation()">
         <a href="https://wa.me/${s.phone.replace(/\D/g,'')}" target="_blank" title="WhatsApp" style="flex:1;height:38px;display:flex;align-items:center;justify-content:center;text-decoration:none;border-right:1px solid var(--border)"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="${stCol[s.status]||'var(--green)'}"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
@@ -5613,7 +5647,7 @@ function inspListCardHTML(r){
   const inspScore   = Math.round(_inspItems.reduce((s,i)=>{
     if(i.result==='Skipped') return s;
     if(i.result==='Pending') return s + 2 * ageMult(r.dateStart);
-    return s + 1; // Approved / Failed
+    return s + 0.5; // Approved / Failed
   }, 0) * 10) / 10;
   const wHc = inspScore>=20?'#dc2626':inspScore>=8?'#d97706':'#059669';
   return `<div class="insp-list-card" onclick="openInspDetail('${r.id}')">
@@ -5632,7 +5666,7 @@ function inspListCardHTML(r){
               <div class="wl-tip-row"><span style="color:var(--sub)">Items checked</span><span style="font-weight:700">${_inspItems.length}</span></div>
               <div class="wl-tip-row"><span style="color:var(--sub)">Age factor</span><span style="font-weight:700">×${Math.round(ageMult(r.dateStart)*10)/10}</span></div>
               <div class="wl-tip-row"><span style="color:var(--sub)">Pressure</span><span style="font-weight:700;color:${wHc}">${inspScore} pts</span></div>
-              <div class="wl-tip-formula">Pending ×2×age · Approved/Failed ×1 · Skipped ×0<br>Age factor = min(1 + days÷30, 4), caps at ×4.</div>
+              <div class="wl-tip-formula">Pending ×2×age · Approved/Failed ×0.5 · Skipped ×0<br>Age factor = min(1 + days÷30, 4), caps at ×4.</div>
             </div>
           </div>
           <span class="badge" style="background:${stBg};color:${stColor}">${stLabel}</span>
