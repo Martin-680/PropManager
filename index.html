@@ -4032,6 +4032,27 @@ function populateAstCategorySelect(id, selected=''){
       .map(x=>`<option value="${x.id}">${x.category}</option>`).join('');
   if(selected) el.value=selected;
 }
+function openNewAssetForUnit(unitId){
+  if(!can('canEditAssets')) return;
+  const u=DB.units.find(x=>x.id===unitId); if(!u) return;
+  closeMo('mo-unit-detail');
+  setTimeout(()=>{
+    openNewAsset();
+    // pre-fill building
+    const bldEl=document.getElementById('af-bldg');
+    if(bldEl&&u.buildingId){ bldEl.value=u.buildingId; afOnBldgChange(); }
+    // pre-fill floor
+    setTimeout(()=>{
+      const flrEl=document.getElementById('af-sub');
+      if(flrEl&&u.floorId){ flrEl.value=u.floorId; afOnFloorChange(); }
+      // pre-fill unit
+      setTimeout(()=>{
+        const locEl=document.getElementById('af-loc');
+        if(locEl&&unitId) locEl.value=unitId;
+      },80);
+    },80);
+  },220);
+}
 function openNewAsset(){
   if(!can('canEditAssets')) return;
   editingId.ast=null;
@@ -4549,6 +4570,10 @@ function openUnitDetail(id){
     <div style="padding:8px 18px 0;display:flex;gap:9px;flex-wrap:wrap">
       <button onclick="editUnit('${u.id}')" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> Edit</button>
       <button onclick="duplicateUnit()" style="flex:1;padding:13px;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--indigo)">Duplicate</button>
+    </div>` : ''}
+    ${can('canEditAssets') ? `
+    <div style="padding:8px 18px 0">
+      <button onclick="openNewAssetForUnit('${u.id}')" style="width:100%;padding:13px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--green)"> Add Asset</button>
     </div>` : ''}
     <div style="padding:8px 18px 0">
       <button onclick="closeMo('mo-unit-detail')" style="width:100%;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--muted)">Cancel</button>
@@ -5453,8 +5478,7 @@ function openSupDetail(id){
   renderSupDetailTix(id);
   const actionsEl=document.getElementById('sup-detail-actions');
   if(actionsEl) actionsEl.innerHTML=`
-    ${can('canManageSuppliers')?`<button onclick="editSupplier('${id}')" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> Edit</button>`:''}
-    ${can('canEditAll')?`<button onclick="confirmDelete('supplier','${id}')" style="flex:1;padding:13px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:var(--rs);font-weight:700;font-size:14px;color:var(--red)"> Delete</button>`:''}`;
+    ${can('canManageSuppliers')?`<button onclick="editSupplier('${id}')" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff"> Edit</button>`:''}`;
   openMo('mo-sup-detail');
 }
 function openNewSupplier(){
