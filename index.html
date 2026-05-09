@@ -475,6 +475,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <button id="dash-seg-quarter" onclick="setDashPeriod('quarter')" style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)">Quarter</button>
       </div>
     </div>
+    <div id="dash-capacity" style="padding:0 14px 4px"></div>
     <div id="dash-stats" style="padding:0 14px 4px;display:flex;flex-direction:column;gap:8px"></div>
 
     <div class="sh fu"><span class="sh-title">By Priority</span></div>
@@ -2357,13 +2358,106 @@ function renderDash(){
   animCount('kpi-other',other);
   animCount('kpi-closed',closed);
   animCount('kpi-unassigned',unassigned);
+  // Shared period helpers
+  const now    = new Date();
+  const days   = dashPeriod==='week'?7:dashPeriod==='month'?30:90;
+  const cutoff = new Date(now.getTime()-days*24*60*60*1000);
+  const inPeriod = d => d && new Date(d) >= cutoff;
+
+  // ── Capacity / Time Spent block ──────────────────────────────
+  const capEl = document.getElementById('dash-capacity');
+  if(capEl && currentUser){
+    // Build building bucket sets for current user
+    const parseBucketIds = field => {
+      const names = (currentUser[field]||'').split(',').map(s=>s.trim()).filter(Boolean);
+      return new Set(DB.buildings.filter(b=>names.includes(b.name)).map(b=>b.id));
+    };
+    const primaryIds  = parseBucketIds('buildings');
+    const ownedIds    = parseBucketIds('buildingsOwned');
+    const extIds      = parseBucketIds('buildingsExternal');
+    const allTracked  = new Set([...primaryIds,...ownedIds,...extIds]);
+
+    // Sum timeSpent (minutes) per building from tickets in period
+    const bldgMins = {};
+    DB.tickets.filter(t=>t.timeSpent&&inPeriod(t.dateOpened)).forEach(t=>{
+      const bid = t.buildingId;
+      if(!bid) return;
+      bldgMins[bid] = (bldgMins[bid]||0) + (parseInt(t.timeSpent)||0);
+    });
+    // Add timeSpent from inspection items in period
+    DB.inspectionItems.filter(i=>i.timeSpent).forEach(i=>{
+      const insp = DB.inspections.find(r=>r.id===i.inspectionId);
+      if(!insp||!inPeriod(insp.dateStart)) return;
+      const bid = insp.buildingId;
+      if(!bid) return;
+      bldgMins[bid] = (bldgMins[bid]||0) + (parseInt(i.timeSpent)||0);
+    });
+
+    // Only include buildings in tracked buckets
+    const tracked = Object.entries(bldgMins)
+      .filter(([bid])=>allTracked.has(bid)||allTracked.size===0)
+      .map(([bid,mins])=>{
+        const b = DB.buildings.find(x=>x.id===bid);
+        const type = primaryIds.has(bid)?'primary':ownedIds.has(bid)?'owned':'ext';
+        return { bid, name:b?.name||bid, mins, type };
+      }).sort((a,z)=>z.mins-a.mins);
+
+    const totalMins = tracked.reduce((s,t)=>s+t.mins,0);
+    const primMins  = tracked.filter(t=>t.type==='primary').reduce((s,t)=>s+t.mins,0);
+    const ownedMins = tracked.filter(t=>t.type==='owned').reduce((s,t)=>s+t.mins,0);
+    const extMins   = tracked.filter(t=>t.type==='ext').reduce((s,t)=>s+t.mins,0);
+
+    const fmtMins = m => m>=60&&m%60===0?`${m/60}h`:m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m}m`;
+    const pct = (m,t) => t?Math.round(m/t*100):0;
+    const externalPct = pct(ownedMins+extMins, totalMins);
+    const typeColor = t => t==='primary'?'#3B6D11':t==='owned'?'#D97706':'#dc2626';
+
+    if(totalMins===0){
+      capEl.innerHTML = `<div style="font-size:13px;color:var(--muted);padding:6px 0 10px">No time logged this period yet</div>`;
+    } else {
+      const warn = externalPct>=25 ? `<div style="padding:8px 10px;background:rgba(245,158,11,.1);border-radius:var(--rs);font-size:12px;color:var(--amber);margin-top:10px">⚠️ ${externalPct}% of logged time is outside primary buildings this period</div>` : '';
+
+      const perBldg = tracked.map(t=>{
+        const w = pct(t.mins, totalMins);
+        const c = typeColor(t.type);
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="width:7px;height:7px;border-radius:50%;background:${c};flex-shrink:0"></div>
+          <span style="font-size:12px;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.name}</span>
+          <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden">
+            <div style="width:${w}%;height:100%;background:${c};border-radius:3px"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${c};min-width:36px;text-align:right">${fmtMins(t.mins)}</span>
+        </div>`;
+      }).join('');
+
+      capEl.innerHTML = `
+        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:14px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <span style="font-size:13px;font-weight:700;color:var(--text)">Time logged</span>
+            <span style="font-size:11px;color:var(--muted)">${fmtMins(totalMins)} total · ${['week','month','quarter'][['week','month','quarter'].indexOf(dashPeriod)]||'period'}</span>
+          </div>
+          <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;display:flex;margin-bottom:10px">
+            <div style="width:${pct(primMins,totalMins)}%;background:#3B6D11;transition:width .4s"></div>
+            <div style="width:${pct(ownedMins,totalMins)}%;background:#D97706;transition:width .4s"></div>
+            <div style="width:${pct(extMins,totalMins)}%;background:#dc2626;transition:width .4s"></div>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:9px;height:9px;border-radius:2px;background:#3B6D11"></div><span style="font-size:11px;color:var(--sub)">Primary <strong style="color:var(--text)">${fmtMins(primMins)}</strong></span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:9px;height:9px;border-radius:2px;background:#D97706"></div><span style="font-size:11px;color:var(--sub)">Owned ext. <strong style="color:var(--amber)">${fmtMins(ownedMins)}</strong></span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:9px;height:9px;border-radius:2px;background:#dc2626"></div><span style="font-size:11px;color:var(--sub)">3rd party <strong style="color:var(--red)">${fmtMins(extMins)}</strong></span></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:10px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:8px">Per building</div>
+            ${perBldg}
+          </div>
+          ${warn}
+        </div>`;
+    }
+  }
+
   // Statistics section — period-aware health score (top 5 buildings by workload)
   const statsEl = document.getElementById('dash-stats');
   if(statsEl){
-    const now    = new Date();
-    const days   = dashPeriod==='week'?7:dashPeriod==='month'?30:90;
-    const cutoff = new Date(now.getTime()-days*24*60*60*1000);
-    const inPeriod = d => d && new Date(d) >= cutoff;
     // Duration multiplier: capped linear, max ×4 at 90 days
     // dMult(date) = min(1 + daysOpen/30, 4)
     const MS_DAY = 86400000;
