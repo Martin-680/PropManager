@@ -466,7 +466,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 
     <div class="sh fu" style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0">
       <span class="sh-title">Statistics</span>
-      <span id="dash-stats-period-badge" style="font-size:10px;font-weight:600;color:var(--blue);background:rgba(37,99,235,.1);padding:2px 8px;border-radius:20px;margin-right:14px">last 90 days</span>
+      <span id="dash-stats-period-badge" style="font-size:10px;font-weight:600;color:var(--blue);background:rgba(37,99,235,.1);padding:2px 8px;border-radius:20px;margin-right:14px">this quarter</span>
     </div>
     <div style="padding:8px 14px 10px;display:flex;background:var(--surface)">
       <div style="display:flex;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
@@ -3878,8 +3878,19 @@ function astCardHTML(a, onclick){
   const inspCount=(DB.inspectionItems||[]).filter(i=>i.assetId===a.id).length;
   const floorLabel = a.floor ? `<span style="display:inline-block;width:3px;height:3px;border-radius:50%;background:currentColor;vertical-align:middle;margin:0 5px;opacity:.4"></span>${a.floor}` : '';
   const aHcFn  = h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
-  const _astDays=astPeriod==='week'?7:astPeriod==='month'?30:90;
-  const _astCut=new Date(today.getTime()-_astDays*24*60*60*1000);
+  const _astCut=(() => {
+    const _d = new Date(today);
+    if(astPeriod==='week'){
+      const _day = _d.getDay()===0?6:_d.getDay()-1;
+      _d.setDate(_d.getDate()-_day);
+    } else if(astPeriod==='month'){
+      _d.setDate(1);
+    } else {
+      _d.setMonth(Math.floor(_d.getMonth()/3)*3, 1);
+    }
+    _d.setHours(0,0,0,0);
+    return _d;
+  })();
   const _astInP=d=>d&&new Date(d)>=_astCut;
   const openTixArr   = (DB.tickets||[]).filter(t=>t.assetId===a.id&&t.status!=='Closed'&&_astInP(t.dateOpened));
   const closedAstTix = (DB.tickets||[]).filter(t=>t.assetId===a.id&&t.status==='Closed'&&_astInP(t.dateOpened)).length;
@@ -4677,8 +4688,19 @@ function renderUnits(){
     const floorDot = flr?.label ? `<span style="display:inline-block;width:3px;height:3px;border-radius:50%;background:currentColor;vertical-align:middle;margin:0 5px;opacity:.4"></span>${flr.label}` : '';
     const uHcFn  = h=>h>=70?'#059669':h>=40?'#d97706':'#dc2626';
     const inspCount = DB.inspectionItems.filter(i=>i.unitId===u.id).length;
-    const _unitDays=unitPeriod==='week'?7:unitPeriod==='month'?30:90;
-    const _unitCut=new Date(today.getTime()-_unitDays*24*60*60*1000);
+    const _unitCut=(() => {
+    const _d = new Date(today);
+    if(unitPeriod==='week'){
+      const _day = _d.getDay()===0?6:_d.getDay()-1;
+      _d.setDate(_d.getDate()-_day);
+    } else if(unitPeriod==='month'){
+      _d.setDate(1);
+    } else {
+      _d.setMonth(Math.floor(_d.getMonth()/3)*3, 1);
+    }
+    _d.setHours(0,0,0,0);
+    return _d;
+  })();
     const _unitInP=d=>d&&new Date(d)>=_unitCut;
     const closedUnitTix = DB.tickets.filter(t=>t.unit===u.label&&t.building===(bld?.name||'')&&t.status==='Closed'&&_unitInP(t.dateOpened)).length;
     // Open tickets: +2 × age factor (period-filtered)
@@ -5012,8 +5034,19 @@ function renderFloors(){
     const effSqm    = sqm>0 ? sqm : unitCount*50;
     const per100    = Math.max(effSqm/100, 0.5);
 
-    const _flrDays=flrPeriod==='week'?7:flrPeriod==='month'?30:90;
-    const _flrCut=new Date(today.getTime()-_flrDays*24*60*60*1000);
+    const _flrCut=(() => {
+    const _d = new Date(today);
+    if(flrPeriod==='week'){
+      const _day = _d.getDay()===0?6:_d.getDay()-1;
+      _d.setDate(_d.getDate()-_day);
+    } else if(flrPeriod==='month'){
+      _d.setDate(1);
+    } else {
+      _d.setMonth(Math.floor(_d.getMonth()/3)*3, 1);
+    }
+    _d.setHours(0,0,0,0);
+    return _d;
+  })();
     const _flrInP=d=>d&&new Date(d)>=_flrCut;
     // Tickets: open +2×age, closed −1 (period-filtered)
     const fTixOpen   = DB.tickets.filter(t=>t.floorId===f.id&&t.status!=='Closed'&&_flrInP(t.dateOpened));
@@ -5607,8 +5640,19 @@ function renderSuppliers(){
 
   // Activity % calculation — open tickets with a supplier assigned, in period
   const now    = new Date();
-  const supDays = supPeriod==='week'?7:supPeriod==='month'?30:90;
-  const supCutoff = new Date(now.getTime()-supDays*24*60*60*1000);
+  const supCutoff = (() => {
+    const _d = new Date(today);
+    if(supPeriod==='week'){
+      const _day = _d.getDay()===0?6:_d.getDay()-1;
+      _d.setDate(_d.getDate()-_day);
+    } else if(supPeriod==='month'){
+      _d.setDate(1);
+    } else {
+      _d.setMonth(Math.floor(_d.getMonth()/3)*3, 1);
+    }
+    _d.setHours(0,0,0,0);
+    return _d;
+  })();
   const inSupPeriod = d => d && new Date(d) >= supCutoff;
   // Denominator: all open tickets in period that have a supplierId assigned
   const assignedOpenTix = DB.tickets.filter(t=>t.status!=='Closed'&&t.supplierId&&inSupPeriod(t.dateOpened));
