@@ -1499,8 +1499,8 @@ const COLS = {
   suppliers: ['id','name','contact','expertise','ratePerHour','transportCost','phone','email','address','status'],
   inspections:      ['id','buildingId','floorId','categoryId','dateStart','dateEnd','inspector','status','notes'],
   inspectionItems:  ['id','inspectionId','unitId','assetId','label','result','note','timeSpent'],
-  floors:    ['id','buildingId','label','sortOrder'],
-  units:     ['id','floorId','buildingId','label','sortOrder'],
+  floors:    ['id','buildingId','label','sortOrder','inspectionTime'],
+  units:     ['id','floorId','buildingId','label','sortOrder','inspectionTime'],
   categories:['id','category','notes'],
   logs:      ['id','date','subject','supplierId','buildingId','floorId','unitId','assetId','note','type','status','categoryId'],
 };
@@ -1807,7 +1807,9 @@ async function loadAllData(){
     // Attach items from InspectionItems tab, re-joining expectedTime from asset
     r.items = DB.inspectionItems.filter(i => i.inspectionId === r.id).map(i => {
       const a = i.assetId ? DB.assets.find(x => x.id === i.assetId) : null;
-      return { ...i, expectedTime: parseInt(a?.inspectionTime)||0 };
+      const u = i.unitId  ? DB.units.find(x => x.id === i.unitId)   : null;
+      const expectedTime = parseInt(a?.inspectionTime) || parseInt(u?.inspectionTime) || 0;
+      return { ...i, expectedTime };
     });
     return r;
   });
@@ -4870,6 +4872,7 @@ function openNewUnit(){
   document.getElementById('unit-modal-title').textContent='New Unit';
   document.getElementById('unit-dup-btn').style.display='none';
   document.getElementById('uf2-label').value='';
+  document.getElementById('uf2-insptime').value='';
   document.getElementById('uf2-sort').value='';
   populateBldSelect('uf2-bldg');
   document.getElementById('uf2-bldg').value='';
@@ -4889,6 +4892,7 @@ function editUnit(id){
   document.getElementById('uf2-bldg').value=bld?bld.name:'';
   uf2OnBldgChange();
   document.getElementById('uf2-floor').value=u.floorId||'';
+  document.getElementById('uf2-insptime').value=u.inspectionTime||'';
   openMo('mo-unit');
 }
 function uf2OnBldgChange(){
@@ -4905,7 +4909,7 @@ async function saveUnit(){
   const bld=DB.buildings.find(b=>b.name===bldName);
   if(!bld){toast('Select a building','err');return;}
   const sortOrder=parseInt(document.getElementById('uf2-sort').value)||0;
-  const data={label,floorId,buildingId:bld.id,sortOrder};
+  const data={label,floorId,buildingId:bld.id,sortOrder,inspectionTime:parseInt(document.getElementById('uf2-insptime').value)||0};
   if(editingId.unit){
     Object.assign(DB.units.find(x=>x.id===editingId.unit),data);
   } else {
@@ -4949,6 +4953,7 @@ function openNewUnitForBuilding(bldId){
   document.getElementById('unit-modal-title').textContent='New Unit';
   document.getElementById('unit-dup-btn').style.display='none';
   document.getElementById('uf2-label').value='';
+  document.getElementById('uf2-insptime').value='';
   document.getElementById('uf2-sort').value='';
   populateBldSelect('uf2-bldg');
   const bld=DB.buildings.find(b=>b.id===bldId);
@@ -5280,6 +5285,7 @@ function openNewFloor(){
   editingId.floor = null;
   document.getElementById('floor-modal-title').textContent = 'New Floor';
   document.getElementById('ff-label').value = '';
+  document.getElementById('ff-insptime').value = '';
   document.getElementById('ff-sort').value  = '';
   populateBldSelect('ff-bldg');
   document.getElementById('ff-bldg').value  = '';
@@ -5298,6 +5304,7 @@ function editFloor(id){
   populateBldSelect('ff-bldg');
   const bld = DB.buildings.find(b=>b.id===f.buildingId);
   document.getElementById('ff-bldg').value  = bld ? bld.name : '';
+  document.getElementById('ff-insptime').value = f.inspectionTime||'';
   openMo('mo-floor');
 }
 
@@ -5308,7 +5315,7 @@ async function saveFloor(){
   const bld = DB.buildings.find(b=>b.name===bldName);
   if(!bld){ toast('Select a building','err'); return; }
   const sortOrder = parseInt(document.getElementById('ff-sort').value)||0;
-  const data = { label, buildingId: bld.id, sortOrder };
+  const data = { label, buildingId: bld.id, sortOrder, inspectionTime: parseInt(document.getElementById('ff-insptime').value)||0 };
   if(editingId.floor){
     Object.assign(DB.floors.find(x=>x.id===editingId.floor), data);
   } else {
@@ -6280,7 +6287,7 @@ function launchInspectionRound(){
     }).sort((a,z)=>a.sortOrder-z.sortOrder);
     items = units.map(u => {
       const flr = DB.floors.find(f=>f.id===u.floorId);
-      return { type:'unit', unitId:u.id, label:u.label, category:'Unit', unit:u.label, floor:flr?.label||'', result:'Open', note:'' };
+      return { type:'unit', unitId:u.id, label:u.label, category:'Unit', unit:u.label, floor:flr?.label||'', result:'Open', note:'', expectedTime: parseInt(u.inspectionTime)||0 };
     });
   } else {
     // assets or category
@@ -7389,6 +7396,7 @@ function calPlanTicket(dateStr){
     <div class="fg"><label>Floor Name *</label><input class="fi2" id="ff-label" placeholder="e.g. Ground Floor"/></div>
     <div class="fg"><label>Building *</label><select class="fs2" id="ff-bldg"><option value="">Select…</option></select></div>
     <div class="fg"><label>Sort Order</label><input class="fi2" type="number" id="ff-sort" placeholder="0"/></div>
+    <div class="fg"><label>Inspection time (min)</label><input class="fi2" type="number" min="0" id="ff-insptime" placeholder="e.g. 30"/></div>
     <button class="btn-p" onclick="saveFloor()">Save Floor</button>
     <button class="btn-s" onclick="closeMo('mo-floor')">Cancel</button>
   </div>
@@ -7413,6 +7421,7 @@ function calPlanTicket(dateStr){
       <div class="fg"><label>Floor</label><select class="fs2" id="uf2-floor"><option value="">— Select floor —</option></select></div>
     </div>
     <div class="fg"><label>Sort Order</label><input class="fi2" type="number" id="uf2-sort" placeholder="0"/></div>
+    <div class="fg"><label>Inspection time (min)</label><input class="fi2" type="number" min="0" id="uf2-insptime" placeholder="e.g. 30"/></div>
     <button class="btn-p" onclick="saveUnit()">Save Unit</button>
     <button class="btn-p" id="unit-dup-btn" onclick="duplicateUnit()" style="background:#EEF2FF;color:var(--indigo);">Duplicate</button>
     <button class="btn-s" onclick="closeMo('mo-unit')">Cancel</button>
