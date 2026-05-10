@@ -1804,8 +1804,11 @@ async function loadAllData(){
     r.building = bld ? bld.name     : r.buildingId;
     r.floor    = flr ? flr.label    : r.floorId;
     r.category = cat ? cat.category : r.categoryId;
-    // Attach items from InspectionItems tab
-    r.items = DB.inspectionItems.filter(i => i.inspectionId === r.id);
+    // Attach items from InspectionItems tab, re-joining expectedTime from asset
+    r.items = DB.inspectionItems.filter(i => i.inspectionId === r.id).map(i => {
+      const a = i.assetId ? DB.assets.find(x => x.id === i.assetId) : null;
+      return { ...i, expectedTime: parseInt(a?.inspectionTime)||0 };
+    });
     return r;
   });
   DB.assets = rowsToObjects(assets, COLS.assets).map(r=>{
