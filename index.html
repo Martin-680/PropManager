@@ -2359,9 +2359,21 @@ function renderDash(){
   animCount('kpi-closed',closed);
   animCount('kpi-unassigned',unassigned);
   // Shared period helpers
-  const now    = new Date();
-  const days   = dashPeriod==='week'?7:dashPeriod==='month'?30:90;
-  const cutoff = new Date(now.getTime()-days*24*60*60*1000);
+  const now = new Date();
+  const cutoff = (() => {
+    const d = new Date(now);
+    if(dashPeriod==='week'){
+      const day = d.getDay()===0?6:d.getDay()-1; // Mon=0
+      d.setDate(d.getDate()-day);
+    } else if(dashPeriod==='month'){
+      d.setDate(1);
+    } else {
+      const q = Math.floor(d.getMonth()/3);
+      d.setMonth(q*3, 1);
+    }
+    d.setHours(0,0,0,0);
+    return d;
+  })();
   const inPeriod = d => d && new Date(d) >= cutoff;
 
   // ── Capacity / Time Spent block ──────────────────────────────
@@ -3360,7 +3372,7 @@ function setDashPeriod(p){
     else      { btn.style.background='none';        btn.style.color='var(--sub)';  btn.style.boxShadow='none'; }
   });
   const badge = document.getElementById('dash-stats-period-badge');
-  if(badge) badge.textContent = p==='week'?'last 7 days':p==='month'?'last 30 days':'last 90 days';
+  if(badge) badge.textContent = p==='week'?'this week':p==='month'?'this month':'this quarter';
   renderDash();
 }
 
@@ -5414,9 +5426,21 @@ function calcBldData(b){
   const effSqm    = sqm>0 ? sqm : unitCount*50;
   const per100    = Math.max(effSqm/100, 1);
 
-  const now    = new Date();
-  const days   = bldPeriod==='week'?7:bldPeriod==='month'?30:90;
-  const cutoff = new Date(now.getTime()-days*24*60*60*1000);
+  const now = new Date();
+  const cutoff = (() => {
+    const d = new Date(now);
+    if(bldPeriod==='week'){
+      const day = d.getDay()===0?6:d.getDay()-1;
+      d.setDate(d.getDate()-day);
+    } else if(bldPeriod==='month'){
+      d.setDate(1);
+    } else {
+      const q = Math.floor(d.getMonth()/3);
+      d.setMonth(q*3, 1);
+    }
+    d.setHours(0,0,0,0);
+    return d;
+  })();
   const inPeriod = d => d && new Date(d) >= cutoff;
 
   // Tickets with dateOpened in period
