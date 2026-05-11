@@ -536,6 +536,14 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <div class="hide-strip-toggle-track" id="tix-hide-track"></div>
       </div>
     </div>
+    <div style="padding:4px 14px 10px;display:flex;background:var(--surface)">
+      <div style="display:flex;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
+        <button id="tix-seg-week"    onclick="setTixPeriod('week')"    style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Week</button>
+        <button id="tix-seg-month"   onclick="setTixPeriod('month')"   style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Month</button>
+        <button id="tix-seg-quarter" onclick="setTixPeriod('quarter')" style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Quarter</button>
+        <button id="tix-seg-all"     onclick="setTixPeriod('all')"     style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)">All</button>
+      </div>
+    </div>
     <div id="tix-list"></div>
   </div>
 
@@ -667,6 +675,14 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="hide-strip-toggle" onclick="toggleShowCompleted()">
         <span>Show completed</span>
         <div class="hide-strip-toggle-track" id="insp-hide-track"></div>
+      </div>
+    </div>
+    <div style="padding:4px 14px 10px;display:flex;background:var(--surface)">
+      <div style="display:flex;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
+        <button id="insp-seg-week"    onclick="setInspPeriod('week')"    style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Week</button>
+        <button id="insp-seg-month"   onclick="setInspPeriod('month')"   style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Month</button>
+        <button id="insp-seg-quarter" onclick="setInspPeriod('quarter')" style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Quarter</button>
+        <button id="insp-seg-all"     onclick="setInspPeriod('all')"     style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)">All</button>
       </div>
     </div>
     <div id="insp-list"></div>
@@ -3382,6 +3398,40 @@ let tixActiveBldg = null;
 let showClosedTix = false;
 let showCompletedInsp = false;
 let dashPeriod = 'quarter';
+let tixPeriod  = 'all';
+let inspPeriod = 'all';
+
+function _periodCutoff(p){
+  if(p==='all') return null;
+  const d = new Date();
+  if(p==='week'){ const day=d.getDay()===0?6:d.getDay()-1; d.setDate(d.getDate()-day); }
+  else if(p==='month'){ d.setDate(1); }
+  else { d.setMonth(Math.floor(d.getMonth()/3)*3, 1); }
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function setTixPeriod(p){
+  tixPeriod = p;
+  ['week','month','quarter','all'].forEach(k=>{
+    const btn = document.getElementById('tix-seg-'+k);
+    if(!btn) return;
+    if(k===p){ btn.style.background='var(--card)'; btn.style.color='var(--text)'; btn.style.boxShadow='0 1px 3px rgba(0,0,0,.08)'; }
+    else      { btn.style.background='none';        btn.style.color='var(--sub)';  btn.style.boxShadow='none'; }
+  });
+  setPage('tix',1); renderTix();
+}
+
+function setInspPeriod(p){
+  inspPeriod = p;
+  ['week','month','quarter','all'].forEach(k=>{
+    const btn = document.getElementById('insp-seg-'+k);
+    if(!btn) return;
+    if(k===p){ btn.style.background='var(--card)'; btn.style.color='var(--text)'; btn.style.boxShadow='0 1px 3px rgba(0,0,0,.08)'; }
+    else      { btn.style.background='none';        btn.style.color='var(--sub)';  btn.style.boxShadow='none'; }
+  });
+  setPage('insp',1); renderInspections();
+}
 
 function setDashPeriod(p){
   dashPeriod = p;
@@ -3531,6 +3581,8 @@ function renderTix(){
   const dateTo   = document.getElementById('sel-tix-date-to')?.value   || '';
   if(dateFrom) list=list.filter(t=>(t.dateOpened||'')>=dateFrom);
   if(dateTo)   list=list.filter(t=>(t.dateOpened||'')<=dateTo);
+  const _tixCutoff = _periodCutoff(tixPeriod);
+  if(_tixCutoff) list=list.filter(t=>t.dateOpened && new Date(t.dateOpened)>=_tixCutoff);
   if(q) list=list.filter(t=>t.subject.toLowerCase().includes(q)||t.building.toLowerCase().includes(q)||t.id.toLowerCase().includes(q)||t.assignedTo?.toLowerCase().includes(q)||(t.reportedBy||'').toLowerCase().includes(q));
   // Hide-closed strip: only applies when status filter is 'All' (not overriding)
   const tixHideActive = (statusVal === 'All' || statusVal === 'notclosed');
@@ -5958,6 +6010,8 @@ function renderInspections(){
   const inspDateTo   = document.getElementById('sel-insp-date-to')?.value   || '';
   if(inspDateFrom) list = list.filter(r => (r.dateStart||'') >= inspDateFrom);
   if(inspDateTo)   list = list.filter(r => (r.dateStart||'') <= inspDateTo);
+  const _inspCutoff = _periodCutoff(inspPeriod);
+  if(_inspCutoff) list = list.filter(r => r.dateStart && new Date(r.dateStart) >= _inspCutoff);
   if(inspQ) list = list.filter(r =>
     (r.title||'').toLowerCase().includes(inspQ) ||
     (r.category||'').toLowerCase().includes(inspQ) ||
