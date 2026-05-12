@@ -1566,45 +1566,46 @@ const PAGE_SIZE = 10;
 const pages = { tix:1, ast:1, usr:1, bld:1, sup:1, insp:1, log:1 };
 const today = new Date();
 const _MS_DAY = 86400000;
-// Dutch public holidays (fixed + Easter-based) for a given year
+// Dutch public holidays (fixed + Easter-based) for a given year — returns {dateStr: name}
 function nlPublicHolidays(year) {
-  // Easter Sunday (Anonymous Gregorian algorithm)
-  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
-  const easter=new Date(year,month-1,day);
-  const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
-  const fmt=d=>`${year}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  return [
-    {date:fmt(new Date(year,0,1)),  name:'Nieuwjaarsdag'},
-    {date:fmt(addDays(easter,-2)),  name:'Goede Vrijdag'},
-    {date:fmt(easter),              name:'Eerste Paasdag'},
-    {date:fmt(addDays(easter,1)),   name:'Tweede Paasdag'},
-    {date:fmt(new Date(year,3,27)), name:'Koningsdag'},
-    {date:fmt(addDays(easter,39)),  name:'Hemelvaartsdag'},
-    {date:fmt(addDays(easter,49)),  name:'Eerste Pinksterdag'},
-    {date:fmt(addDays(easter,50)),  name:'Tweede Pinksterdag'},
-    {date:fmt(new Date(year,11,25)),name:'Eerste Kerstdag'},
-    {date:fmt(new Date(year,11,26)),name:'Tweede Kerstdag'},
-  ];
+  const a=year%19,b=Math.floor(year/100),c=year%100,dd=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-dd-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
+  const E=new Date(year,month-1,day);
+  const add=(x,n)=>{const r=new Date(x);r.setDate(r.getDate()+n);return r;};
+  const fmt=x=>`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
+  return {[fmt(new Date(year,0,1))]:'Nieuwjaarsdag',[fmt(add(E,-2))]:'Goede Vrijdag',[fmt(E)]:'Eerste Paasdag',[fmt(add(E,1))]:'Tweede Paasdag',[fmt(new Date(year,3,27))]:'Koningsdag',[fmt(add(E,39))]:'Hemelvaartsdag',[fmt(add(E,49))]:'Eerste Pinksterdag',[fmt(add(E,50))]:'Tweede Pinksterdag',[fmt(new Date(year,11,25))]:'Eerste Kerstdag',[fmt(new Date(year,11,26))]:'Tweede Kerstdag'};
 }
-// Working days between two dates (Mon-Fri, excl. NL public holidays), returns {days, holidays:[]}
+// Working days between two dates (Mon-Fri, excl. NL public holidays), returns {days, holidays:[names]}
 function workingDaysInRange(start, end) {
-  const holidays = {};
-  const infoMap  = {};
-  [start.getFullYear(), end.getFullYear()].forEach(y => {
-    nlPublicHolidays(y).forEach(h => { holidays[h.date]=true; infoMap[h.date]=h.name; });
-  });
-  let days=0; const hitHolidays=[];
+  if(start>end) return {days:0,holidays:[]};
+  const hols={...nlPublicHolidays(start.getFullYear()),...nlPublicHolidays(end.getFullYear())};
+  let days=0; const hitH=[];
   const cur=new Date(start);
   while(cur<=end){
-    const dow=cur.getDay(); // 0=Sun,6=Sat
+    const dow=cur.getDay();
     const ds=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
-    if(dow>=1&&dow<=5){
-      if(holidays[ds]) hitHolidays.push({date:ds,name:infoMap[ds]});
-      else days++;
-    }
+    if(dow>=1&&dow<=5){ if(hols[ds]) hitH.push(hols[ds]); else days++; }
     cur.setDate(cur.getDate()+1);
   }
-  return {days, holidays:hitHolidays};
+  return {days, holidays:hitH};
+}
+// Period bounds: full period start/end + tomorrow for remaining calc
+function getDashPeriodBounds() {
+  const t=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+  let pStart,pEnd;
+  if(dashPeriod==='week'){
+    const dow=t.getDay()===0?6:t.getDay()-1;
+    pStart=new Date(t); pStart.setDate(t.getDate()-dow);
+    pEnd=new Date(pStart); pEnd.setDate(pStart.getDate()+4);
+  } else if(dashPeriod==='month'){
+    pStart=new Date(t.getFullYear(),t.getMonth(),1);
+    pEnd=new Date(t.getFullYear(),t.getMonth()+1,0);
+  } else {
+    const q=Math.floor(t.getMonth()/3);
+    pStart=new Date(t.getFullYear(),q*3,1);
+    pEnd=new Date(t.getFullYear(),q*3+3,0);
+  }
+  const tomorrow=new Date(t); tomorrow.setDate(t.getDate()+1);
+  return {pStart,pEnd,tomorrow};
 }
 // Parse YYYY-MM-DD as local midnight to avoid UTC offset shifting the date by ±1 day
 const parseDate=(s)=>{if(!s)return null;const p=s.split('-');if(p.length===3)return new Date(+p[0],+p[1]-1,+p[2]);return new Date(s);};
@@ -2520,36 +2521,42 @@ function renderDash(){
         </div>`;
       }).join('');
 
+      const {pStart,pEnd,tomorrow} = getDashPeriodBounds();
+      const wpFull = workingDaysInRange(pStart, pEnd);
+      const wpRem  = workingDaysInRange(tomorrow<=pEnd?tomorrow:new Date(9999,0,1), pEnd);
+      const capMins = wpFull.days * 7.5 * 60;
+      const remMins = wpRem.days * 7.5 * 60;
+      const utilPct = capMins ? Math.min(100,Math.round(totalMins/capMins*100)) : 0;
+      const capH   = (capMins/60).toFixed(1).replace('.',',');
+      const remH   = (remMins/60).toFixed(1).replace('.',',');
+      const holidayHtml = wpFull.holidays.length
+        ? `<div style="margin-top:6px;font-size:11px;color:var(--muted)">🇳🇱 ${[...new Set(wpFull.holidays)].join(', ')}</div>`
+        : '';
       capEl.innerHTML = `
         <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:14px">
           <div style="margin-bottom:10px">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
               <span style="font-size:13px;font-weight:700;color:var(--text)">Time Spent</span>
-              <span style="font-size:11px;color:var(--muted)">${fmtMins(totalMins)} total · ${(totalMins/450).toFixed(1).replace('.',',')} werkdag${totalMins===450?'':' en'}</span>
+              <span style="font-size:11px;color:var(--muted)">${fmtMins(totalMins)} · ${(totalMins/450).toFixed(1).replace('.',',')} d</span>
             </div>
-            ${(()=>{
-              const wp = workingDaysInRange(cutoff, now);
-              const capMins = wp.days * 7.5 * 60;
-              const capH = (capMins/60).toFixed(1).replace('.',',');
-              const utilPct = capMins ? Math.min(100,Math.round(totalMins/capMins*100)) : 0;
-              const holidayHtml = wp.holidays.length
-                ? `<div style="margin-top:6px;font-size:11px;color:var(--muted)">🇳🇱 ${wp.holidays.length} feestdag${wp.holidays.length>1?'en':''} in periode: ${wp.holidays.map(h=>h.name).join(', ')}</div>`
-                : '';
-              return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;font-size:12px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-                  <span style="color:var(--sub)">Periode capaciteit</span>
-                  <span style="font-weight:700;color:var(--text)">${capH}h &nbsp;·&nbsp; ${wp.days} werkdag${wp.days===1?'':'en'}</span>
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                  <span style="color:var(--sub)">Benutting</span>
-                  <span style="font-weight:700;color:var(--text)">${utilPct}%</span>
-                </div>
-                <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
-                  <div style="width:${utilPct}%;height:100%;background:#1D9E75;border-radius:3px;transition:width .4s"></div>
-                </div>
-                ${holidayHtml}
-              </div>`;
-            })()}
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;font-size:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="color:var(--sub)">Periode capaciteit</span>
+                <span style="font-weight:700;color:var(--text)">${capH} · ${wpFull.days} d</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="color:var(--sub)">Resterend</span>
+                <span style="font-weight:700;color:var(--text)">${remH} · ${wpRem.days} d</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="color:var(--sub)">Benutting</span>
+                <span style="font-weight:700;color:var(--text)">${utilPct}%</span>
+              </div>
+              <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+                <div style="width:${utilPct}%;height:100%;background:#1D9E75;border-radius:3px;transition:width .4s"></div>
+              </div>
+              ${holidayHtml}
+            </div>
           </div>
           <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;display:flex;margin-bottom:10px">
             <div style="width:${pct(primMins,totalMins)}%;background:#3B6D11;transition:width .4s"></div>
