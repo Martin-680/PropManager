@@ -1397,6 +1397,15 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       </div>
     </div>
     <div class="fg"><label>Active</label><select class="fs2" id="uf-active"><option value="true">Yes</option><option value="false">No</option></select></div>
+    <div id="uf-daysoff-section" style="display:none;border-top:1px solid var(--border);margin-top:10px;padding-top:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;">Vrije dagen</div>
+      <div id="uf-daysoff-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="date" id="uf-dayoff-input" style="flex:1;font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--rs);background:var(--surface);color:var(--text);">
+        <button onclick="addDayOff()" style="padding:6px 12px;font-size:12px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;">+ Toevoegen</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">Vrije dagen op feestdagen tellen al niet mee.</div>
+    </div>
     <button class="btn-p" onclick="saveUser()">Save User</button>
     <button class="btn-s" onclick="closeMo('mo-usr')">Cancel</button>
   </div>
@@ -1508,7 +1517,7 @@ const TABS = { users:'Users', buildings:'Buildings', assets:'Assets', tickets:'T
 
 /* Column orders for each sheet (row index 0 = header) */
 const COLS = {
-  users:     ['id','name','role','email','phone','buildings','buildingsOwned','buildingsExternal','active'],
+  users:     ['id','name','role','email','phone','buildings','buildingsOwned','buildingsExternal','active','daysOff'],
   buildings: ['id','name','address','daysOpen','timeOpen','units','manager','phone','email','size'],
   assets:    ['id','label','buildingId','floorId','unitId','supplierId','categoryId','status','manufacturer','model','warrantyExpiry','purchaseDate','lastServiced','inspectionTime'],
   tickets:   ['id','buildingId','floorId','unitId','subject','status','priority','categoryId','assignedTo','dateOpened','dateClosed','assetId','supplierId','reportedBy','notes','createdBy','activity','type','timeSpent'],
@@ -1574,19 +1583,24 @@ function nlPublicHolidays(year) {
   const fmt=x=>`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
   return {[fmt(new Date(year,0,1))]:'Nieuwjaarsdag',[fmt(add(E,-2))]:'Goede Vrijdag',[fmt(E)]:'Eerste Paasdag',[fmt(add(E,1))]:'Tweede Paasdag',[fmt(new Date(year,3,27))]:'Koningsdag',[fmt(add(E,39))]:'Hemelvaartsdag',[fmt(add(E,49))]:'Eerste Pinksterdag',[fmt(add(E,50))]:'Tweede Pinksterdag',[fmt(new Date(year,11,25))]:'Eerste Kerstdag',[fmt(new Date(year,11,26))]:'Tweede Kerstdag'};
 }
-// Working days between two dates (Mon-Fri, excl. NL public holidays), returns {days, holidays:[names]}
-function workingDaysInRange(start, end) {
-  if(start>end) return {days:0,holidays:[]};
+// Working days between two dates (Mon-Fri, excl. NL public holidays + optional daysOff array)
+function workingDaysInRange(start, end, skipDates=[]) {
+  if(start>end) return {days:0,holidays:[],daysOff:[]};
   const hols={...nlPublicHolidays(start.getFullYear()),...nlPublicHolidays(end.getFullYear())};
-  let days=0; const hitH=[];
+  const skipSet=new Set(skipDates);
+  let days=0; const hitH=[]; const hitOff=[];
   const cur=new Date(start);
   while(cur<=end){
     const dow=cur.getDay();
     const ds=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
-    if(dow>=1&&dow<=5){ if(hols[ds]) hitH.push(hols[ds]); else days++; }
+    if(dow>=1&&dow<=5){
+      if(hols[ds]) hitH.push(hols[ds]);
+      else if(skipSet.has(ds)) hitOff.push(ds);
+      else days++;
+    }
     cur.setDate(cur.getDate()+1);
   }
-  return {days, holidays:hitH};
+  return {days, holidays:hitH, daysOff:hitOff};
 }
 // Period bounds: full period start/end + tomorrow for remaining calc
 function getDashPeriodBounds() {
@@ -2522,8 +2536,9 @@ function renderDash(){
       }).join('');
 
       const {pStart,pEnd,tomorrow} = getDashPeriodBounds();
-      const wpFull = workingDaysInRange(pStart, pEnd);
-      const wpRem  = workingDaysInRange(tomorrow<=pEnd?tomorrow:new Date(9999,0,1), pEnd);
+      const _userDaysOff = (currentUser?.daysOff||'').split(',').map(s=>s.trim()).filter(Boolean);
+      const wpFull = workingDaysInRange(pStart, pEnd, _userDaysOff);
+      const wpRem  = workingDaysInRange(tomorrow<=pEnd?tomorrow:new Date(9999,0,1), pEnd, _userDaysOff);
       const capMins = wpFull.days * 7.5 * 60;
       const remMins = wpRem.days * 7.5 * 60;
       const utilPct = capMins ? Math.min(100,Math.round(totalMins/capMins*100)) : 0;
@@ -2531,6 +2546,10 @@ function renderDash(){
       const remH   = (remMins/60).toFixed(1).replace('.',',');
       const holidayHtml = wpFull.holidays.length
         ? `<div style="margin-top:6px;font-size:11px;color:var(--muted)">🇳🇱 ${[...new Set(wpFull.holidays)].join(', ')}</div>`
+        : '';
+      const daysOffInPeriod = wpFull.daysOff||[];
+      const daysOffHtml = daysOffInPeriod.length
+        ? `<div style="margin-top:4px;font-size:11px;color:var(--muted)">🌴 ${daysOffInPeriod.map(ds=>{const d=new Date(ds+'T00:00:00');return d.toLocaleDateString('nl-NL',{day:'numeric',month:'short'});}).join(', ')}</div>`
         : '';
       capEl.innerHTML = `
         <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:14px">
@@ -2555,7 +2574,7 @@ function renderDash(){
               <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
                 <div style="width:${utilPct}%;height:100%;background:#1D9E75;border-radius:3px;transition:width .4s"></div>
               </div>
-              ${holidayHtml}
+              ${holidayHtml}${daysOffHtml}
             </div>
           </div>
           <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;display:flex;margin-bottom:10px">
@@ -4591,7 +4610,47 @@ function editUser(id){
   ['uf-owned-chev','uf-ext-chev'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.transform='rotate(0deg)';});
   populateUfBldgDropdown(); populateUfOwnedDropdown(); populateUfExtDropdown();
   document.getElementById('uf-active').value=u.active?'true':'false';
+  // Show vrije dagen section only for own profile
+  const doffSection=document.getElementById('uf-daysoff-section');
+  if(doffSection){
+    const isSelf = currentUser && (u.id===currentUser.id || u.email===currentUser.email);
+    doffSection.style.display = isSelf ? 'block' : 'none';
+    if(isSelf) renderDaysOffList(u.daysOff||'');
+  }
   openMo('mo-usr');
+}
+function renderDaysOffList(daysOffStr){
+  const days=(daysOffStr||'').split(',').map(s=>s.trim()).filter(Boolean).sort();
+  const list=document.getElementById('uf-daysoff-list');
+  if(!list) return;
+  if(!days.length){list.innerHTML='<div style="font-size:12px;color:var(--muted);">Geen vrije dagen geregistreerd.</div>';return;}
+  list.innerHTML=days.map(ds=>{
+    const d=new Date(ds+'T00:00:00');
+    const label=d.toLocaleDateString('nl-NL',{day:'numeric',month:'short',year:'numeric'});
+    return`<div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px">
+      <span style="font-size:12px;color:var(--text)">${label}</span>
+      <button onclick="removeDayOff('${ds}')" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0">✕</button>
+    </div>`;
+  }).join('');
+}
+function getDaysOffInput(){
+  // Read current days from the rendered list
+  const list=document.getElementById('uf-daysoff-list');
+  if(!list) return [];
+  return [...list.querySelectorAll('button')].map(b=>b.getAttribute('onclick').match(/'([^']+)'/)?.[1]).filter(Boolean);
+}
+function addDayOff(){
+  const inp=document.getElementById('uf-dayoff-input');
+  const val=inp.value; if(!val) return;
+  const existing=getDaysOffInput();
+  if(existing.includes(val)){inp.value='';return;}
+  existing.push(val);
+  renderDaysOffList(existing.join(','));
+  inp.value='';
+}
+function removeDayOff(ds){
+  const existing=getDaysOffInput().filter(x=>x!==ds);
+  renderDaysOffList(existing.join(','));
 }
 function populateUfBldgDropdown(){
   const wrap=document.getElementById('uf-bldgs-wrap');
@@ -4631,7 +4690,9 @@ async function saveUser(){
   const name=document.getElementById('uf-name').value.trim();
   const email=document.getElementById('uf-email').value.trim().toLowerCase();
   if(!name||!email){toast('Name and email required','err');return;}
-  const data={name,role:document.getElementById('uf-role').value,email,phone:document.getElementById('uf-phone').value,buildings:document.getElementById('uf-bldgs').value.split(',').map(s=>s.trim()).filter(Boolean).join(', '),buildingsOwned:document.getElementById('uf-bldgs-owned').value.split(',').map(s=>s.trim()).filter(Boolean).join(', '),buildingsExternal:document.getElementById('uf-bldgs-external').value.split(',').map(s=>s.trim()).filter(Boolean).join(', '),active:document.getElementById('uf-active').value==='true'};
+  const _doffSection=document.getElementById('uf-daysoff-section');
+  const _doffVal=_doffSection&&_doffSection.style.display!=='none'?getDaysOffInput().join(','):null;
+  const data={name,role:document.getElementById('uf-role').value,email,phone:document.getElementById('uf-phone').value,buildings:document.getElementById('uf-bldgs').value.split(',').map(s=>s.trim()).filter(Boolean).join(', '),buildingsOwned:document.getElementById('uf-bldgs-owned').value.split(',').map(s=>s.trim()).filter(Boolean).join(', '),buildingsExternal:document.getElementById('uf-bldgs-external').value.split(',').map(s=>s.trim()).filter(Boolean).join(', '),active:document.getElementById('uf-active').value==='true',...(_doffVal!==null?{daysOff:_doffVal}:{})};
   if(editingId.usr){ Object.assign(DB.users.find(x=>x.id===editingId.usr),data); }
   else { DB.users.push({id:nextId(DB.users,'USR'),...data}); }
   // Keep currentUser in sync if the signed-in user edited their own record
