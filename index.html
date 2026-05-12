@@ -468,15 +468,15 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <span class="sh-title">Statistics</span>
       <span id="dash-stats-period-badge" style="font-size:10px;font-weight:600;color:var(--blue);background:rgba(37,99,235,.1);padding:2px 8px;border-radius:20px;margin-right:14px">this quarter</span>
     </div>
-    <div style="padding:8px 14px 10px;display:flex;background:var(--surface)">
-      <div style="display:flex;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
+    <div style="padding:8px 14px 10px;display:flex;background:var(--bg)">
+      <div style="display:flex;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
         <button id="dash-seg-week"    onclick="setDashPeriod('week')"    style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Week</button>
         <button id="dash-seg-month"   onclick="setDashPeriod('month')"   style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Month</button>
         <button id="dash-seg-quarter" onclick="setDashPeriod('quarter')" style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)">Quarter</button>
       </div>
     </div>
     <div id="dash-capacity" style="padding:0 14px 4px"></div>
-    <div id="dash-stats" style="padding:0 14px 4px;display:flex;flex-direction:column;gap:8px"></div>
+    <div id="dash-stats" style="padding:4px 14px 4px;display:flex;flex-direction:column;gap:8px"></div>
 
     <div class="sh fu"><span class="sh-title">By Priority</span></div>
     <div class="fu" id="pri-chart"></div>
@@ -536,8 +536,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <div class="hide-strip-toggle-track" id="tix-hide-track"></div>
       </div>
     </div>
-    <div style="padding:4px 14px 10px;display:flex;background:var(--surface)">
-      <div style="display:flex;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
+    <div style="padding:4px 14px 10px;display:flex;background:var(--bg)">
+      <div style="display:flex;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
         <button id="tix-seg-week"    onclick="setTixPeriod('week')"    style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Week</button>
         <button id="tix-seg-month"   onclick="setTixPeriod('month')"   style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Month</button>
         <button id="tix-seg-quarter" onclick="setTixPeriod('quarter')" style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Quarter</button>
@@ -677,8 +677,8 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <div class="hide-strip-toggle-track" id="insp-hide-track"></div>
       </div>
     </div>
-    <div style="padding:4px 14px 10px;display:flex;background:var(--surface)">
-      <div style="display:flex;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
+    <div style="padding:4px 14px 10px;display:flex;background:var(--bg)">
+      <div style="display:flex;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
         <button id="insp-seg-week"    onclick="setInspPeriod('week')"    style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Week</button>
         <button id="insp-seg-month"   onclick="setInspPeriod('month')"   style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Month</button>
         <button id="insp-seg-quarter" onclick="setInspPeriod('quarter')" style="flex:1;padding:6px 0;font-size:12px;font-weight:600;border:none;border-radius:calc(var(--rs) - 2px);cursor:pointer;transition:all .15s;background:none;color:var(--sub)">Quarter</button>
@@ -862,9 +862,15 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     </div>
     <div style="padding:4px 14px 8px;font-size:12px;color:var(--sub);line-height:1.5">For an overview of scheduled entries and tickets by date — tap a highlighted day to see what's planned.</div>
     <div style="padding:12px 14px 8px;display:flex;flex-direction:column;gap:10px">
-      <div style="display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;flex-direction:column;gap:6px">
         <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Start month</label>
-        <select id="cal-start" class="fi2" style="padding:8px 10px;font-size:13px;width:100%" onchange="renderCalendar()"></select>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+          <button onclick="calYearNav(-1)" style="font-size:18px;border:none;background:none;color:var(--sub);cursor:pointer;padding:0 4px;line-height:1">&#8249;</button>
+          <span id="cal-year-label" style="font-size:13px;font-weight:700;color:var(--text)"></span>
+          <button onclick="calYearNav(1)" style="font-size:18px;border:none;background:none;color:var(--sub);cursor:pointer;padding:0 4px;line-height:1">&#8250;</button>
+        </div>
+        <div id="cal-month-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px"></div>
+        <input type="hidden" id="cal-start">
       </div>
       <div style="display:flex;flex-direction:column;gap:4px">
         <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Supplier</label>
@@ -7328,20 +7334,23 @@ function exportCSV(type){
 const CAL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const CAL_DOW = ['Mo','Tu','We','Th','Fr','Sa','Su'];
 
+const CAL_MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let _calYear = null;
+
 function initCalendar(){
-  const sel = document.getElementById('cal-start');
-  if(!sel || sel.options.length > 1) return;
+  const hidden = document.getElementById('cal-start');
+  if(!hidden) return;
+  // Only init once — check if grid already populated
+  const grid = document.getElementById('cal-month-grid');
+  if(grid && grid.children.length > 0 && _calYear !== null) return;
   const now = new Date();
-  const startYear = now.getFullYear() - 1;
-  for(let y = startYear; y <= now.getFullYear() + 1; y++){
-    for(let m = 0; m < 12; m++){
-      const opt = document.createElement('option');
-      opt.value = `${y}-${m}`;
-      opt.textContent = `${CAL_MONTHS[m]} ${y}`;
-      if(y === now.getFullYear() && m === now.getMonth()) opt.selected = true;
-      sel.appendChild(opt);
-    }
+  // Default: 2 months back
+  if(_calYear === null){
+    const def = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+    _calYear = def.getFullYear();
+    hidden.value = `${_calYear}-${def.getMonth()}`;
   }
+  renderCalMonthGrid();
   // populate supplier select
   const supSel = document.getElementById('cal-sup');
   if(supSel && supSel.options.length === 1){
@@ -7351,6 +7360,34 @@ function initCalendar(){
       supSel.appendChild(o);
     });
   }
+}
+function renderCalMonthGrid(){
+  const grid = document.getElementById('cal-month-grid');
+  const lbl  = document.getElementById('cal-year-label');
+  const hidden = document.getElementById('cal-start');
+  if(!grid || !lbl || !hidden) return;
+  lbl.textContent = _calYear;
+  const selVal = hidden.value; // e.g. "2026-2"
+  const [selY, selM] = selVal ? selVal.split('-').map(Number) : [_calYear, 0];
+  const now = new Date();
+  grid.innerHTML = CAL_MONTH_SHORT.map((name, m) => {
+    const isSelected = (_calYear === selY && m === selM);
+    const isPast = (_calYear < now.getFullYear()) || (_calYear === now.getFullYear() && m < now.getMonth());
+    const bg = isSelected ? 'background:rgba(37,99,235,.12);color:var(--blue);border-color:rgba(37,99,235,.3);font-weight:700'
+             : isPast     ? 'color:var(--sub);background:var(--surface)'
+             :              'color:var(--text);background:var(--surface)';
+    return `<button onclick="calSelectMonth(${_calYear},${m})" style="padding:7px 4px;font-size:12px;text-align:center;border-radius:var(--rs);border:1px solid var(--border);cursor:pointer;${bg}">${name}</button>`;
+  }).join('');
+}
+function calSelectMonth(y, m){
+  const hidden = document.getElementById('cal-start');
+  if(hidden){ hidden.value = `${y}-${m}`; }
+  renderCalMonthGrid();
+  renderCalendar();
+}
+function calYearNav(dir){
+  _calYear += dir;
+  renderCalMonthGrid();
 }
 
 function calInspToggle(){
