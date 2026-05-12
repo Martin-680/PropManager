@@ -89,6 +89,9 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 .drawer-item.danger{color:var(--red);}
 .drawer-item-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(239,68,68,.15);color:var(--red);}
 .drawer-footer{padding:12px 18px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center;background:var(--surface);}
+.insp-pill-wrap{display:flex;flex-wrap:wrap;gap:5px;padding:6px 8px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--surface);min-height:36px;cursor:pointer;align-items:center;}
+.insp-pill{display:inline-flex;align-items:center;gap:3px;background:rgba(37,99,235,.1);color:var(--blue);border-radius:20px;font-size:11px;font-weight:600;padding:3px 8px;}
+.insp-pill-x{cursor:pointer;opacity:.6;font-size:13px;line-height:1;margin-left:1px;}
 .info-subscreen{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--surface);transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;z-index:2;}
 .info-subscreen.open{transform:translateX(0);}
 .info-main{transition:transform .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;width:100%;flex:1;min-height:0;}
@@ -1521,7 +1524,7 @@ const SHEET_ID    = '1UkjXu3yOwPWlb1bKjMnXuCrYkxsvzC6wBZ48nPr1P4A';
 const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email openid';
 
 /* Sheet tab names — must match exactly what you created */
-const TABS = { users:'Users', buildings:'Buildings', assets:'Assets', tickets:'Tickets', suppliers:'Suppliers', inspections:'Inspections', inspectionItems:'InspectionItems', floors:'Floors', units:'Units', categories:'Categories', logs:'Logs' };
+const TABS = { users:'Users', buildings:'Buildings', assets:'Assets', tickets:'Tickets', suppliers:'Suppliers', inspections:'Inspections', inspectionItems:'InspectionItems', floors:'Floors', units:'Units', categories:'Categories', logs:'Logs', inspectionTemplates:'InspectionTemplates' };
 
 /* Column orders for each sheet (row index 0 = header) */
 const COLS = {
@@ -1536,6 +1539,7 @@ const COLS = {
   units:     ['id','floorId','buildingId','label','sortOrder','inspectionTime'],
   categories:['id','category','notes'],
   logs:      ['id','date','subject','supplierId','buildingId','floorId','unitId','assetId','note','type','status','categoryId'],
+  inspectionTemplates: ['id','name','buildingId','types','floors','categories','units','assets'],
 };
 
 /* ══════════════════════════════════════════════════════════
@@ -1570,7 +1574,7 @@ function getUserBuildingIds(){
    STATE
 ══════════════════════════════════════════════════════════ */
 let tokenClient, accessToken=null, currentUser=null;
-let DB = { users:[], buildings:[], assets:[], tickets:[], suppliers:[], inspections:[], inspectionItems:[], floors:[], units:[], categories:[], logs:[] };
+let DB = { users:[], buildings:[], assets:[], tickets:[], suppliers:[], inspections:[], inspectionItems:[], floors:[], units:[], categories:[], logs:[], inspectionTemplates:[] };
 let bldPeriod  = 'quarter';
 let astPeriod  = 'quarter';
 let unitPeriod = 'quarter';
@@ -1841,7 +1845,7 @@ function rowsToObjects(rows, cols){
 }
 
 async function loadAllData(){
-  const [users,buildings,assets,tickets,suppliers,inspections,inspectionItems,floors,units,categories,logs] = await Promise.all([
+  const [users,buildings,assets,tickets,suppliers,inspections,inspectionItems,floors,units,categories,logs,inspectionTemplates] = await Promise.all([
     sheetsGet(`${TABS.users}!A:Z`),
     sheetsGet(`${TABS.buildings}!A:Z`),
     sheetsGet(`${TABS.assets}!A:Z`),
@@ -1853,8 +1857,10 @@ async function loadAllData(){
     sheetsGet(`${TABS.units}!A:Z`),
     sheetsGet(`${TABS.categories}!A:Z`),
     sheetsGet(`${TABS.logs}!A:Z`),
+    sheetsGet(`${TABS.inspectionTemplates}!A:Z`),
   ]);
   DB.users      = rowsToObjects(users,     COLS.users);
+  DB.inspectionTemplates = rowsToObjects(inspectionTemplates||[], COLS.inspectionTemplates);
   DB.buildings  = rowsToObjects(buildings, COLS.buildings);
   DB.suppliers  = rowsToObjects(suppliers, COLS.suppliers);
   DB.categories = rowsToObjects(categories, COLS.categories);
@@ -6290,234 +6296,311 @@ function inspListCardHTML(r){
 /* ── Start-round modal ── */
 let inspType = ''; // 'units' | 'assets' | 'category'
 
-function inspSetType(type){
-  inspType = type;
-  ['units','assets','category'].forEach(t => {
-    const btn = document.getElementById('insp-type-' + t);
-    if(!btn) return;
-    const active = t === type;
-    btn.style.background   = active ? 'var(--blue)' : 'var(--card)';
-    btn.style.color        = active ? '#fff'        : 'var(--sub)';
-    btn.style.borderColor  = active ? 'var(--blue)' : 'var(--border)';
-  });
-  const catWrap = document.getElementById('insp-cat-wrap');
-  if(catWrap) catWrap.style.display = type === 'category' ? '' : 'none';
-  document.getElementById('insp-type-filters').style.display = '';
-  updateInspPreview();
-}
+/* ── Inspection state ── */
+let inspTypes = new Set(); // 'assets' | 'units'
+let inspSelFloors = [];
+let inspSelCats = [];
+let inspSelUnits = [];
+let inspSelAssets = [];
+let inspActiveTplId = null;
+let _inspPillDDContext = null;
 
 function openStartInspection(){
   if(!can('canStartInspection')){ toast('No permission to start inspections','err'); return; }
-  inspType = '';
-  populateBldSelect('insp-bldg');
-  document.getElementById('insp-bldg').value = '';
-  document.getElementById('insp-filters-wrap').style.display = 'none';
-  document.getElementById('insp-type-filters').style.display = 'none';
-  document.getElementById('insp-floor').innerHTML = '<option value="">All floors</option>';
-  const catSel = document.getElementById('insp-cat');
-  catSel.innerHTML = '<option value="All">All Categories</option>' + getCategoryList().map(c=>`<option value="${c}">${c}</option>`).join('');
-  catSel.value = 'All';
-  // Reset type buttons
-  ['units','assets','category'].forEach(t => {
-    const btn = document.getElementById('insp-type-' + t);
-    if(btn){ btn.style.background='var(--card)'; btn.style.color='var(--sub)'; btn.style.borderColor='var(--border)'; }
-  });
-  // Reset date
-  document.getElementById('insp-start-date').value = '';
-  document.getElementById('insp-date-display').textContent = 'Today';
-  document.getElementById('insp-date-display').style.color = 'var(--text)';
-  document.getElementById('insp-status-badge').style.display = 'none';
-  document.getElementById('insp-asset-preview').textContent = 'Select a building to preview items';
+  inspTypes=new Set(); inspSelFloors=[]; inspSelCats=[]; inspSelUnits=[]; inspSelAssets=[]; inspActiveTplId=null;
+  document.getElementById('insp-start-date').value='';
+  document.getElementById('insp-tpl-preview').style.display='none';
+  document.getElementById('insp-free-form').style.display='none';
+  document.getElementById('insp-tpl-section').style.display='';
+  renderInspTemplates();
   openMo('mo-insp-start');
 }
-function inspPickDate(){
-  const picker = document.getElementById('insp-date-picker');
-  if(!picker) return;
-  const todayStr = today.toISOString().split('T')[0];
-  picker.min = '';
-  picker.value = document.getElementById('insp-start-date').value || todayStr;
-  picker.style.cssText = 'position:fixed;opacity:0;pointer-events:none;top:0;left:0;width:1px;height:1px;';
-  document.body.appendChild(picker);
-  picker.focus();
-  picker.click();
+
+function renderInspTemplates(){
+  const list=document.getElementById('insp-tpl-list');
+  if(!list) return;
+  const tpls=DB.inspectionTemplates||[];
+  if(!tpls.length){
+    list.innerHTML='<div style="padding:10px 14px;font-size:12px;color:var(--muted)">No templates yet — create your first round below.</div>';
+    return;
+  }
+  list.innerHTML=tpls.map((t,i)=>{
+    const bld=DB.buildings.find(b=>b.id===t.buildingId);
+    const sub=[t.types,t.floors?'Floors: '+t.floors:'',t.categories?t.categories:''].filter(Boolean).join(' · ');
+    const border=i<tpls.length-1?'border-bottom:0.5px solid var(--border);':'';    const canDel=currentUser&&currentUser.role==='Admin';
+    return`<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;${border}" onclick="inspSelectTemplate('${t.id}')">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.name}</div>
+        <div style="font-size:11px;color:var(--sub)">${bld?bld.name:t.buildingId} · ${sub||'All'}</div>
+      </div>
+      <button onclick="event.stopPropagation();inspEditTemplate('${t.id}')" style="font-size:11px;padding:3px 8px;border:0.5px solid var(--border);border-radius:var(--rs);background:var(--surface);color:var(--sub);cursor:pointer">Edit</button>
+      ${canDel?`<button onclick="event.stopPropagation();inspDeleteTemplate('${t.id}')" style="font-size:11px;padding:3px 8px;border:0.5px solid rgba(220,38,38,.3);border-radius:var(--rs);background:none;color:var(--red);cursor:pointer">✕</button>`:''}
+    </div>`;  }).join('');
 }
-function inspDateChosen(val){
-  if(!val) return;
-  const todayStr = today.toISOString().split('T')[0];
-  document.getElementById('insp-start-date').value = val;
-  const d = new Date(val+'T00:00:00');
-  const display = d.toLocaleDateString('nl-NL',{day:'numeric',month:'short',year:'numeric'});
-  const isFuture = val > todayStr;
-  const dispEl = document.getElementById('insp-date-display');
-  const badgeEl = document.getElementById('insp-status-badge');
-  dispEl.textContent = isFuture ? display : (val===todayStr ? 'Today' : display);
-  dispEl.style.color = isFuture ? 'var(--purple)' : 'var(--text)';
-  if(badgeEl){ badgeEl.style.display = isFuture ? 'inline-flex' : 'none'; }
+
+function inspSelectTemplate(id){
+  const t=DB.inspectionTemplates.find(x=>x.id===id); if(!t) return;
+  inspActiveTplId=id;
+  // Load template values into state
+  inspTypes=new Set((t.types||'').split(',').filter(Boolean));
+  inspSelFloors=(t.floors||'').split(',').filter(Boolean);
+  inspSelCats=(t.categories||'').split(',').filter(Boolean);
+  inspSelUnits=(t.units||'').split(',').filter(Boolean);
+  inspSelAssets=(t.assets||'').split(',').filter(Boolean);
+  const bld=DB.buildings.find(b=>b.id===t.buildingId);
+  const card=document.getElementById('insp-tpl-selected-card');
+  if(card) card.innerHTML=`<strong>${t.name}</strong><br><span style="font-size:11px;opacity:.8">${bld?bld.name:t.buildingId} · ${t.types||'All'}</span>`;
+  document.getElementById('insp-tpl-section').style.display='none';
+  document.getElementById('insp-free-form').style.display='none';
+  document.getElementById('insp-tpl-preview').style.display='';
+  inspUpdateFreePreview(true);
+}
+
+function inspEditTemplate(id){
+  const t=DB.inspectionTemplates.find(x=>x.id===id); if(!t) return;
+  inspActiveTplId=id;
+  inspTypes=new Set((t.types||'').split(',').filter(Boolean));
+  inspSelFloors=(t.floors||'').split(',').filter(Boolean);
+  inspSelCats=(t.categories||'').split(',').filter(Boolean);
+  inspSelUnits=(t.units||'').split(',').filter(Boolean);
+  inspSelAssets=(t.assets||'').split(',').filter(Boolean);
+  document.getElementById('insp-tpl-section').style.display='none';
+  document.getElementById('insp-tpl-preview').style.display='none';
+  showInspFreeForm(t.buildingId, t.name, true);
+}
+
+async function inspDeleteTemplate(id){
+  if(!confirm('Delete this template?')) return;
+  DB.inspectionTemplates=DB.inspectionTemplates.filter(x=>x.id!==id);
+  await writeSheet('inspectionTemplates');
+  renderInspTemplates();
+}
+
+function inspStartNew(){
+  inspActiveTplId=null;
+  inspTypes=new Set(); inspSelFloors=[]; inspSelCats=[]; inspSelUnits=[]; inspSelAssets=[];
+  document.getElementById('insp-tpl-section').style.display='none';
+  document.getElementById('insp-tpl-preview').style.display='none';
+  showInspFreeForm('', '', false);
+}
+
+function showInspFreeForm(bldgId, tplName, isEdit){
+  const form=document.getElementById('insp-free-form');
+  form.style.display='';
+  populateBldSelect('insp-bldg');
+  const bldSel=document.getElementById('insp-bldg');
+  if(bldgId){ const b=DB.buildings.find(x=>x.id===bldgId); if(b) bldSel.value=b.name; }
+  else bldSel.value='';
+  // Type toggles
+  ['assets','units'].forEach(tp=>{
+    const btn=document.getElementById('insp-type-'+tp);
+    const active=inspTypes.has(tp);
+    if(btn){ btn.style.background=active?'var(--blue)':' var(--card)'; btn.style.color=active?'#fff':'var(--sub)'; btn.style.borderColor=active?'var(--blue)':'var(--border)'; }
+  });
+  const chk=document.getElementById('insp-save-tpl-chk');
+  const nameInp=document.getElementById('insp-tpl-name');
+  const nameWrap=document.getElementById('insp-tpl-name-wrap');
+  if(isEdit){ if(chk)chk.checked=true; if(nameWrap)nameWrap.style.display='flex'; if(nameInp)nameInp.value=tplName; }
+  else { if(chk)chk.checked=false; if(nameWrap)nameWrap.style.display='none'; if(nameInp)nameInp.value=''; }
+  if(bldgId) inspOnBldgChange();
+  else { document.getElementById('insp-filters-wrap').style.display='none'; }
+}
+
+function inspToggleType(tp){
+  if(inspTypes.has(tp)) inspTypes.delete(tp); else inspTypes.add(tp);
+  ['assets','units'].forEach(t=>{
+    const btn=document.getElementById('insp-type-'+t);
+    const active=inspTypes.has(t);
+    if(btn){ btn.style.background=active?'var(--blue)':'var(--card)'; btn.style.color=active?'#fff':'var(--sub)'; btn.style.borderColor=active?'var(--blue)':'var(--border)'; }
+  });
+  document.getElementById('insp-units-fg').style.display=inspTypes.has('units')?'':' none';
+  document.getElementById('insp-assets-fg').style.display=inspTypes.has('assets')?'':' none';
+  inspUpdateFreePreview(false);
 }
 
 function inspOnBldgChange(){
-  const bldg = document.getElementById('insp-bldg').value;
-  const wrap  = document.getElementById('insp-filters-wrap');
-  if(!bldg){ wrap.style.display='none'; updateInspPreview(); return; }
-  wrap.style.display = '';
-
-  // Reset type selection
-  inspType = '';
-  ['units','assets','category'].forEach(t => {
-    const btn = document.getElementById('insp-type-' + t);
-    if(btn){ btn.style.background='var(--card)'; btn.style.color='var(--sub)'; btn.style.borderColor='var(--border)'; }
-  });
-  document.getElementById('insp-type-filters').style.display = 'none';
-
-  // Populate floors for this building
-  const floors = getFloorsForBuilding(bldg);
-  document.getElementById('insp-floor').innerHTML =
-    '<option value="">All floors</option>' + floors.map(f=>`<option value="${f.label}">${f.label}</option>`).join('');
-
-  // Populate categories scoped to this building's assets
-  const bldgAssets = DB.assets.filter(a=>a.building===bldg);
-  const cats = [...new Set(bldgAssets.map(a=>a.category).filter(Boolean))].sort();
-  document.getElementById('insp-cat').innerHTML =
-    '<option value="All">All categories</option>' + cats.map(c=>`<option value="${c}">${c}</option>`).join('');
-
-  updateInspPreview();
+  const bldgName=document.getElementById('insp-bldg')?.value;
+  const wrap=document.getElementById('insp-filters-wrap');
+  if(!bldgName){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  inspSelFloors=[]; inspSelCats=[]; inspSelUnits=[]; inspSelAssets=[];
+  renderInspPills('floors',inspSelFloors);
+  renderInspPills('cats',inspSelCats);
+  renderInspPills('units',inspSelUnits);
+  renderInspPills('assets',inspSelAssets);
+  document.getElementById('insp-units-fg').style.display=inspTypes.has('units')?'':' none';
+  document.getElementById('insp-assets-fg').style.display=inspTypes.has('assets')?'':' none';
+  inspUpdateFreePreview(false);
 }
 
-function updateInspPreview(){
-  const bldg  = document.getElementById('insp-bldg').value;
-  const floor = document.getElementById('insp-floor').value;
-  const cat   = document.getElementById('insp-cat').value;
-  const prev  = document.getElementById('insp-asset-preview');
-  if(!bldg || !inspType){ prev.textContent = inspType ? 'Select a building to preview items' : 'Select what to inspect'; return; }
-
-  let count = 0, label = '';
-  if(inspType === 'units'){
-    const bldObj = DB.buildings.find(b=>b.name===bldg);
-    const bldFloorIds = bldObj ? DB.floors.filter(f=>f.buildingId===bldObj.id).map(f=>f.id) : [];
-    const units = DB.units.filter(u => {
-      if(!bldFloorIds.includes(u.floorId)) return false;
-      if(floor){ const flr=DB.floors.find(f=>f.id===u.floorId); if(flr?.label!==floor) return false; }
-      return true;
-    });
-    count = units.length; label = `unit${count!==1?'s':''}`;
-  } else if(inspType === 'assets'){
-    const assets = DB.assets.filter(a => {
-      if(a.building !== bldg) return false;
-      if(floor && a.floor !== floor) return false;
-      return true;
-    });
-    count = assets.length; label = `asset${count!==1?'s':''}`;
-  } else if(inspType === 'category'){
-    const assets = DB.assets.filter(a => {
-      if(a.building !== bldg) return false;
-      if(floor && a.floor !== floor) return false;
-      if(cat && cat !== 'All' && a.category !== cat) return false;
-      return true;
-    });
-    count = assets.length; label = `asset${count!==1?'s':''}`;
-  }
-
-  if(!count){
-    prev.innerHTML = `<span style="color:var(--red)">No ${inspType} match this selection.</span>`;
+function renderInspPills(ctx, selected){
+  const map={floors:'insp-floors-pills',cats:'insp-cats-pills',units:'insp-units-pills',assets:'insp-assets-pills'};
+  const el=document.getElementById(map[ctx]); if(!el) return;
+  const placeholder={floors:'All floors',cats:'All categories',units:'All units',assets:'All assets'};
+  if(!selected.length){
+    el.innerHTML=`<span style="font-size:12px;color:var(--muted)">${placeholder[ctx]}</span>`;
   } else {
-    prev.innerHTML = `<span style="color:var(--green);font-weight:700">${count} ${label}</span> <span style="color:var(--sub)">will be included in this round.</span>`;
+    el.innerHTML=selected.map(v=>`<span class="insp-pill">${v}<span class="insp-pill-x" onclick="event.stopPropagation();inspRemovePill('${ctx}','${v.replace(/'/g,"\\'")}')">×</span></span>`).join('')
+      +'<span style="font-size:11px;color:var(--sub);cursor:pointer">+ add</span>';
   }
 }
 
-function getInspAssets(bldg, floor, unit, assetName, cat){
-  return DB.assets.filter(a => {
-    if(a.building !== bldg) return false;
-    if(floor     && a.floor    && a.floor    !== floor)     return false;
-    if(unit      && a.unit     && a.unit     !== unit)      return false;
-    if(assetName && a.name     !== assetName)               return false;
-    if(cat && cat !== 'All'    && a.category !== cat)       return false;
+function inspRemovePill(ctx,val){
+  const map={floors:inspSelFloors,cats:inspSelCats,units:inspSelUnits,assets:inspSelAssets};
+  const arr=map[ctx]; if(!arr) return;
+  const idx=arr.indexOf(val); if(idx>=0) arr.splice(idx,1);
+  renderInspPills(ctx,arr);
+  inspUpdateFreePreview(false);
+}
+
+function inspOpenPillDD(ctx){
+  const bldgName=document.getElementById('insp-bldg')?.value; if(!bldgName) return;
+  _inspPillDDContext=ctx;
+  const bldObj=DB.buildings.find(b=>b.name===bldgName);
+  let options=[];
+  if(ctx==='floors'){ options=getFloorsForBuilding(bldgName).map(f=>f.label); }
+  else if(ctx==='cats'){ options=[...new Set(DB.assets.filter(a=>a.building===bldgName).map(a=>a.category).filter(Boolean))].sort(); }
+  else if(ctx==='units'){ if(bldObj){ const flrIds=DB.floors.filter(f=>f.buildingId===bldObj.id).map(f=>f.id); options=DB.units.filter(u=>flrIds.includes(u.floorId)).map(u=>u.label); } }
+  else if(ctx==='assets'){ options=DB.assets.filter(a=>a.building===bldgName).map(a=>a.label||a.name); }
+  const map={floors:inspSelFloors,cats:inspSelCats,units:inspSelUnits,assets:inspSelAssets};
+  const sel=new Set(map[ctx]||[]);
+  const dd=document.getElementById('insp-pill-dd');
+  if(!dd) return;
+  if(!options.length){ dd.style.display='none'; return; }
+  dd.style.display='';
+  dd.innerHTML=options.map(o=>`<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:0.5px solid var(--border)"><input type="checkbox" ${sel.has(o)?'checked':''} onchange="inspPillToggle('${ctx}','${o.replace(/'/g,"\\'")}',this.checked)" style="accent-color:var(--blue);width:14px;height:14px">${o}</label>`).join('');
+}
+
+function inspPillToggle(ctx,val,checked){
+  const map={floors:inspSelFloors,cats:inspSelCats,units:inspSelUnits,assets:inspSelAssets};
+  const arr=map[ctx]; if(!arr) return;
+  if(checked && !arr.includes(val)) arr.push(val);
+  if(!checked){ const i=arr.indexOf(val); if(i>=0) arr.splice(i,1); }
+  renderInspPills(ctx,arr);
+  inspUpdateFreePreview(false);
+}
+
+function inspUpdateFreePreview(fromTemplate){
+  const bldgName = fromTemplate
+    ? (()=>{ const t=DB.inspectionTemplates.find(x=>x.id===inspActiveTplId); const b=t&&DB.buildings.find(x=>x.id===t.buildingId); return b?b.name:''; })()
+    : document.getElementById('insp-bldg')?.value;
+  const prevId = fromTemplate ? 'insp-asset-preview' : 'insp-asset-preview-free';
+  const prev=document.getElementById(prevId); if(!prev) return;
+  if(!bldgName||!inspTypes.size){ prev.innerHTML='<span style="color:var(--sub)">Select building and type to preview items</span>'; return; }
+  let total=0, parts=[];
+  if(inspTypes.has('assets')){
+    const bldObj=DB.buildings.find(b=>b.name===bldgName);
+    const flrLabels=new Set(inspSelFloors);
+    let ast=DB.assets.filter(a=>{
+      if(a.building!==bldgName) return false;
+      if(flrLabels.size&&!flrLabels.has(a.floor)) return false;
+      if(inspSelCats.length&&!inspSelCats.includes(a.category)) return false;
+      if(inspSelAssets.length&&!inspSelAssets.includes(a.label||a.name)) return false;
+      return true;
+    });
+    total+=ast.length; if(ast.length) parts.push(`${ast.length} asset${ast.length!==1?'s':''}`);
+  }
+  if(inspTypes.has('units')){
+    const bldObj=DB.buildings.find(b=>b.name===bldgName);
+    const flrIds=bldObj?DB.floors.filter(f=>f.buildingId===bldObj.id&&(!inspSelFloors.length||inspSelFloors.includes(f.label))).map(f=>f.id):[];
+    let unt=DB.units.filter(u=>{
+      if(!flrIds.includes(u.floorId)) return false;
+      if(inspSelUnits.length&&!inspSelUnits.includes(u.label)) return false;
+      return true;
+    });
+    total+=unt.length; if(unt.length) parts.push(`${unt.length} unit${unt.length!==1?'s':''}`);
+  }
+  if(!total){ prev.innerHTML='<span style="color:var(--red)">No items match this selection.</span>'; }
+  else { prev.innerHTML=`<span style="color:var(--green);font-weight:700">${total} item${total!==1?'s':''}</span> <span style="color:var(--sub)">— ${parts.join(' + ')}</span>`; }
+}
+
+function inspPickDate(){
+  const picker=document.getElementById('insp-date-picker'); if(!picker) return;
+  const todayStr=today.toISOString().split('T')[0];
+  picker.min=''; picker.value=document.getElementById('insp-start-date').value||todayStr;
+  picker.style.cssText='position:fixed;opacity:0;pointer-events:none;top:0;left:0;width:1px;height:1px;';
+  document.body.appendChild(picker); picker.focus(); picker.click();
+}
+function inspDateChosen(val){
+  if(!val) return;
+  const todayStr=today.toISOString().split('T')[0];
+  document.getElementById('insp-start-date').value=val;
+  // Auto-launch after date chosen
+  launchInspectionRound();
+}
+
+function getInspAssets(bldg, floors, cats, assetNames){
+  return DB.assets.filter(a=>{
+    if(a.building!==bldg) return false;
+    if(floors&&floors.length&&!floors.includes(a.floor)) return false;
+    if(cats&&cats.length&&!cats.includes(a.category)) return false;
+    if(assetNames&&assetNames.length&&!assetNames.includes(a.label||a.name)) return false;
     return true;
   });
 }
-
-function getInspUnits(bldg, floor, unit, assetName, cat){
-  const bldObj = DB.buildings.find(b=>b.name===bldg);
-  if(!bldObj) return [];
-  // When filtering by asset name or category, find which floors/units those assets touch
-  let allowedFloors = null;
-  let allowedUnits  = null;
-  if(assetName || (cat && cat !== 'All')){
-    const matchingAssets = DB.assets.filter(a => {
-      if(a.building !== bldg) return false;
-      if(assetName && a.name !== assetName) return false;
-      if(cat && cat !== 'All' && a.category !== cat) return false;
-      return true;
-    });
-    allowedFloors = new Set(matchingAssets.map(a=>a.floor).filter(Boolean));
-    allowedUnits  = new Set(matchingAssets.map(a=>a.unit).filter(Boolean));
-  }
-  return DB.units.filter(u => {
-    const flr = DB.floors.find(f=>f.id===u.floorId);
-    if(flr?.buildingId !== bldObj.id) return false;
-    if(floor && flr?.label !== floor) return false;
-    if(unit  && u.label    !== unit)  return false;
-    // If asset/cat filter active, only include units that share floor or unit with matching assets
-    if(allowedFloors !== null){
-      if(!allowedFloors.has(flr?.label) && !allowedUnits.has(u.label)) return false;
-    }
+function getInspUnitsNew(bldg, floors, unitNames){
+  const bldObj=DB.buildings.find(b=>b.name===bldg); if(!bldObj) return [];
+  const flrIds=DB.floors.filter(f=>f.buildingId===bldObj.id&&(!floors||!floors.length||floors.includes(f.label))).map(f=>f.id);
+  return DB.units.filter(u=>{
+    if(!flrIds.includes(u.floorId)) return false;
+    if(unitNames&&unitNames.length&&!unitNames.includes(u.label)) return false;
     return true;
   }).sort((a,z)=>a.sortOrder-z.sortOrder);
 }
 
-/* ── Launch the round (full-screen checklist) ── */
-function launchInspectionRound(){
-  const bldg  = document.getElementById('insp-bldg').value;
-  const floor = document.getElementById('insp-floor').value;
-  const cat   = document.getElementById('insp-cat').value;
-  if(!bldg){ toast('Select a building','err'); return; }
-  if(!inspType){ toast('Select what to inspect','err'); return; }
-
-  let items = [];
-
-  if(inspType === 'units'){
-    const bldObj = DB.buildings.find(b=>b.name===bldg);
-    const bldFloorIds = bldObj ? DB.floors.filter(f=>f.buildingId===bldObj.id).map(f=>f.id) : [];
-    const units = DB.units.filter(u => {
-      if(!bldFloorIds.includes(u.floorId)) return false;
-      if(floor){ const flr=DB.floors.find(f=>f.id===u.floorId); if(flr?.label!==floor) return false; }
-      return true;
-    }).sort((a,z)=>a.sortOrder-z.sortOrder);
-    items = units.map(u => {
-      const flr = DB.floors.find(f=>f.id===u.floorId);
-      return { type:'unit', unitId:u.id, label:u.label, category:'Unit', unit:u.label, floor:flr?.label||'', result:'Open', note:'', expectedTime: parseInt(u.inspectionTime)||0 };
-    });
+async function launchInspectionRound(){
+  // Resolve building name
+  let bldgName;
+  if(inspActiveTplId&&document.getElementById('insp-tpl-preview')?.style.display!=='none'){
+    const t=DB.inspectionTemplates.find(x=>x.id===inspActiveTplId);
+    const b=t&&DB.buildings.find(x=>x.id===t.buildingId);
+    bldgName=b?b.name:'';
   } else {
-    // assets or category
-    const assets = DB.assets.filter(a => {
-      if(a.building !== bldg) return false;
-      if(floor && a.floor !== floor) return false;
-      if(inspType === 'category' && cat && cat !== 'All' && a.category !== cat) return false;
-      return true;
-    });
-    items = assets.map(a => ({ type:'asset', assetId:a.id, label:a.label||a.name, category:a.category, unit:a.unit||'', floor:a.floor||'', result:'Open', note:'', expectedTime: parseInt(a.inspectionTime)||0 }));
+    bldgName=document.getElementById('insp-bldg')?.value;
   }
+  if(!bldgName){ toast('Select a building','err'); return; }
+  if(!inspTypes.size){ toast('Select at least one type (Assets or Units)','err'); return; }
 
+  let items=[];
+  if(inspTypes.has('assets')){
+    const ast=getInspAssets(bldgName,inspSelFloors,inspSelCats,inspSelAssets);
+    ast.forEach(a=>items.push({type:'asset',assetId:a.id,label:a.label||a.name,category:a.category,unit:a.unit||'',floor:a.floor||'',result:'Open',note:'',expectedTime:parseInt(a.inspectionTime)||0}));
+  }
+  if(inspTypes.has('units')){
+    const unt=getInspUnitsNew(bldgName,inspSelFloors,inspSelUnits);
+    unt.forEach(u=>{ const flr=DB.floors.find(f=>f.id===u.floorId); items.push({type:'unit',unitId:u.id,label:u.label,category:'Unit',unit:u.label,floor:flr?.label||'',result:'Open',note:'',expectedTime:parseInt(u.inspectionTime)||0}); });
+  }
   if(!items.length){ toast('No items match this selection','err'); return; }
 
-  const todayStr = today.toISOString().split('T')[0];
-  const chosenDate = document.getElementById('insp-start-date')?.value || todayStr;
-  const isFuture = chosenDate > todayStr;
-  const inspId = nextId(DB.inspections, 'INS');
-  activeRound = {
-    inspId,
-    building  : bldg,
-    floor     : floor,
-    category  : inspType === 'category' ? cat : (inspType === 'units' ? 'Units' : 'Assets'),
-    dateStart : chosenDate,
-    status    : isFuture ? 'Planned' : 'In Progress',
-    items,
+  // Optionally save as template
+  const saveTpl=document.getElementById('insp-save-tpl-chk')?.checked;
+  const tplName=document.getElementById('insp-tpl-name')?.value.trim();
+  if(saveTpl&&tplName){
+    const bldObj=DB.buildings.find(b=>b.name===bldgName);
+    const tplData={name:tplName,buildingId:bldObj?bldObj.id:bldgName,types:[...inspTypes].join(','),floors:inspSelFloors.join(','),categories:inspSelCats.join(','),units:inspSelUnits.join(','),assets:inspSelAssets.join(',')};
+    if(inspActiveTplId){
+      Object.assign(DB.inspectionTemplates.find(x=>x.id===inspActiveTplId)||{},tplData);
+    } else {
+      DB.inspectionTemplates.push({id:nextId(DB.inspectionTemplates,'TPL'),...tplData});
+    }
+    await writeSheet('inspectionTemplates');
+    toast('Template saved');
+  }
+
+  const todayStr=today.toISOString().split('T')[0];
+  const chosenDate=document.getElementById('insp-start-date')?.value||todayStr;
+  const isFuture=chosenDate>todayStr;
+  const inspId=nextId(DB.inspections,'INS');
+  const bldObj=DB.buildings.find(b=>b.name===bldgName);
+  activeRound={
+    inspId, building:bldgName,
+    floor:inspSelFloors.join(', '),
+    category:[...inspTypes].join('+')+( inspSelCats.length? ' · '+inspSelCats.join(','):''),
+    dateStart:chosenDate, status:isFuture?'Planned':'In Progress', items,
   };
-
   closeMo('mo-insp-start');
-
-  document.getElementById('insp-round-title').textContent = bldg + (floor ? ' · ' + floor : '');
-  document.getElementById('insp-round-sub').textContent   = (inspType === 'category' && cat !== 'All' ? cat + ' · ' : '') + items.length + ' items';
-
+  document.getElementById('insp-round-title').textContent=bldgName+(inspSelFloors.length?' · '+inspSelFloors.join(', '):'');
+  document.getElementById('insp-round-sub').textContent=items.length+' items';
   setRoundToggle('all');
   renderRound();
   navTo('insp-round');
@@ -7669,36 +7752,59 @@ function calPlanTicket(dateStr){
   <div class="ms">
     <div class="mh"></div>
     <div class="mt"><span>Start Inspection Round</span><button class="mt-close" onclick="closeMo('mo-insp-start')">✕</button></div>
-    <!-- Step 1: Building -->
-    <div class="fg"><label>Building *</label><select class="fs2" id="insp-bldg" onchange="inspOnBldgChange()"><option value="">Select building…</option></select></div>
-    <div id="insp-filters-wrap" style="display:none">
-      <!-- Step 2: Type -->
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:4px 18px 8px">Inspect *</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 18px 12px">
-        <button id="insp-type-units"    onclick="inspSetType('units')"    style="padding:11px 4px;border-radius:var(--rs);border:1.5px solid var(--border);font-size:13px;font-weight:700;color:var(--sub);background:var(--card);transition:all .15s">Units</button>
-        <button id="insp-type-assets"   onclick="inspSetType('assets')"   style="padding:11px 4px;border-radius:var(--rs);border:1.5px solid var(--border);font-size:13px;font-weight:700;color:var(--sub);background:var(--card);transition:all .15s">Assets</button>
-        <button id="insp-type-category" onclick="inspSetType('category')" style="padding:11px 4px;border-radius:var(--rs);border:1.5px solid var(--border);font-size:13px;font-weight:700;color:var(--sub);background:var(--card);transition:all .15s">Category</button>
+
+    <!-- Templates section -->
+    <div id="insp-tpl-section">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:10px 18px 6px">Templates</div>
+      <div id="insp-tpl-list" style="margin:0 14px 8px;border:1.5px solid var(--border);border-radius:var(--rs);overflow:hidden"></div>
+      <div style="padding:0 14px 10px">
+        <button onclick="inspStartNew()" style="width:100%;padding:9px;border:1.5px dashed var(--border);border-radius:var(--rs);font-size:12px;font-weight:600;color:var(--sub);background:none;cursor:pointer">+ New round (no template)</button>
       </div>
-      <!-- Step 3: Filters (shown after type selected) -->
-      <div id="insp-type-filters" style="display:none">
-        <div class="fg"><label>Floor</label><select class="fs2" id="insp-floor" onchange="updateInspPreview()"><option value="">All floors</option></select></div>
-        <div class="fg" id="insp-cat-wrap" style="display:none"><label>Category</label><select class="fs2" id="insp-cat" onchange="updateInspPreview()"><option value="All">All categories</option></select></div>
+      <div style="height:1px;background:var(--border);margin:0 0 4px"></div>
+    </div>
+
+    <!-- Template selected preview -->
+    <div id="insp-tpl-preview" style="display:none;padding:0 0 4px">
+      <div id="insp-tpl-selected-card" style="margin:8px 14px 10px;padding:10px 12px;background:rgba(37,99,235,.06);border:1.5px solid rgba(37,99,235,.25);border-radius:var(--rs);font-size:12px;color:var(--blue)"></div>
+      <div id="insp-asset-preview" style="margin:0 14px 10px;padding:10px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--sub)">Calculating…</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 10px">
+        <button class="btn-p" style="margin:0" onclick="launchInspectionRound()">Start now →</button>
+        <button style="padding:11px;background:#F5F3FF;border:1.5px solid #7C3AED;border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer" onclick="inspPickDate()">📅 Plan ahead</button>
       </div>
     </div>
-    <div id="insp-asset-preview" style="margin:0 18px 12px;padding:12px 14px;background:#F8FAFF;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--sub)">Select a building to preview items</div>
-    <div id="insp-date-row" style="display:flex;align-items:center;gap:8px;padding:0 18px 12px">
-      <span style="font-size:12px;color:var(--sub);font-weight:600">Date:</span>
-      <span id="insp-date-display" style="font-size:13px;font-weight:700;color:var(--text)">Today</span>
-      <span id="insp-status-badge" style="display:none;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(124,58,237,.12);color:var(--purple)">Planned</span>
-      <input type="hidden" id="insp-start-date" value="">
+
+    <!-- Free selection form -->
+    <div id="insp-free-form" style="display:none">
+      <div class="fg"><label>Building *</label><select class="fs2" id="insp-bldg" onchange="inspOnBldgChange()"><option value="">Select building…</option></select></div>
+      <div id="insp-filters-wrap" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:2px 18px 8px">Type *</div>
+        <div style="display:flex;gap:8px;padding:0 18px 12px">
+          <button id="insp-type-assets" onclick="inspToggleType('assets')" style="flex:1;padding:10px 4px;border-radius:var(--rs);border:1.5px solid var(--border);font-size:13px;font-weight:700;color:var(--sub);background:var(--card);transition:all .15s">Assets</button>
+          <button id="insp-type-units"  onclick="inspToggleType('units')"  style="flex:1;padding:10px 4px;border-radius:var(--rs);border:1.5px solid var(--border);font-size:13px;font-weight:700;color:var(--sub);background:var(--card);transition:all .15s">Units</button>
+        </div>
+        <div class="fg"><label>Floors</label><div id="insp-floors-pills" class="insp-pill-wrap" onclick="inspOpenPillDD('floors')"></div></div>
+        <div class="fg"><label>Categories <span style="font-size:10px;font-weight:400;color:var(--muted)">(assets only)</span></label><div id="insp-cats-pills" class="insp-pill-wrap" onclick="inspOpenPillDD('cats')"></div></div>
+        <div id="insp-units-fg" class="fg" style="display:none"><label>Units</label><div id="insp-units-pills" class="insp-pill-wrap" onclick="inspOpenPillDD('units')"></div></div>
+        <div id="insp-assets-fg" class="fg" style="display:none"><label>Assets</label><div id="insp-assets-pills" class="insp-pill-wrap" onclick="inspOpenPillDD('assets')"></div></div>
+        <!-- Pill dropdown -->
+        <div id="insp-pill-dd" style="display:none;margin:0 14px 8px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--card);max-height:160px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.08)"></div>
+      </div>
+      <div id="insp-asset-preview-free" style="margin:0 14px 10px;padding:10px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--sub)">Select a building to preview items</div>
+      <!-- Save as template -->
+      <div style="display:flex;align-items:center;gap:8px;padding:0 18px 10px">
+        <input type="checkbox" id="insp-save-tpl-chk" onchange="document.getElementById('insp-tpl-name-wrap').style.display=this.checked?'flex':'none'" style="width:14px;height:14px;accent-color:var(--blue)">
+        <label for="insp-save-tpl-chk" style="font-size:12px;color:var(--sub);font-weight:600">Save as template</label>
+      </div>
+      <div id="insp-tpl-name-wrap" style="display:none;padding:0 18px 12px;gap:8px;flex-direction:column">
+        <input class="fi2" id="insp-tpl-name" placeholder="Template name…">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 10px">
+        <button class="btn-p" style="margin:0" onclick="launchInspectionRound()">Start now →</button>
+        <button style="padding:11px;background:#F5F3FF;border:1.5px solid #7C3AED;border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer" onclick="inspPickDate()">📅 Plan ahead</button>
+      </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 10px">
-      <button class="btn-p" style="margin:0" onclick="launchInspectionRound()">Start Round →</button>
-      <button style="padding:13px;background:#F5F3FF;border:1.5px solid #7C3AED;border-radius:var(--rs);font-size:14px;font-weight:700;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer" onclick="inspPickDate()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Set Date
-      </button>
-    </div>
+
+    <input type="hidden" id="insp-start-date" value="">
     <input type="date" id="insp-date-picker" style="display:none;position:absolute" onchange="inspDateChosen(this.value)">
     <div style="height:8px"></div>
   </div>
