@@ -1452,7 +1452,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 ══════════════════════════════════════════════════════════ */
 const CLIENT_ID   = '806872056167-d9r8u2mq154725634o1nbpu93mdpt5ff.apps.googleusercontent.com';
 const SHEET_ID    = '1UkjXu3yOwPWlb1bKjMnXuCrYkxsvzC6wBZ48nPr1P4A';
-const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email openid';
+const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email openid';
 
 /* Sheet tab names — must match exactly what you created */
 const TABS = { users:'Users', buildings:'Gebouwen', assets:'Middelen', tickets:'Tickets', suppliers:'Leveranciers', inspections:'Inspections', inspectionItems:'InspectionItems', floors:'Verdiepingen', units:'Eenheden', categories:'Categorieën', inspectionTemplates:'InspectionTemplates' };
@@ -1998,6 +1998,21 @@ async function getDriveFolder(){
 }
 
 async function uploadPhotoToDrive(file){
+  // Request drive.file scope on demand if not already granted
+  const hasDrive = await new Promise(resolve => {
+    const tc = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      callback: resp => {
+        if(resp.error){ resolve(false); return; }
+        gapi.client.setToken({ access_token: resp.access_token });
+        resolve(true);
+      },
+    });
+    tc.requestAccessToken({ prompt: '' });
+  });
+  if(!hasDrive) throw new Error('Drive toestemming geweigerd');
+
   const folderId = await getDriveFolder();
   const meta = JSON.stringify({ name: file.name, parents: [folderId] });
   const form = new FormData();
@@ -2008,9 +2023,9 @@ async function uploadPhotoToDrive(file){
     { method: 'POST', headers: { Authorization: 'Bearer ' + gapi.client.getToken().access_token }, body: form }
   );
   const data = await res.json();
-  if(!data.id) throw new Error(data.error?.message || 'Upload failed');
+  if(!data.id) throw new Error(data.error?.message || 'Upload mislukt');
   // Make file publicly viewable so thumbnails load
-  await fetch(`https://www.googleapis.com/drive/v3/files/${data.id}/permissions`, {
+  await fetch(`https://drive.google.com/drive/v3/files/${data.id}/permissions`, {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + gapi.client.getToken().access_token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ role: 'reader', type: 'anyone' })
