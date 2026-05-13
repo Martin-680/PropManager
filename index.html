@@ -7146,7 +7146,7 @@ async function saveInspectionRound(){
   const hasSkipped = activeRound.items.some(i => i.result === 'Skipped');
   const newStatus = (activeRound.status === 'Planned')
     ? 'Planned'
-    : (allApproved && !hasSkipped ? 'Completed' : 'In Progress');
+    : (allChecked ? 'Completed' : 'In Progress');
   const inspRecord = {
     id         : activeRound.inspId,
     buildingId : inspBld ? inspBld.id : activeRound.building,
@@ -7222,7 +7222,7 @@ async function saveInspectionRound(){
       const flr   = asset ? DB.floors.find(f=>f.id===asset.floorId) : unit ? DB.floors.find(f=>f.id===unit.floorId) : null;
       const cat   = DB.categories.find(c=>c.category===item.category);
       const tix = {
-        id         : nextId(DB.tickets,'TIX'),
+        id         : nextId(DB.tickets,'TKT'),
         buildingId : inspBld2?.id || '',
         floorId    : flr?.id || '',
         unitId     : unit?.id || '',
