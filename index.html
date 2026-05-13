@@ -1893,10 +1893,19 @@ async function loadAllData(){
     r.category = cat ? cat.category : r.categoryId;
     // Attach items from InspectionItems tab, re-joining expectedTime from asset
     r.items = DB.inspectionItems.filter(i => i.inspectionId === r.id).map(i => {
-      const a = i.assetId ? DB.assets.find(x => x.id === i.assetId) : null;
-      const u = i.unitId  ? DB.units.find(x => x.id === i.unitId)   : null;
+      const a   = i.assetId ? DB.assets.find(x => x.id === i.assetId) : null;
+      const u   = i.unitId  ? DB.units.find(x => x.id === i.unitId)   : null;
+      const flr = a ? DB.floors.find(f => f.id === a.floorId) : u ? DB.floors.find(f => f.id === u.floorId) : null;
+      const cat = DB.categories.find(x => x.id === (a?.categoryId || i.categoryId));
       const expectedTime = parseInt(a?.inspectionTime) || parseInt(u?.inspectionTime) || 0;
-      return { ...i, expectedTime };
+      return {
+        ...i,
+        type     : i.type || (i.unitId && !i.assetId ? 'unit' : 'asset'),
+        floor    : i.floor    || flr?.label  || '',
+        unit     : i.unit     || (a ? (DB.units.find(x => x.id === a.unitId)?.label || '') : (u?.label || '')),
+        category : i.category || cat?.category || (a?.category || ''),
+        expectedTime,
+      };
     });
     return r;
   });
