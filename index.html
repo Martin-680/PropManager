@@ -2823,10 +2823,18 @@ function renderDash(){
                 <div class="wl-tip-title">${s.b.name} · health score</div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;color:${s.openTixCount>0?'var(--red)':'var(--text)'}">${s.openTixCount}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Insp. items in period</span><span style="font-weight:700">${s.inspItemCount}</span></div>
-                <div class="wl-tip-row"><span style="color:var(--sub)">Size (per100)</span><span style="font-weight:700">${Math.round(s.effSqm/100*10)/10}</span></div>
+                <div class="wl-tip-row"><span style="color:var(--sub)">Size (per 100m²)</span><span style="font-weight:700">${Math.round(s.effSqm/100*10)/10}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(s.workload*10)/10}</span></div>
+                <div class="wl-tip-row"><span style="color:var(--sub)">Pressure</span><span style="font-weight:700">${Math.round(s.workload/Math.max(s.effSqm/100,1)*100)/100}</span></div>
                 <div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${hc}">${s.health}%</span></div>
-                <div class="wl-tip-formula">Open ticket ×2 · Pending item ×2 (both × age factor) · Approved/Failed ×0.5 · Skipped ×0 · Closed −1<br>Age factor = min(1 + days÷30, 4) — caps at ×4 after 90 days<br>Pressure = workload ÷ (m² ÷ 100) · Health = 100 − pressure</div>
+                <div class="wl-tip-formula">
+                  <b>Open tickets (×2) = ${s.openTixCount}</b> — raw count of open tickets. Contribution to workload: ${s.openTixCount} × 2 × age factor (age factor ≥ 1).<br><br>
+                  <b>Insp. items = ${s.inspItemCount}</b> — each item adds 0.5 pts (approved/failed) or 2×age pts (pending).<br><br>
+                  <b>Size (per 100m²) = ${Math.round(s.effSqm/100*10)/10}</b> — building is ${s.effSqm > 0 ? Math.round(s.effSqm)+' m²' : 'size unknown'}. Divides workload to normalise by building size.<br><br>
+                  <b>Workload = ${Math.round(s.workload*10)/10}</b> — weighted sum of all above.<br><br>
+                  <b>Pressure = ${Math.round(s.workload*10)/10} ÷ ${Math.round(s.effSqm/100*10)/10} = ${Math.round(s.workload/Math.max(s.effSqm/100,1)*100)/100}</b><br><br>
+                  <b>Health = 100 − ${Math.round(s.workload/Math.max(s.effSqm/100,1)*100)/100} = ${s.health}%</b>
+                </div>
               </div>
             </div>
           </div>
