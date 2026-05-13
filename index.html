@@ -3869,11 +3869,9 @@ function tixItemHTML(t,clickable=true){
             <span class="wl-info">ⓘ</span>
           </div>
           <div class="wl-tip">
-            <div class="wl-tip-title">${t.subject||'—'} · pressure</div>
             <div class="wl-tip-row"><span style="color:var(--sub)">Base score</span><span style="font-weight:700">2 pts</span></div>
             <div class="wl-tip-row"><span style="color:var(--sub)">Age factor</span><span style="font-weight:700">×${Math.round(ageMult(t.dateOpened)*10)/10}</span></div>
             <div class="wl-tip-row"><span style="color:var(--sub)">Pressure</span><span style="font-weight:700;color:${hc}">${tixScore} pts</span></div>
-            <div class="wl-tip-formula">2 × min(1 + days÷30, 4)<br>Age factor caps at ×4 after 90 days.</div>
           </div>
         </div>
       </div>
@@ -4237,18 +4235,12 @@ function astCardHTML(a, onclick){
               <span class="wl-info">ⓘ</span>
             </div>
             <div class="wl-tip">
-              <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">Health — ${a.name}</div>
-              <div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;padding-bottom:8px;border-bottom:0.5px solid var(--border)">
-                <span style="color:var(--sub)">Open tickets (×2×age)</span><span style="font-weight:700;text-align:right;color:${aColor}">${openTixArr.length} = ${Math.round(openTixPtsA*10)/10} pts</span>
-                <span style="color:var(--sub)">Insp. items</span><span style="font-weight:700;text-align:right">${astInspItems.length} = ${Math.round(inspItemPtsA*10)/10} pts</span>
-                <span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedAstTix} = ${closedAstTix*-1} pts</span>
-                <span style="font-weight:600;color:var(--text)">Workload</span><span style="font-weight:700;text-align:right">${Math.round(workloadA*10)/10} pts</span>
-              </div>
-              <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − workload = <strong>${aHealth}%</strong></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border)">
-                <span style="font-size:11px;font-weight:700;color:var(--text)">Health score</span>
-                <span style="font-size:14px;font-weight:800;color:${aColor}">${aHealth}%</span>
-              </div>
+              <div class="wl-tip-title">${a.name} · health score</div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;color:${openTixArr.length>0?'var(--red)':'var(--text)'}">${openTixArr.length}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Insp. items</span><span style="font-weight:700">${astInspItems.length}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(workloadA*10)/10}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${aColor}">${aHealth}%</span></div>
+              <div class="wl-tip-formula">See Info › Buildings for a full explanation.</div>
             </div>
           </div>
       </div>
@@ -5094,18 +5086,12 @@ function renderUnits(){
               <span class="wl-info">ⓘ</span>
             </div>
             <div class="wl-tip">
-              <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">Health — ${u.label}</div>
-              <div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;padding-bottom:8px;border-bottom:0.5px solid var(--border)">
-                <span style="color:var(--sub)">Open tickets (×2×age)</span><span style="font-weight:700;text-align:right;color:${uColor}">${openTix.length} = ${Math.round(openTixPtsU*10)/10} pts</span>
-                <span style="color:var(--sub)">Insp. items</span><span style="font-weight:700;text-align:right">${unitInspItems.length} = ${Math.round(inspItemPtsU*10)/10} pts</span>
-                <span style="color:var(--sub)">Closed tickets</span><span style="font-weight:700;text-align:right;color:var(--muted)">${closedUnitTix} = ${closedUnitTix*-1} pts</span>
-                <span style="font-weight:600;color:var(--text)">Workload</span><span style="font-weight:700;text-align:right">${Math.round(workloadU*10)/10} pts</span>
-              </div>
-              <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − workload = <strong>${uHealth}%</strong></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border)">
-                <span style="font-size:11px;font-weight:700;color:var(--text)">Health score</span>
-                <span style="font-size:14px;font-weight:800;color:${uColor}">${uHealth}%</span>
-              </div>
+              <div class="wl-tip-title">${u.label} · health score</div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;color:${openTix.length>0?'var(--red)':'var(--text)'}">${openTix.length}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Insp. items</span><span style="font-weight:700">${unitInspItems.length}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(workloadU*10)/10}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${uColor}">${uHealth}%</span></div>
+              <div class="wl-tip-formula">See Info › Buildings for a full explanation.</div>
             </div>
           </div>
         </div>
@@ -5449,19 +5435,14 @@ function renderFloors(){
               <span class="wl-info">ⓘ</span>
             </div>
             <div class="wl-tip">
-              <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">Health — ${f.label}</div>
-              <div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:11px;padding-bottom:8px;border-bottom:0.5px solid var(--border)">
-                <span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;text-align:right;color:${color}">${fTixCount} = ${fTixCount*2} pts</span>
-                <span style="color:var(--sub)">Insp. items</span><span style="font-weight:700;text-align:right">${fInspCount} = ${itemPts} pts</span>
-                <span style="color:var(--sub)">Workload</span><span style="font-weight:700;text-align:right">${Math.round(workload*10)/10} pts</span>
-                <span style="color:var(--sub)">Size (per100)</span><span style="font-weight:700;text-align:right">${Math.round(per100*10)/10}</span>
-                <span style="font-weight:600;color:var(--text)">Pressure</span><span style="font-weight:700;text-align:right">${Math.round(pressure*10)/10}</span>
-              </div>
-              <div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6">Health = 100 − pressure × 5<br>= <strong>${health}%</strong></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border)">
-                <span style="font-size:11px;font-weight:700;color:var(--text)">Health score</span>
-                <span style="font-size:14px;font-weight:800;color:${color}">${health}%</span>
-              </div>
+              <div class="wl-tip-title">${f.label} · health score</div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;color:${fTixCount>0?'var(--red)':'var(--text)'}">${fTixCount}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Insp. items</span><span style="font-weight:700">${fInspCount}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Size (per 100m²)</span><span style="font-weight:700">${Math.round(per100*10)/10}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(workload*10)/10}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Pressure</span><span style="font-weight:700">${Math.round(pressure*10)/10}</span></div>
+              <div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${color}">${health}%</span></div>
+              <div class="wl-tip-formula">See Info › Buildings for a full explanation.</div>
             </div>
           </div>
         </div>
@@ -5906,7 +5887,7 @@ function renderBlds(){
     const smsBtn     = b.phone ? `<a href="sms:${b.phone}" title="SMS" onclick="event.stopPropagation()" style="flex:1;height:40px;display:flex;align-items:center;justify-content:center;text-decoration:none;border-right:1px solid var(--border)"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="${iconCol}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a>` : `<span style="flex:1;height:40px;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--border);opacity:.25"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>`;
     const telBtn     = b.phone ? `<a href="tel:${b.phone}" title="Call" onclick="event.stopPropagation()" style="flex:1;height:40px;display:flex;align-items:center;justify-content:center;text-decoration:none;border-right:1px solid var(--border)"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="${iconCol}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12 19.79 19.79 0 0 1 1.97 3.34a2 2 0 0 1 1.94-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>` : `<span style="flex:1;height:40px;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--border);opacity:.25"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12 19.79 19.79 0 0 1 1.97 3.34a2 2 0 0 1 1.94-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>`;
     const mailBtn    = b.email ? `<a href="mailto:${b.email}" title="Email" onclick="event.stopPropagation()" style="flex:1;height:40px;display:flex;align-items:center;justify-content:center;text-decoration:none"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="${iconCol}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>` : `<span style="flex:1;height:40px;display:flex;align-items:center;justify-content:center;opacity:.25"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>`;
-    const wlTooltip  = `<div class="wl-tooltip-wrap"><div class="wl-tooltip-chip"><span style="font-size:12px;font-weight:700;color:${col}">${score}% health</span><span class="wl-info">ⓘ</span></div><div class="wl-tip"><div class="wl-tip-title">${b.name} · health score</div><div class="wl-tip-row"><span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;color:${openTix>0?'var(--red)':'var(--text)'}">${openTix}</span></div><div class="wl-tip-row"><span style="color:var(--sub)">Insp. items in period</span><span style="font-weight:700">${inspItems}</span></div><div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(bldData.score*10)/10}</span></div><div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${col}">${score}%</span></div><div class="wl-tip-formula">Open ticket ×2 · Pending item ×2 (both × age factor) · Closed −1<br>Pressure = workload ÷ (m² ÷ 100) · Health = 100 − pressure</div></div></div>`;
+    const wlTooltip  = `<div class="wl-tooltip-wrap"><div class="wl-tooltip-chip"><span style="font-size:12px;font-weight:700;color:${col}">${score}% health</span><span class="wl-info">ⓘ</span></div><div class="wl-tip"><div class="wl-tip-title">${b.name} · health score</div><div class="wl-tip-row"><span style="color:var(--sub)">Open tickets (×2)</span><span style="font-weight:700;color:${openTix>0?'var(--red)':'var(--text)'}">${openTix}</span></div><div class="wl-tip-row"><span style="color:var(--sub)">Insp. items in period</span><span style="font-weight:700">${inspItems}</span></div><div class="wl-tip-row"><span style="color:var(--sub)">Workload score</span><span style="font-weight:700">${Math.round(bldData.score*10)/10}</span></div><div class="wl-tip-row"><span style="color:var(--sub)">Health score</span><span style="font-weight:700;color:${col}">${score}%</span></div><div class="wl-tip-formula">See Info › Buildings for a full explanation.</div></div></div>`;
     return`<div class="bc-wrap" onclick="openBldDetail('${safeId}')">
       <div style="padding:14px 16px 12px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
