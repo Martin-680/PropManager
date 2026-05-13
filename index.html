@@ -7050,6 +7050,12 @@ function finishInspectionRound(){
         </div>
       </div>`).join('');
     tixSection.style.display = '';
+    // Update create tickets button label with count
+    const ctBtn = document.getElementById('insp-create-tix-btn');
+    if(ctBtn) ctBtn.textContent = `🎫 Create ${failedItems.length} Ticket${failedItems.length!==1?'s':''} & Complete Round`;
+    // Hide the plain save button when there are failed items — use the combined button instead
+    const saveBtn2 = document.getElementById('insp-save-btn');
+    if(saveBtn2) saveBtn2.style.display = 'none';
     window._inspPhotoAdd = async (e, idx) => {
       const file = e.target.files[0]; if(!file) return;
       const lbl = document.getElementById('insp-photo-lbl-'+idx);
@@ -8055,6 +8061,7 @@ function calPlanTicket(dateStr){
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Create tickets for failed items</div>
       <div id="insp-fail-checklist" style="border:1.5px solid var(--border);border-radius:var(--rs);overflow:hidden;margin-bottom:10px"></div>
       <div style="font-size:11px;color:var(--sub);margin-bottom:12px">🗓 Due date automatically set to <strong id="insp-due-label"></strong> (today + 14 days)</div>
+      <button id="insp-create-tix-btn" onclick="saveInspectionRound()" style="width:100%;padding:13px;background:linear-gradient(135deg,#EF4444,#F59E0B);border:none;border-radius:var(--rs);font-weight:700;font-size:14px;color:#fff;cursor:pointer;margin-bottom:10px">🎫 Create Tickets &amp; Complete Round</button>
     </div>
     <button class="btn-p" id="insp-save-btn" onclick="saveInspectionRound()">Save Round</button>
     <button class="btn-s" onclick="closeMo('mo-insp-summary')">Keep Reviewing</button>
