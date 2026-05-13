@@ -459,7 +459,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div style="padding:0 14px 10px">
         <div class="sbar" style="margin:0">
           <span style="color:var(--muted);display:flex"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-          <input id="global-search" placeholder="Search tickets, assets, suppliers…" oninput="renderGlobalSearch()"/>
+          <input id="global-search" placeholder="Zoek meldingen, middelen, leveranciers…" oninput="renderGlobalSearch()"/>
           <button id="gs-clear" onclick="clearGlobalSearch()" style="color:var(--muted);font-size:15px;display:none">✕</button>
         </div>
         <div id="global-results" style="margin-top:8px"></div>
@@ -469,7 +469,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 
     <div class="sh fu" style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0">
       <span class="sh-title">Statistieken</span>
-      <span id="dash-stats-period-badge" style="font-size:10px;font-weight:600;color:var(--blue);background:rgba(37,99,235,.1);padding:2px 8px;border-radius:20px;margin-right:14px">this quarter</span>
+      <span id="dash-stats-period-badge" style="font-size:10px;font-weight:600;color:var(--blue);background:rgba(37,99,235,.1);padding:2px 8px;border-radius:20px;margin-right:14px">dit kwartaal</span>
     </div>
     <div style="padding:8px 14px 10px;display:flex;background:var(--bg)">
       <div style="display:flex;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rs);padding:2px;gap:2px;width:100%">
@@ -532,7 +532,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div id="tix-hide-strip" class="hide-strip">
       <span id="tix-hide-label"></span>
       <div class="hide-strip-toggle" onclick="toggleShowClosed()">
-        <span id="tix-hide-toggle-lbl">Show closed</span>
+        <span id="tix-hide-toggle-lbl">Toon gesloten</span>
         <div class="hide-strip-toggle-track" id="tix-hide-track"></div>
       </div>
     </div>
@@ -673,7 +673,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div id="insp-hide-strip" class="hide-strip">
       <span id="insp-hide-label"></span>
       <div class="hide-strip-toggle" onclick="toggleShowCompleted()">
-        <span>Show completed</span>
+        <span>Toon voltooid</span>
         <div class="hide-strip-toggle-track" id="insp-hide-track"></div>
       </div>
     </div>
@@ -860,10 +860,10 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         </div>
       </div>
     </div>
-    <div style="padding:4px 14px 8px;font-size:12px;color:var(--sub);line-height:1.5">For an overview of scheduled entries and tickets by date — tap a highlighted day to see what's planned.</div>
+    <div style="padding:4px 14px 8px;font-size:12px;color:var(--sub);line-height:1.5">Overzicht van geplande items en meldingen per datum — tik op een gemarkeerde dag om te zien wat er gepland staat.iv>
     <div style="padding:12px 14px 8px;display:flex;flex-direction:column;gap:10px">
       <div style="display:flex;flex-direction:column;gap:6px">
-        <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Start month</label>
+        <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Startmaand</label>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
           <button onclick="calYearNav(-1)" style="font-size:18px;border:none;background:none;color:var(--sub);cursor:pointer;padding:0 4px;line-height:1">&#8249;</button>
           <span id="cal-year-label" style="font-size:13px;font-weight:700;color:var(--text)"></span>
@@ -873,13 +873,13 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         <input type="hidden" id="cal-start">
       </div>
       <div style="display:flex;flex-direction:column;gap:4px">
-        <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Supplier</label>
-        <select id="cal-sup" class="fi2" style="padding:8px 10px;font-size:13px;width:100%" onchange="renderCalendar()"><option value="">All suppliers</option></select>
+        <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Leverancier</label>
+        <select id="cal-sup" class="fi2" style="padding:8px 10px;font-size:13px;width:100%" onchange="renderCalendar()"><option value="">Alle leveranciers</option></select>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px">
         <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Type</label>
         <select id="cal-type" class="fi2" style="padding:8px 10px;font-size:13px;width:100%" onchange="renderCalendar()">
-          <option value="">All types</option>
+          <option value="">Alle types</option>
           <option value="arbo">Arbo</option>
           <option value="bestelling">Bestelling</option>
           <option value="bezoek">Bezoek</option>
@@ -893,7 +893,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         </select>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 2px 2px">
-        <label for="cal-show-insp" style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Show Inspections</label>
+        <label for="cal-show-insp" style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Toon inspecties</label>
         <label style="position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0">
           <input type="checkbox" id="cal-show-insp" style="opacity:0;width:0;height:0" onchange="calInspToggle();renderCalendar()">
           <span id="cal-insp-track" style="position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:22px;transition:.2s">
@@ -919,7 +919,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       </div>
       <div id="cal-both-legend" style="display:none;align-items:center;gap:7px">
         <div style="width:16px;height:16px;border-radius:5px;background:linear-gradient(135deg,#EAF3DE 50%,#EEEDFE 50%);border:1px solid #ccc;flex-shrink:0"></div>
-        Both on same day
+        Beide op dezelfde dag
       </div>
     </div>
   </div>
@@ -1185,7 +1185,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div class="fg"><label>Datum geopend</label><input class="fi2" type="date" id="tf-date-opened"/></div>
       <div class="fg"><label>Datum gesloten</label><input class="fi2" type="date" id="tf-date-closed"/></div>
     </div>
-    <div class="fg"><label>Supplier</label>
+    <div class="fg"><label>Leverancier</label>
       <div id="tf-supplier-wrap" style="position:relative">
         <input id="tf-supplier-search" class="fi2" placeholder="Search supplier…" autocomplete="off"
           oninput="fSupFilter('tf')"
@@ -1232,7 +1232,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     </div>
     <div class="frow2">
       <div class="fg"><label>Unit</label><select class="fs2" id="af-loc"><option value="">— Select unit —</option></select></div>
-      <div class="fg"><label>Supplier</label>
+      <div class="fg"><label>Leverancier</label>
         <div id="af-cat-wrap" style="position:relative">
           <input id="af-cat-search" class="fi2" placeholder="Search supplier…" autocomplete="off"
             oninput="fSupFilter('af')"
@@ -1408,7 +1408,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div class="sh" style="padding-bottom:8px">
       <span id="sup-detail-tix-count" class="sh-title">Tickets</span>
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:12px;color:var(--sub)">Show closed</span>
+        <span style="font-size:12px;color:var(--sub)">Toon gesloten</span>
         <div id="sup-closed-tog" onclick="toggleSupClosed()" style="width:36px;height:20px;border-radius:10px;background:var(--border2,#cbd5e1);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0"><div id="sup-closed-knob" style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s"></div></div>
       </div>
     </div>
@@ -3620,7 +3620,7 @@ function setDashPeriod(p){
     else      { btn.style.background='none'; btn.style.color='var(--sub)'; btn.style.boxShadow='none'; btn.style.fontWeight='600'; }
   });
   const badge = document.getElementById('dash-stats-period-badge');
-  if(badge) badge.textContent = p==='week'?'this week':p==='month'?'this month':'this quarter';
+  if(badge) badge.textContent = p==='week'?'deze week':p==='month'?'deze maand':'dit kwartaal';
   renderDash();
 }
 
@@ -3769,7 +3769,7 @@ function renderTix(){
   const tixTrack = document.getElementById('tix-hide-track');
   if(tixStrip){
     tixStrip.style.display = (tixHideActive && closedCount > 0) ? 'flex' : 'none';
-    if(tixLabel) tixLabel.textContent = showClosedTix ? `${closedCount} closed shown` : `${closedCount} closed hidden`;
+    if(tixLabel) tixLabel.textContent = showClosedTix ? `${closedCount} gesloten weergegeven` : `${closedCount} gesloten verborgen`;
     if(tixTrack) tixTrack.classList.toggle('on', showClosedTix);
   }
   // Sort
@@ -6067,7 +6067,7 @@ function openSupDetail(id){
 function openNewSupplier(){
   if(!can('canManageSuppliers')) return;
   editingId.sup=null;
-  document.getElementById('sup-modal-title').textContent='Add Supplier';
+  document.getElementById('sup-modal-title').textContent='Leverancier toevoegen';
   ['sf-name','sf-contact','sf-expertise','sf-rate','sf-transport','sf-phone','sf-email','sf-address'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('sf-status').value='Active';
   openMo('mo-sup');
@@ -6076,7 +6076,7 @@ function editSupplier(id){
   if(!can('canManageSuppliers')) return;
   const s=DB.suppliers.find(x=>x.id===id); if(!s) return;
   editingId.sup=id; closeMo('mo-sup-detail');
-  document.getElementById('sup-modal-title').textContent='Edit Supplier';
+  document.getElementById('sup-modal-title').textContent='Leverancier bewerken';
   document.getElementById('sf-name').value=s.name;
   document.getElementById('sf-contact').value=s.contact||'';
   const exp=Array.isArray(s.expertise)?s.expertise.join(', '):String(s.expertise||'').replace(/[\[\]"]/g,'').trim();
@@ -6099,7 +6099,7 @@ async function saveSupplier(){
   else { DB.suppliers.push({id:nextId(DB.suppliers,'SUP'),...data}); }
   closeMo('mo-sup');
   await writeSheet('suppliers');
-  toast(editingId.sup?'Supplier updated':'Supplier added');
+  toast(editingId.sup?'Leverancier bijgewerkt':'Leverancier toegevoegd');
   if(currentScreen==='suppliers') renderSuppliers();
 }
 
@@ -6236,13 +6236,13 @@ function renderInspections(){
   const inspTrack = document.getElementById('insp-hide-track');
   if(inspStrip){
     inspStrip.style.display = (inspHideActive && completedCount > 0) ? 'flex' : 'none';
-    if(inspLabel) inspLabel.textContent = showCompletedInsp ? `${completedCount} completed shown` : `${completedCount} completed hidden`;
+    if(inspLabel) inspLabel.textContent = showCompletedInsp ? `${completedCount} voltooid weergegeven` : `${completedCount} voltooid verborgen`;
     if(inspTrack) inspTrack.classList.toggle('on', showCompletedInsp);
   }
 
   const lbl = document.getElementById('insp-lbl');
   const _inspDays = _inspCutoff ? Math.max(1, Math.ceil((new Date() - _inspCutoff) / _MS_DAY)) : null;
-  if(lbl) lbl.textContent = list.length + ' round' + (list.length!==1?'s':'') + (_inspDays ? ' · ' + _inspDays + ' day' + (_inspDays===1?'':'s') : '');
+  if(lbl) lbl.textContent = list.length + ' ronde' + (list.length!==1?'n':'') + (_inspDays ? ' · ' + _inspDays + ' day' + (_inspDays===1?'':'s') : '');
 
   const c = document.getElementById('insp-list');
   if(!list.length){
@@ -6252,8 +6252,8 @@ function renderInspections(){
           <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
         </svg>
       </div>
-      <div style="font-size:13px">No inspection rounds found</div>
-      ${can('canStartInspection') ? `<button onclick="openStartInspection()" style="margin-top:8px;padding:10px 20px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:13px;font-weight:700;color:#fff"> Start First Round</button>` : ''}
+      <div style="font-size:13px">Geen inspectieroonden gevonden</div>
+      ${can('canStartInspection') ? `<button onclick="openStartInspection()" style="margin-top:8px;padding:10px 20px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:13px;font-weight:700;color:#fff"> Eerste ronde starten</button>` : ''}
     </div>`;
     return;
   }
@@ -6381,7 +6381,7 @@ function renderInspTemplates(){
   if(!list) return;
   const tpls=DB.inspectionTemplates||[];
   if(!tpls.length){
-    list.innerHTML='<div style="padding:10px 14px;font-size:12px;color:var(--muted)">Nog geen sjablonen — create your first round below.</div>';
+    list.innerHTML='<div style="padding:10px 14px;font-size:12px;color:var(--muted)">Nog geen sjablonen — maak hieronder uw eerste ronde.</div>';
     return;
   }
   list.innerHTML=tpls.map((t,i)=>{
@@ -7734,7 +7734,7 @@ function renderCalendar(){
   const matched = calGetMatched();
   const todayStr = new Date().toISOString().slice(0,10);
   let total = new Set(Object.keys(matched)).size;
-  document.getElementById('cal-lbl').textContent = `${total} matching day${total!==1?'s':''}`;
+  document.getElementById('cal-lbl').textContent = `${total} overeenkomende dag${total!==1?'en':''}`;
   // Pre-compute holidays for the 3 visible months
   const holidays = {};
   for(let i=0;i<3;i++){ const d=new Date(y,m+i,1); Object.assign(holidays,dutchHolidays(d.getFullYear())); }
@@ -8121,7 +8121,7 @@ function calPlanTicket(dateStr){
           <option value="mine">Aan mij toegewezen</option>
         </select>
       </div>
-      <div class="fg" style="padding:0"><label>Supplier</label>
+      <div class="fg" style="padding:0"><label>Leverancier</label>
         <select class="fi2" id="mf-tix-sup"><option value="All">Alle leveranciers</option></select>
       </div>
     </div>
@@ -8280,7 +8280,7 @@ function calPlanTicket(dateStr){
         <option value="Decommissioned">Buiten gebruik</option>
       </select>
     </div>
-    <div class="fg"><label>Supplier</label>
+    <div class="fg"><label>Leverancier</label>
       <select class="fi2" id="mf-ast-cat"><option value="All">Alle leveranciers</option></select>
     </div>
     <div class="fg"><label>Category</label>
