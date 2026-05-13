@@ -643,7 +643,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
   <div id="screen-inspections" class="screen">
     <div class="topbar">
       <div class="topbar-inner">
-        <div class="topbar-left"><div class="topbar-title">Inspecties</div><div class="topbar-sub" id="insp-lbl"></div></div>
+        <div class="topbar-left"><div class="topbar-title">Inspect.</div><div class="topbar-sub" id="insp-lbl"></div></div>
         <div class="topbar-actions">
           <button class="ib" id="insp-clear-btn" onclick="clearInspFilters()" title="Clear filters" style="opacity:.35;pointer-events:none;transition:opacity .2s" style="background:#E6F1FB;border:1px solid #B5D4F4;"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           <button class="ib" id="insp-filter-btn" onclick="openInspFilterModal()" title="Filters" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg><span id="insp-filter-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--blue);color:#fff;font-size:9px;font-weight:800;padding:1px 4px;border-radius:20px;pointer-events:none"></span></button>
@@ -1079,18 +1079,15 @@ input,select,textarea{font-family:inherit;color:var(--text);}
   </div>
 
   </div><!-- /info-slide-wrap -->
-</div>
   <!-- ═══════ NAV ═══════ -->
   <nav class="bottom-nav" style="grid-template-columns:repeat(4,1fr)">
     <button class="ni active" onclick="navTo('dashboard')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dash</button>
-    <button class="ni" onclick="navTo('inspections')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>Inspecties</button>
+    <button class="ni" onclick="navTo('inspections')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>Inspect.</button>
     <button class="ni" onclick="navTo('tickets')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></span>Tickets<span class="ni-badge" id="open-badge" style="display:none"></span></button>
     <button class="ni" onclick="navTo('calendar')"><span class="ni-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/><rect x="11" y="13" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/><rect x="15" y="13" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/><rect x="7" y="17" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/><rect x="11" y="17" width="2" height="2" rx="0.5" fill="currentColor" stroke="none"/></svg></span>Kalender</button>
   </nav>
 
-
-
-</div>
+</div><!-- /app -->
 
 
 <!-- ═══════ DRAWER ═══════ -->
@@ -2865,7 +2862,7 @@ function renderDash(){
       return`<div style="background:var(--card);border:1.5px solid var(--border);border-left:3px solid ${b.border};border-radius:0 var(--r) var(--r) 0;padding:11px 14px;margin-bottom:8px;cursor:pointer" onclick="openPriDetail('${b.n}')">
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:9px;height:9px;border-radius:50%;background:${b.fill};flex-shrink:0"></div>
-          <div style="font-size:13px;font-weight:700;color:${b.text};width:58px;flex-shrink:0">${b.n}</div>
+          <div style="font-size:13px;font-weight:700;color:${b.text};width:76px;flex-shrink:0;font-size:12px">${b.n}</div>
           <div style="flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden">
             <div style="height:100%;width:${pct}%;background:${b.bar};border-radius:4px;transition:width .4s ease"></div>
           </div>
@@ -4187,7 +4184,7 @@ function astCardHTML(a, onclick){
     <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
       <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
         <div style="font-size:13px;font-weight:800;color:var(--text)">${inspCount}</div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspecties</div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspect.</div>
       </div>
       <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
         <div style="font-size:13px;font-weight:800;color:${openTix>0?'var(--red)':'var(--text)'}">${openTix}</div>
@@ -4423,7 +4420,7 @@ function openAstDetail(id){
 
   document.getElementById('ast-detail-body').innerHTML=`
     <div style="display:flex;align-items:center;border-bottom:1px solid var(--border);padding:0 18px;gap:8px">
-      <button id="adtab-inspect" style="${tabActive}"  onclick="astDetailTab('inspect')">Inspecties</button>
+      <button id="adtab-inspect" style="${tabActive}"  onclick="astDetailTab('inspect')">Inspect.</button>
       <button id="adtab-tickets" style="${tabStyle}"  onclick="astDetailTab('tickets')">Tickets</button>
       ${a.photos ? `<button id="adtab-photos" style="${tabStyle}" onclick="astDetailTab('photos')">Photos</button>` : ''}
       <button id="adtoggle-closed" style="${toggleOff}" onclick="window._adToggleClosed()">Gesloten</button>
@@ -5038,7 +5035,7 @@ function renderUnits(){
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
         <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
           <div style="font-size:13px;font-weight:800;color:var(--text)">${inspCount}</div>
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspecties</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspect.</div>
         </div>
         <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
           <div style="font-size:13px;font-weight:800;color:${openTix.length?'var(--red)':'var(--text)'}">${openTix.length}</div>
@@ -5091,7 +5088,7 @@ function openUnitDetail(id){
 
   document.getElementById('unit-detail-body').innerHTML = `
     <div style="display:flex;align-items:center;border-bottom:1px solid var(--border);padding:0 18px;gap:8px">
-      <button id="udtab-inspect" style="${tabActive}"  onclick="unitDetailTab('inspect')">Inspecties</button>
+      <button id="udtab-inspect" style="${tabActive}"  onclick="unitDetailTab('inspect')">Inspect.</button>
       <button id="udtab-tickets" style="${tabStyle}"  onclick="unitDetailTab('tickets')">Tickets</button>
       <button id="udtoggle-closed" style="${toggleOff}" onclick="window._udToggleClosed()">Gesloten</button>
     </div>
@@ -5389,7 +5386,7 @@ function renderFloors(){
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:8px 8px 10px;border-top:1px solid var(--border)">
         <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
           <div style="font-size:13px;font-weight:800;color:var(--text)">${fInspCount}</div>
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspecties</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-top:1px">Inspect.</div>
         </div>
         <div style="text-align:center;background:var(--card2,rgba(0,0,0,.03));border-radius:8px;padding:6px 3px;">
           <div style="font-size:13px;font-weight:800;color:${fTixCount?'var(--red)':'var(--text)'}">${fTixCount}</div>
@@ -5441,7 +5438,7 @@ function openFloorDetail(id){
   document.getElementById('floor-detail-sub').textContent = f.id + (bld ? '  ·  ' + bld.name : '');
   document.getElementById('floor-detail-body').innerHTML = `
     <div style="display:flex;align-items:center;border-bottom:1px solid var(--border);padding:0 18px;gap:8px">
-      <button id="fdtab-inspect" style="${tabActiveS}"   onclick="floorDetailTab('inspect')">Inspecties</button>
+      <button id="fdtab-inspect" style="${tabActiveS}"   onclick="floorDetailTab('inspect')">Inspect.</button>
       <button id="fdtab-tickets" style="${tabStyle}"   onclick="floorDetailTab('tickets')">Tickets</button>
       <button id="fdtoggle-closed" style="${toggleOff}" onclick="window._fdToggleClosed()">Gesloten</button>
     </div>
