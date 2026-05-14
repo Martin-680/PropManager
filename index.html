@@ -2610,9 +2610,18 @@ function renderDash(){
       const wpRem  = workingDaysInRange(tomorrow<=pEnd?tomorrow:new Date(9999,0,1), pEnd, _userDaysOff);
       const capMins = wpFull.days * 8 * 60;
       const remMins = wpRem.days * 8 * 60;
-      const utilPct = capMins ? Math.min(100,Math.round(totalMins/capMins*100)) : 0;
-      const capH   = (capMins/60).toFixed(1).replace('.',',');
-      const remH   = (remMins/60).toFixed(1).replace('.',',');
+      const utilPct = capMins ? Math.min(100,(totalMins/capMins*100)) : 0;
+      const f2 = n => n.toFixed(2).replace('.',',');
+      const capH   = f2(capMins/60);
+      const capD   = f2(wpFull.days);
+      const remH   = f2(remMins/60);
+      const remD   = f2(wpRem.days);
+      const spentH = f2(totalMins/60);
+      const spentD = f2(totalMins/480);
+      const restH  = f2(Math.max(0,(capMins-totalMins)/60));
+      const restD  = f2(Math.max(0,(capMins-totalMins)/480));
+      const utilF  = f2(utilPct);
+      const vSpan  = (val,col,unit) => `<span style="font-weight:700;font-variant-numeric:tabular-nums;text-align:right;min-width:52px;display:inline-block;color:${col}">${val}</span><span style="font-size:10px;color:${col};width:12px;display:inline-block">${unit}</span>`;
       const holidayHtml = wpFull.holidays.length
         ? `<div style="display:flex;align-items:flex-start;gap:5px;margin-top:6px"><span style="flex-shrink:0;line-height:1.5">🇳🇱</span><span style="font-size:11px;color:var(--muted);line-height:1.5">${[...new Set(wpFull.holidays)].join(', ')}</span></div>`
         : '';
@@ -2629,26 +2638,26 @@ function renderDash(){
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;font-size:12px">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
                 <span style="color:var(--sub)">Periode capaciteit</span>
-                <span style="font-weight:700;color:var(--text)">${capH} · ${wpFull.days} d</span>
+                <div style="display:flex;gap:6px;align-items:center">${vSpan(capH,'#185FA5','u')}<span style="color:var(--border2)">·</span>${vSpan(capD,'#185FA5','d')}</div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
                 <span style="color:var(--sub)">Bestede tijd</span>
-                <span style="font-weight:700;color:var(--text)">${fmtMins(totalMins)} · ${(totalMins/480).toFixed(1).replace('.',',')} d</span>
+                <div style="display:flex;gap:6px;align-items:center">${vSpan(spentH,'#3B6D11','u')}<span style="color:var(--border2)">·</span>${vSpan(spentD,'#3B6D11','d')}</div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
                 <span style="color:var(--sub)">Resterende tijd</span>
-                <span style="font-weight:700;color:var(--text)">${fmtMins(Math.max(0,capMins-totalMins))} · ${(Math.max(0,capMins-totalMins)/480).toFixed(1).replace('.',',')} d</span>
+                <div style="display:flex;gap:6px;align-items:center">${vSpan(restH,'#854F0B','u')}<span style="color:var(--border2)">·</span>${vSpan(restD,'#854F0B','d')}</div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
                 <span style="color:var(--sub);display:inline-flex;align-items:center;gap:4px;cursor:pointer;position:relative" onclick="(function(el){const t=el.querySelector('.cap-tip');t.style.display=t.style.display==='block'?'none':'block';})(this)">Tijd over in periode <span style="font-size:10px;opacity:.5">ⓘ</span><span class="cap-tip" style="display:none;position:absolute;left:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;font-size:11px;color:var(--text);white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)">Werkdagen vanaf morgen t/m einde<br>periode × 8u. Feestdagen en<br>vrije dagen niet meegerekend.</span></span>
-                <span style="font-weight:700;color:var(--text)">${remH} · ${wpRem.days} d</span>
+                <div style="display:flex;gap:6px;align-items:center">${vSpan(remH,'var(--sub)','u')}<span style="color:var(--border2)">·</span>${vSpan(remD,'var(--sub)','d')}</div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
                 <span style="color:var(--sub)">Benutting in %</span>
-                <span style="font-weight:700;color:var(--text)">${utilPct}%</span>
+                <div style="display:flex;gap:6px;align-items:center">${vSpan(utilF,'var(--text)','%')}</div>
               </div>
               <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
-                <div style="width:${utilPct}%;height:100%;background:#1D9E75;border-radius:3px;transition:width .4s"></div>
+                <div style="width:${Math.min(100,utilPct)}%;height:100%;background:#1D9E75;border-radius:3px;transition:width .4s"></div>
               </div>
               ${holidayHtml}${daysOffHtml}
             </div>
