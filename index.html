@@ -955,7 +955,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div style="padding:14px 18px">
       <div class="info-desc">Statistieken geeft een portfoliobrede weergave van de werkdruk per gebouw. Alle cijfers worden live herberekend vanuit je Google Sheets-data.</div>
       <div class="info-section-lbl" style="padding:14px 0 6px">Capaciteits management</div>
-      <div class="info-desc">Het capaciteitsoverzicht toont vijf waarden voor de geselecteerde periode (Week, Maand of Kwartaal):<br><br><strong>Periode capaciteit</strong> — alle werkdagen in de periode × 8 uur. Dit is het totale beschikbare uurbudget, exclusief feestdagen en vrije dagen in je profiel.<br><br><strong>Bestede tijd</strong> — handmatig geregistreerde uren op meldingen en inspectieitems in de periode.<br><br><strong>Resterende tijd</strong> — periode capaciteit minus bestede tijd. Hoeveel uurbudget er nog over is om in te vullen.<br><br><strong>Tijd over in periode</strong> — werkdagen vanaf morgen t/m einde periode × 8 uur. Hoeveel kalendertijd er fysiek nog beschikbaar is, ongeacht wat al geregistreerd is.<br><br><strong>Benutting in %</strong> — bestede tijd ÷ periode capaciteit × 100. Antwoord op: "Van alle beschikbare uren deze periode, welk percentage heb ik al geregistreerd?" Zegt niets over hoeveel kalendertijd er nog over is — dat toont Tijd over in periode.<br><br>Uren worden handmatig ingevoerd per melding of inspectie-item in het veld Bestede tijd.</div>
+      <div class="info-desc">Het capaciteitsoverzicht toont vijf waarden voor de geselecteerde periode (Week, Maand of Kwartaal):<br><br><strong>Periode capaciteit</strong> — alle werkdagen in de periode × 7,2 uur. Dit is het totale beschikbare uurbudget, exclusief feestdagen en vrije dagen in je profiel.<br><br><strong>Bestede tijd</strong> — handmatig geregistreerde uren op meldingen en inspectieitems in de periode.<br><br><strong>Resterende tijd</strong> — periode capaciteit minus bestede tijd. Hoeveel uurbudget er nog over is om in te vullen.<br><br><strong>Tijd over in periode</strong> — werkdagen vanaf morgen t/m einde periode × 7,2 uur. Hoeveel kalendertijd er fysiek nog beschikbaar is, ongeacht wat al geregistreerd is.<br><br><strong>Benutting in %</strong> — bestede tijd ÷ periode capaciteit × 100. Antwoord op: "Van alle beschikbare uren deze periode, welk percentage heb ik al geregistreerd?" Zegt niets over hoeveel kalendertijd er nog over is — dat toont Tijd over in periode.<br><br>Uren worden handmatig ingevoerd per melding of inspectie-item in het veld Bestede tijd.</div>
       <div class="info-section-lbl" style="padding:14px 0 6px">Per prioriteit</div>
       <div class="info-desc">Dit onderdeel toont alle openstaande middelen en eenheden per automatisch bepaalde prioriteitsband: Kritiek, Hoog, Gemiddeld en Laag. De prioriteitsband wordt automatisch berekend op basis van signalen zoals mislukte inspecties, open meldingen, middelstatus en garantiewaarschuwingen — deze wordt nooit handmatig ingesteld.<br><br>Gebruik dit overzicht om snel te beoordelen of de huidige werkdruk beheersbaar is — een groot aantal Kritieke of Hoge items vraagt om directe aandacht vóór werk met lagere prioriteit.</div>
       <div class="info-section-lbl" style="padding:14px 0 6px">Afgelopen 8 weken</div>
@@ -2608,8 +2608,8 @@ function renderDash(){
       const _userDaysOff = (currentUser?.daysOff||'').split(',').map(s=>s.trim()).filter(Boolean);
       const wpFull = workingDaysInRange(pStart, pEnd, _userDaysOff);
       const wpRem  = workingDaysInRange(tomorrow<=pEnd?tomorrow:new Date(9999,0,1), pEnd, _userDaysOff);
-      const capMins = wpFull.days * 8 * 60;
-      const remMins = wpRem.days * 8 * 60;
+      const capMins = wpFull.days * 7.2 * 60;
+      const remMins = wpRem.days * 7.2 * 60;
       const utilPct = capMins ? Math.min(100,(totalMins/capMins*100)) : 0;
       const f2 = n => n.toFixed(2).replace('.',',');
       const capH   = f2(capMins/60);
@@ -2617,9 +2617,9 @@ function renderDash(){
       const remH   = f2(remMins/60);
       const remD   = f2(wpRem.days);
       const spentH = f2(totalMins/60);
-      const spentD = f2(totalMins/480);
+      const spentD = f2(totalMins/432);
       const restH  = f2(Math.max(0,(capMins-totalMins)/60));
-      const restD  = f2(Math.max(0,(capMins-totalMins)/480));
+      const restD  = f2(Math.max(0,(capMins-totalMins)/432));
       const utilF  = f2(utilPct);
       const vSpan  = (val,col,unit) => `<span style="font-weight:700;font-variant-numeric:tabular-nums;text-align:right;min-width:52px;display:inline-block;color:${col}">${val}</span><span style="font-size:10px;color:${col};width:12px;display:inline-block">${unit}</span>`;
       const holidayHtml = wpFull.holidays.length
@@ -2649,7 +2649,7 @@ function renderDash(){
                 <div style="display:flex;gap:6px;align-items:center">${vSpan(restH,'#854F0B','u')}<span style="color:var(--border2)">·</span>${vSpan(restD,'#854F0B','d')}</div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-                <span style="color:var(--sub);display:inline-flex;align-items:center;gap:4px;cursor:pointer;position:relative" onclick="(function(el){const t=el.querySelector('.cap-tip');t.style.display=t.style.display==='block'?'none':'block';})(this)">Tijd over in periode <span style="font-size:10px;opacity:.5">ⓘ</span><span class="cap-tip" style="display:none;position:absolute;left:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;font-size:11px;color:var(--text);white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)">Werkdagen vanaf morgen t/m einde<br>periode × 8u. Feestdagen en<br>vrije dagen niet meegerekend.</span></span>
+                <span style="color:var(--sub);display:inline-flex;align-items:center;gap:4px;cursor:pointer;position:relative" onclick="(function(el){const t=el.querySelector('.cap-tip');t.style.display=t.style.display==='block'?'none':'block';})(this)">Tijd over in periode <span style="font-size:10px;opacity:.5">ⓘ</span><span class="cap-tip" style="display:none;position:absolute;left:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;font-size:11px;color:var(--text);white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)">Werkdagen vanaf morgen t/m einde<br>periode × 7,2u. Feestdagen en<br>vrije dagen niet meegerekend.</span></span>
                 <div style="display:flex;gap:6px;align-items:center">${vSpan(remH,'var(--sub)','u')}<span style="color:var(--border2)">·</span>${vSpan(remD,'var(--sub)','d')}</div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
