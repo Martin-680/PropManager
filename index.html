@@ -3760,7 +3760,7 @@ function renderTix(){
   if(_tixCutoff) list=list.filter(t=>t.dateOpened && new Date(t.dateOpened)>=_tixCutoff);
   if(q) list=list.filter(t=>t.subject.toLowerCase().includes(q)||t.building.toLowerCase().includes(q)||t.id.toLowerCase().includes(q)||t.assignedTo?.toLowerCase().includes(q)||(t.reportedBy||'').toLowerCase().includes(q));
   // Hide-closed strip: only applies when status filter is 'All' (not overriding)
-  const tixHideActive = (statusVal === 'All' || statusVal === 'notclosed');
+  const tixHideActive = (statusVal === 'All' || statusVal === 'notclosed' || statusVal === 'mine');
   const closedCount = tixHideActive ? list.filter(t=>t.status==='Closed').length : 0;
   if(tixHideActive && !showClosedTix) list = list.filter(t=>t.status!=='Closed');
   const tixStrip = document.getElementById('tix-hide-strip');
