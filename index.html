@@ -6535,7 +6535,7 @@ function inspUpdateFreePreview(fromTemplate){
     : document.getElementById('insp-bldg')?.value;
   const prevId = fromTemplate ? 'insp-asset-preview' : 'insp-asset-preview-free';
   const prev=document.getElementById(prevId); if(!prev) return;
-  if(!bldgName||!inspTypes.size){ prev.innerHTML='<span style="color:var(--sub)">Select building and type to preview items</span>'; return; }
+  if(!bldgName||!inspTypes.size){ prev.innerHTML='<span style="color:var(--sub)">Selecteer een gebouw om items te bekijken</span>'; return; }
   let total=0, parts=[];
   if(inspTypes.has('assets')){
     const bldObj=DB.buildings.find(b=>b.name===bldgName);
@@ -8034,14 +8034,14 @@ function calPlanTicket(dateStr){
       <div id="insp-tpl-selected-card" style="margin:8px 14px 10px;padding:10px 12px;background:rgba(37,99,235,.06);border:1.5px solid rgba(37,99,235,.25);border-radius:var(--rs);font-size:12px;color:var(--blue)"></div>
       <div id="insp-asset-preview" style="margin:0 14px 10px;padding:10px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--sub)">Calculating…</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 10px">
-        <button class="btn-p" style="margin:0" onclick="launchInspectionRound()">Start now →</button>
-        <button style="padding:11px;background:#F5F3FF;border:1.5px solid #7C3AED;border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer" onclick="inspPickDate()">📅 Plan ahead</button>
+        <button class="btn-p" style="margin:0" onclick="launchInspectionRound()">Nu starten</button>
+        <button style="padding:11px;background:#F5F3FF;border:1.5px solid #7C3AED;border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer" onclick="inspPickDate()">Inplannen</button>
       </div>
     </div>
 
     <!-- Free selection form -->
     <div id="insp-free-form" style="display:none">
-      <div class="fg"><label>Gebouw *</label><select class="fs2" id="insp-bldg" onchange="inspOnBldgChange()"><option value="">Select building…</option></select></div>
+      <div class="fg"><label>Gebouw *</label><select class="fs2" id="insp-bldg" onchange="inspOnBldgChange()"><option value="">— Selecteer gebouw —</option></select></div>
       <div id="insp-filters-wrap" style="display:none">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:2px 18px 8px">Type *</div>
         <div style="display:flex;gap:8px;padding:0 18px 12px">
@@ -8055,7 +8055,7 @@ function calPlanTicket(dateStr){
         <!-- Pill dropdown -->
         <div id="insp-pill-dd" style="display:none;margin:0 14px 8px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--card);max-height:160px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.08)"></div>
       </div>
-      <div id="insp-asset-preview-free" style="margin:0 14px 10px;padding:10px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--sub)">Select a building to preview items</div>
+      <div id="insp-asset-preview-free" style="margin:0 14px 10px;padding:10px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--sub)">Selecteer een gebouw om items te bekijken</div>
       <!-- Opslaan als sjabloon -->
       <div style="display:flex;align-items:center;gap:8px;padding:0 18px 10px">
         <input type="checkbox" id="insp-save-tpl-chk" onchange="document.getElementById('insp-tpl-name-wrap').style.display=this.checked?'flex':'none'" style="width:14px;height:14px;accent-color:var(--blue)">
@@ -8065,8 +8065,8 @@ function calPlanTicket(dateStr){
         <input class="fi2" id="insp-tpl-name" placeholder="Naam sjabloon…">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 10px">
-        <button class="btn-p" style="margin:0" onclick="launchInspectionRound()">Start now →</button>
-        <button style="padding:11px;background:#F5F3FF;border:1.5px solid #7C3AED;border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer" onclick="inspPickDate()">📅 Plan ahead</button>
+        <button class="btn-p" style="margin:0" onclick="launchInspectionRound()">Nu starten</button>
+        <button style="padding:11px;background:#F5F3FF;border:1.5px solid #7C3AED;border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer" onclick="inspPickDate()">Inplannen</button>
       </div>
     </div>
 
