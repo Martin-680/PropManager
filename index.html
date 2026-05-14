@@ -2653,7 +2653,7 @@ function renderDash(){
                 <div style="display:flex;gap:6px;align-items:center">${vSpan(remH,'var(--sub)','u')}<span style="color:var(--border2)">·</span>${vSpan(remD,'var(--sub)','d')}</div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                <span style="color:var(--sub)">Benutting in %</span>
+                <span style="color:var(--sub);display:inline-flex;align-items:center;gap:4px;cursor:pointer;position:relative" onclick="(function(el){const t=el.querySelector('.cap-tip');t.style.display=t.style.display==='block'?'none':'block';})(this)">Benutting in % <span style="font-size:10px;opacity:.5">ⓘ</span><span class="cap-tip" style="display:none;position:absolute;left:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;font-size:11px;color:var(--text);white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)">Van de <strong>${capH}</strong> beschikbare uren<br>is <strong>${spentH} uur</strong> geregistreerd (${utilF}%).</span></span>
                 <div style="display:flex;gap:6px;align-items:center">${vSpan(utilF,'var(--text)','%')}</div>
               </div>
               <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
