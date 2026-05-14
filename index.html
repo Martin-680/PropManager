@@ -1131,11 +1131,11 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div class="fg"><label>Onderwerp *</label><input class="fi2" id="tf-subj" placeholder="Beschrijf het probleem…"/></div>
     <div class="frow2">
       <div class="fg"><label>Gebouw *</label><select class="fs2" id="tf-bldg" onchange="tfOnBldgChange()"><option value="">— Select —</option></select></div>
-      <div class="fg"><label>Floor</label><select class="fs2" id="tf-sub" onchange="tfOnFloorChange()"><option value="">— None —</option></select></div>
+      <div class="fg"><label>Verdieping</label><select class="fs2" id="tf-sub" onchange="tfOnFloorChange()"><option value="">— Geen —</option></select></div>
     </div>
     <div class="frow2">
-      <div class="fg"><label>Unit</label><select class="fs2" id="tf-unit" onchange="tfOnUnitChange()"><option value="">— None —</option></select></div>
-      <div class="fg"><label>Asset</label><select class="fs2" id="tf-asset" onchange="tfOnAssetChange()"><option value="">— None —</option></select></div>
+      <div class="fg"><label>Eenheid</label><select class="fs2" id="tf-unit" onchange="tfOnUnitChange()"><option value="">— Geen —</option></select></div>
+      <div class="fg"><label>Asset</label><select class="fs2" id="tf-asset" onchange="tfOnAssetChange()"><option value="">— Geen —</option></select></div>
     </div>
     <div class="frow2">
       <div class="fg"><label>Type</label>
@@ -1153,7 +1153,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
           <option value="verhuizing">Verhuizing</option>
         </select>
       </div>
-      <div class="fg"><label>Category</label>
+      <div class="fg"><label>Categorie</label>
         <select class="fs2" id="tf-cat"><option value="">— Select —</option></select>
       </div>
     </div>
@@ -1169,7 +1169,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     </div>
     <div class="fg"><label>Leverancier</label>
       <div id="tf-supplier-wrap" style="position:relative">
-        <input id="tf-supplier-search" class="fi2" placeholder="Search supplier…" autocomplete="off"
+        <input id="tf-supplier-search" class="fi2" placeholder="Zoek leverancier…" autocomplete="off"
           oninput="fSupFilter('tf')"
           onfocus="fSupOpen('tf')"
           onblur="setTimeout(()=>fSupClose('tf'),180)"
@@ -1182,7 +1182,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div class="fg"><label>Gemeld door</label><input class="fi2" id="tf-reporter" placeholder="Naam melder"/></div>
     <div class="fg"><label>Notities</label><textarea class="ft2" id="tf-notes" placeholder="Aanvullende details…"></textarea></div>
     <div class="fg"><div id="tf-photos-editor"></div></div>
-    <div class="fg"><label>Time Spent</label>
+    <div class="fg"><label>Bestede tijd</label>
       <div style="display:flex;gap:8px;align-items:center">
         <input class="fi2" type="number" id="tf-time-val" placeholder="0" min="0" style="flex:1;text-align:center"/>
         <select class="fs2" id="tf-time-unit" style="flex:0 0 90px">
@@ -1191,9 +1191,9 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         </select>
       </div>
     </div>
-    <button class="btn-p" onclick="saveTix()">Save Ticket</button>
-    <button class="btn-s" id="btn-dup-tix" onclick="duplicateTix()" style="display:none;background:#EEF2FF;border-color:#C7D2FE;color:var(--indigo);font-weight:700"> Duplicate Ticket</button>
-    <button class="btn-s" onclick="closeMo('mo-tix')">Cancel</button>
+    <button class="btn-p" onclick="saveTix()">Opslaan</button>
+    <button class="btn-s" id="btn-dup-tix" onclick="duplicateTix()" style="display:none;background:#EEF2FF;border-color:#C7D2FE;color:var(--indigo);font-weight:700"> Dupliceren</button>
+    <button class="btn-s" onclick="closeMo('mo-tix')">Annuleren</button>
   </div>
 </div>
 
