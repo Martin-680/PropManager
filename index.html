@@ -7876,7 +7876,7 @@ function calDayTab(tab){
   });
 }
 
-
+function calPlanInsp(dateStr){
   // Open Start Inspection modal with the date pre-set to Planned
   if(!can('canStartInspection')){ toast('No permission to start inspections','err'); return; }
   openStartInspection();
