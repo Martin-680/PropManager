@@ -5946,20 +5946,18 @@ function renderSuppliers(){
     return _d;
   })();
   const inSupPeriod = d => d && new Date(d) >= supCutoff;
-  // Denominator: all open tickets in period that have a supplierId assigned
-  const assignedOpenTix = DB.tickets.filter(t=>t.status!=='Closed'&&t.supplierId&&inSupPeriod(t.dateOpened));
-  const totalAssigned = assignedOpenTix.length;
-  // Per-supplier count
-  const supTixCount = {};
-  assignedOpenTix.forEach(t=>{ supTixCount[t.supplierId]=(supTixCount[t.supplierId]||0)+1; });
-  // Has this supplier ever had any ticket at all?
+  // Per-supplier: open ticket count + closing ratio
   const supEverHadTix = new Set(DB.tickets.filter(t=>t.supplierId).map(t=>t.supplierId));
-  const actPct = id => {
-    if(!supEverHadTix.has(id)) return null; // never used — show nothing
-    if(!totalAssigned) return 0;
-    return Math.round((supTixCount[id]||0)/totalAssigned*100);
-  };
-  const actCol = pct => pct>=30?'var(--red)':pct>=15?'var(--amber)':'var(--green)';
+  const supOpenCount = {};
+  const supTotalCount = {};
+  const supClosedCount = {};
+  DB.tickets.filter(t=>t.supplierId&&inSupPeriod(t.dateOpened)).forEach(t=>{
+    supTotalCount[t.supplierId]=(supTotalCount[t.supplierId]||0)+1;
+    if(t.status!=='Closed') supOpenCount[t.supplierId]=(supOpenCount[t.supplierId]||0)+1;
+    else supClosedCount[t.supplierId]=(supClosedCount[t.supplierId]||0)+1;
+  });
+  const openCol  = n => n>=6?'var(--red)':n>=3?'var(--amber)':'var(--green)';
+  const closeCol = p => p>=75?'var(--green)':p>=50?'var(--amber)':'var(--red)';
 
   let list=[...DB.suppliers];
   if(statusVal!=='All') list=list.filter(s=>s.status===statusVal);
@@ -5970,8 +5968,8 @@ function renderSuppliers(){
     });
   }
   if(q) list=list.filter(s=>s.name.toLowerCase().includes(q)||(Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',')).join(' ').toLowerCase().includes(q));
-  if(sortVal==='asc') list.sort((a,b)=>(actPct(a.id)??-1)-(actPct(b.id)??-1));
-  else if(sortVal==='desc') list.sort((a,b)=>(actPct(b.id)??-1)-(actPct(a.id)??-1));
+  if(sortVal==='asc') list.sort((a,b)=>(supOpenCount[a.id]||0)-(supOpenCount[b.id]||0));
+  else if(sortVal==='desc') list.sort((a,b)=>(supOpenCount[b.id]||0)-(supOpenCount[a.id]||0));
   else list.sort((a,b)=>a.name.localeCompare(b.name));
   document.getElementById('sup-lbl').textContent=`${list.length} leverancier${list.length!==1?'s':''}`;
   const c=document.getElementById('sup-list');
@@ -5988,11 +5986,22 @@ function renderSuppliers(){
   const iDim = (svg, last) => `<span style="flex:1;height:40px;display:flex;align-items:center;justify-content:center;opacity:.25;${last?'':'border-right:1px solid var(--border)'}">${svg}</span>`;
   c.innerHTML=slice.map(s=>{
     const exp=Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',').map(x=>x.trim()).filter(Boolean);
-    const pct=actPct(s.id);
-    const col = pct===null ? 'var(--muted)' : actCol(pct);
-    const chip = pct===null
+    const nOpen  = supOpenCount[s.id]||0;
+    const nTotal = supTotalCount[s.id]||0;
+    const nClosed= supClosedCount[s.id]||0;
+    const closePct = nTotal ? Math.round(nClosed/nTotal*100) : null;
+    const chip = !supEverHadTix.has(s.id)
       ? `<span style="font-size:15px;font-weight:700;color:var(--muted)">—</span>`
-      : `<div class="wl-tooltip-wrap" onclick="event.stopPropagation();wlTip(this)"><div class="wl-tooltip-chip"><span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">Activity</span><span style="font-size:12px;font-weight:800;color:${col}">${pct}%</span><span class="wl-info">ⓘ</span></div><div class="wl-tip"><div class="wl-tip-title">${s.name} · activity</div><div class="wl-tip-row"><span style="color:var(--sub)">Open assigned tickets</span><span style="font-weight:700;color:${col}">${supTixCount[s.id]||0}</span></div><div class="wl-tip-row"><span style="color:var(--sub)">Total assigned (period)</span><span style="font-weight:700">${totalAssigned}</span></div><div class="wl-tip-formula">Activiteit = open meldingen van deze leverancier ÷ all assigned open tickets in period</div></div></div>`;
+      : `<div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
+            <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--sub)">Open</span>
+            <span style="font-size:12px;font-weight:800;color:${openCol(nOpen)}">${nOpen}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
+            <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--sub)">Gesloten</span>
+            <span style="font-size:12px;font-weight:800;color:${closePct===null?'var(--muted)':closeCol(closePct)}">${closePct===null?'—':closePct+'%'}</span>
+          </div>
+        </div>`;
     const gc = 'var(--green)';
     const waS  = iconSVG.wa.replace('ICOL', gc);
     const smsS = iconSVG.sms.replace('ICOL', gc);
