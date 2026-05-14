@@ -202,18 +202,13 @@ input,select,textarea{font-family:inherit;color:var(--text);}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:2px 6px 7px}
 .cal-day{height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:12px;color:var(--text);cursor:default;position:relative;overflow:hidden}
 .cal-day.cal-match{background:#EAF3DE;color:#27500A;font-weight:700;cursor:pointer}
-.cal-day.cal-insp{color:#534AB7;font-weight:700;cursor:pointer}
-.cal-day.cal-insp span{border:2px solid #7F77DD;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px}
+.cal-day.cal-insp{color:#185FA5;font-weight:700;cursor:pointer}
+.cal-day.cal-insp span{border:2px solid #378ADD;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px}
 .cal-day.cal-selected{background:#3B6D11;color:#fff;font-weight:700;cursor:pointer}
 .cal-day.cal-today{outline:1.5px solid var(--blue);outline-offset:-1px}
 .cal-day.cal-empty{color:var(--muted);}
 .cal-day.cal-pad{pointer-events:none;}
 .cal-day.cal-holiday{background:none;border:2px solid #E24B4A;color:#A32D2D;font-weight:700;cursor:pointer}
-.cal-day.cal-range-start{background:#0F6E56;color:#fff;font-weight:700;cursor:pointer;border-radius:7px 0 0 7px}
-.cal-day.cal-range-end{background:#0F6E56;color:#fff;font-weight:700;cursor:pointer;border-radius:0 7px 7px 0}
-.cal-day.cal-range-mid{background:#E1F5EE;color:#0F6E56;border-radius:0;cursor:pointer}
-.cal-day.cal-range-mid.cal-match{background:linear-gradient(180deg,#E1F5EE 50%,#EAF3DE 50%);color:#0F6E56}
-.cal-day.cal-range-mid.cal-insp{background:#E1F5EE;color:#534AB7}
 /* ── TICKET LIST ── */
 .tlist{display:flex;flex-direction:column;gap:8px;padding:0 14px 8px;}
 .ti{background:var(--card);border:1.5px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:var(--r);padding:13px 14px;display:flex;align-items:flex-start;gap:11px;cursor:pointer;transition:border-color .15s;}
@@ -906,7 +901,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:10px;padding:4px 14px 10px;align-items:center">
       <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)"><div style="width:12px;height:12px;border-radius:3px;background:#EAF3DE;border:1px solid #3B6D11;flex-shrink:0"></div>Ticket</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)"><div style="width:12px;height:12px;border-radius:50%;background:none;border:2px solid #7F77DD;flex-shrink:0"></div>Inspectie</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)"><div style="width:12px;height:12px;border-radius:50%;background:none;border:2px solid #378ADD;flex-shrink:0"></div>Inspectie</div>
       <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)"><div style="width:12px;height:12px;border-radius:3px;background:none;border:2px solid #E24B4A;flex-shrink:0"></div>Feestdag</div>
     </div>
     <div class="cal-months" id="cal-months"></div>
@@ -916,11 +911,11 @@ input,select,textarea{font-family:inherit;color:var(--text);}
         Overeenkomende meldingen
       </div>
       <div id="cal-insp-legend" style="display:none;align-items:center;gap:7px">
-        <div style="width:16px;height:16px;border-radius:50%;background:none;border:2px solid #7F77DD;flex-shrink:0"></div>
-        Inspectie dag
+        <div style="width:16px;height:16px;border-radius:50%;background:none;border:2px solid #378ADD;flex-shrink:0"></div>
+        Inspectie startdag
       </div>
       <div id="cal-both-legend" style="display:none;align-items:center;gap:7px">
-        <div style="width:16px;height:16px;border-radius:50%;background:#EAF3DE;border:2px solid #7F77DD;flex-shrink:0"></div>
+        <div style="width:16px;height:16px;border-radius:50%;background:#EAF3DE;border:2px solid #378ADD;flex-shrink:0"></div>
         Melding + inspectie
       </div>
     </div>
@@ -7687,10 +7682,10 @@ function calGetMatched(){
   DB.tickets.forEach(t=>{
     if(!t.dateOpened) return;
     const hasRange = t.dateClosed && t.dateClosed!==t.dateOpened;
-    entries.push({ date:t.dateOpened, supplierId:t.supplierId, type:t.type||'', source:'ticket', id:t.id, subject:t.subject||'—', marker: hasRange ? 'start' : '', dateEnd: hasRange ? t.dateClosed : '' });
+    entries.push({ date:t.dateOpened, supplierId:t.supplierId, type:t.type||'', source:'ticket', id:t.id, subject:t.subject||'—', marker: hasRange ? 'start' : '', dateEnd: hasRange ? t.dateClosed : '', dateStart:'' });
     if(hasRange){
-      entries.push({ date:t.dateClosed, supplierId:t.supplierId, type:t.type||'', source:'ticket', id:t.id, subject:t.subject||'—', marker:'end', dateEnd:'' });
-      addMidDays(t.dateOpened, t.dateClosed, { supplierId:t.supplierId, type:t.type||'', source:'ticket', id:t.id, subject:t.subject||'—', dateEnd:'' });
+      entries.push({ date:t.dateClosed, supplierId:t.supplierId, type:t.type||'', source:'ticket', id:t.id, subject:t.subject||'—', marker:'end', dateEnd:'', dateStart:t.dateOpened });
+      addMidDays(t.dateOpened, t.dateClosed, { supplierId:t.supplierId, type:t.type||'', source:'ticket', id:t.id, subject:t.subject||'—', dateEnd:'', dateStart:'' });
     }
   });
   if(showInsp){
@@ -7698,10 +7693,10 @@ function calGetMatched(){
       if(!r.dateStart) return;
       const sub=`${r.building||''}${r.floor?' · '+r.floor:''}`;
       const hasRange = r.dateEnd && r.dateEnd!==r.dateStart;
-      entries.push({ date:r.dateStart, supplierId:'', type:'inspectie', source:'insp', id:r.id, subject:sub, marker: hasRange ? 'start' : '', dateEnd: hasRange ? r.dateEnd : '' });
+      entries.push({ date:r.dateStart, supplierId:'', type:'inspectie', source:'insp', id:r.id, subject:sub, marker: hasRange ? 'start' : '', dateEnd: hasRange ? r.dateEnd : '', dateStart:'' });
       if(hasRange){
-        entries.push({ date:r.dateEnd, supplierId:'', type:'inspectie', source:'insp', id:r.id, subject:sub, marker:'end', dateEnd:'' });
-        addMidDays(r.dateStart, r.dateEnd, { supplierId:'', type:'inspectie', source:'insp', id:r.id, subject:sub, dateEnd:'' });
+        entries.push({ date:r.dateEnd, supplierId:'', type:'inspectie', source:'insp', id:r.id, subject:sub, marker:'end', dateEnd:'', dateStart:r.dateStart });
+        addMidDays(r.dateStart, r.dateEnd, { supplierId:'', type:'inspectie', source:'insp', id:r.id, subject:sub, dateEnd:'', dateStart:'' });
       }
     });
   }
@@ -7769,26 +7764,16 @@ function renderCalendar(){
       const isToday  = ds===todayStr;
       const holiday  = holidays[ds];
       const isRangeStart = dayEntries.some(e=>e.marker==='start');
-      const isRangeEnd   = dayEntries.some(e=>e.marker==='end');
-      const isRangeMid   = dayEntries.some(e=>e.marker==='mid');
       let dayStyle = '', cls = ['cal-day'], title = holiday ? `title="${holiday}"` : '';
-      if(isRangeStart){ cls.push('cal-range-start'); }
-      else if(isRangeEnd){ cls.push('cal-range-end'); }
-      else if(isRangeMid){
-        cls.push('cal-range-mid');
-        if(hasMatch) cls.push('cal-match');
-        else if(hasInsp) cls.push('cal-insp');
-      } else if(hasMatch && hasInsp){
-        dayStyle='background:linear-gradient(135deg,#EAF3DE 50%,transparent 50%);';
-        cls.push('cal-insp');
-      } else if(hasMatch){ cls.push('cal-match'); }
+      if(hasMatch && hasInsp){ cls.push('cal-match'); cls.push('cal-insp'); }
+      else if(hasMatch){ cls.push('cal-match'); }
       else if(hasInsp){ cls.push('cal-insp'); }
       else { cls.push('cal-empty'); }
       if(holiday) cls.push('cal-holiday');
       if(isToday) cls.push('cal-today');
       const clickable = hasMatch||hasInsp||holiday;
-      const inner = hasInsp && !isRangeStart && !isRangeEnd ? `<span>${day}</span>` : day;
-      html+=`<div class="${cls.join(' ')}" style="${dayStyle}${clickable?'cursor:pointer;':''}" data-date="${ds}" ${title} onclick="calDayClick('${ds}')">${inner}</div>`;
+      const inner = hasInsp ? `<span>${day}</span>` : day;
+      html+=`<div class="${cls.join(' ')}" style="${clickable?'cursor:pointer;':''}" data-date="${ds}" ${title} onclick="calDayClick('${ds}')">${inner}</div>`;
     }
     html+=`</div></div>`;
   }
@@ -7847,14 +7832,15 @@ function calDayClick(dateStr){
         : `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(37,99,235,.12);color:var(--blue)">Ticket</span>`;
       const typBadge = e.type && e.source!=='insp' ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(100,116,139,.12);color:var(--sub)">${e.type}</span>` : '';
       const editFn = e.source==='insp' ? `openInspDetail('${e.id}')` : `calOpenEntry('tix','${e.id}')`;
-      const endDateFmt = e.dateEnd ? new Date(e.dateEnd+'T00:00:00').toLocaleDateString('nl-NL',{day:'numeric',month:'short'}) : '';
+      const endDateFmt   = e.dateEnd   ? new Date(e.dateEnd  +'T00:00:00').toLocaleDateString('nl-NL',{day:'numeric',month:'short'}) : '';
+      const startDateFmt = e.dateStart ? new Date(e.dateStart+'T00:00:00').toLocaleDateString('nl-NL',{day:'numeric',month:'short'}) : '';
+      const bSolid = (lbl,dt) => `<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:#0F6E56;color:#fff">${lbl} ${dt}</span>`;
+      const bGhost = (lbl,dt) => `<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:#E1F5EE;color:#7DB8A8;border:1px solid #B2DDD3">${lbl} ${dt}</span>`;
+      const thisDayFmt = new Date(e.date+'T00:00:00').toLocaleDateString('nl-NL',{day:'numeric',month:'short'});
       const dateRow = e.marker==='start' && e.dateEnd
-        ? `<div style="display:flex;gap:5px;align-items:center;margin-top:5px">
-            <span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;background:#0F6E56;color:#fff">start</span>
-            <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:#E1F5EE;color:#0F6E56;border:1px solid #5DCAA5">t/m ${endDateFmt}</span>
-           </div>`
-        : e.marker==='end'
-        ? `<div style="margin-top:5px"><span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;background:#0F6E56;color:#fff">end</span></div>`
+        ? `<div style="display:flex;gap:5px;align-items:center;margin-top:5px">${bSolid('start',thisDayFmt)}<span style="font-size:10px;color:var(--muted)">—</span>${bGhost('eind',endDateFmt)}</div>`
+        : e.marker==='end' && e.dateStart
+        ? `<div style="display:flex;gap:5px;align-items:center;margin-top:5px">${bGhost('start',startDateFmt)}<span style="font-size:10px;color:var(--muted)">—</span>${bSolid('eind',thisDayFmt)}</div>`
         : '';
       html += `<div onclick="${editFn}" style="padding:11px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s" onmousedown="this.style.background='var(--card2)'" onmouseup="this.style.background=''" onmouseleave="this.style.background=''">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:3px">
