@@ -5613,8 +5613,6 @@ function openBldDetail(id){
   html+=`<div class="bc-wrap" style="cursor:default;margin-top:12px" onclick="event.stopPropagation()">
     <div class="bc-hdr">
       <div>
-        <div class="bc-name">${b.name}</div>
-        ${b.address?`<div class="bc-addr">${b.address}</div>`:''}
         ${b.daysOpen||b.timeOpen?`<div style="font-size:13px;color:var(--sub);font-weight:500;margin-top:3px">${[b.daysOpen,b.timeOpen].filter(Boolean).join(' · ')}</div>`:''}
         ${b.phone?`<div style="font-size:13px;color:var(--sub);font-weight:500;margin-top:2px"><a href="tel:${b.phone}" onclick="event.stopPropagation()" style="color:var(--blue);font-weight:700;text-decoration:none">${b.phone}</a></div>`:''}
         ${b.email?`<div style="font-size:13px;color:var(--sub);font-weight:500;margin-top:2px"><a href="mailto:${b.email}" onclick="event.stopPropagation()" style="color:var(--blue);font-weight:700;text-decoration:none">${b.email}</a></div>`:''}
@@ -5622,10 +5620,10 @@ function openBldDetail(id){
       </div>
     </div>
     <div class="bc-body">
-      <div class="bs" style="cursor:pointer" onclick="navTo('floors');setTimeout(()=>{const s=document.getElementById('sel-floor-bldg');if(s){s.value='${b.id}';renderFloors();}},150)"><div class="bs-val" style="color:var(--blue)">${floorCount}</div><div class="bs-lbl">Floors</div></div>
-      <div class="bs"><div class="bs-val">${b.units||0}</div><div class="bs-lbl">Workspace</div></div>
-      <div class="bs" style="cursor:pointer" onclick="navTo('tickets');setTimeout(()=>{const s=document.getElementById('sel-tix-bldg');if(s){s.value='${safeName}';setPage('tix',1);renderTix();}},150)"><div class="bs-val" style="color:var(--blue)">${openTix.length}</div><div class="bs-lbl">Open Tix</div></div>
-      <div class="bs" style="cursor:pointer" onclick="navTo('assets');setTimeout(()=>{const s=document.getElementById('sel-ast-bldg');if(s){s.value='${b.id}';onAstBldgChange();}},150)"><div class="bs-val" style="color:var(--blue)">${allAsts.length}</div><div class="bs-lbl">Assets</div></div>
+      <div class="bs" style="cursor:pointer" onclick="navTo('floors');setTimeout(()=>{const s=document.getElementById('sel-floor-bldg');if(s){s.value='${b.id}';renderFloors();}},150)"><div class="bs-val" style="color:var(--blue)">${floorCount}</div><div class="bs-lbl">Lagen</div></div>
+      <div class="bs"><div class="bs-val">${b.units||0}</div><div class="bs-lbl">Werkplek</div></div>
+      <div class="bs" style="cursor:pointer" onclick="navTo('tickets');setTimeout(()=>{const s=document.getElementById('sel-tix-bldg');if(s){s.value='${safeName}';setPage('tix',1);renderTix();}},150)"><div class="bs-val" style="color:var(--blue)">${openTix.length}</div><div class="bs-lbl">Open meldingen</div></div>
+      <div class="bs" style="cursor:pointer" onclick="navTo('assets');setTimeout(()=>{const s=document.getElementById('sel-ast-bldg');if(s){s.value='${b.id}';onAstBldgChange();}},150)"><div class="bs-val" style="color:var(--blue)">${allAsts.length}</div><div class="bs-lbl">Middelen</div></div>
     </div>
   </div>`;
 
@@ -5673,7 +5671,7 @@ function openBldDetail(id){
     openTix.filter(t=>t.assetId).map(t=>DB.assets.find(a=>a.id===t.assetId&&a.building===b.name)).filter(Boolean).map(a=>[a.id,a])
   ).values()];
   if(affectedAsts.length){
-    html+=`<div class="sh"><span class="sh-title">Assets Affected (${affectedAsts.length})</span></div>`;
+    html+=`<div class="sh"><span class="sh-title">Betrokken middelen (${affectedAsts.length})</span></div>`;
     html+='<div style="padding:0 14px 8px">'+affectedAsts.map(a=>astCardHTML(a,`openAstDetail('${a.id}')`)).join('')+'</div>';
   }
 
@@ -5688,7 +5686,7 @@ function openBldDetail(id){
   html+='<div style="height:20px"></div>';
   if(can('canManageBuildings')) html+=`<div style="padding:0 14px 8px;display:flex;gap:9px">
     <button onclick="editBld('${b.id}')" style="flex:1;padding:14px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-size:15px;font-weight:700;color:#fff"> Gebouw bewerken</button>
-    <button onclick="openNewUnitForBuilding('${b.id}')" style="flex:1;padding:14px;background:#EEF2FF;border:1.5px solid #C7D2FE;border-radius:var(--rs);font-size:15px;font-weight:700;color:var(--indigo)"> Add Unit</button>
+    <button onclick="openNewUnitForBuilding('${b.id}')" style="flex:1;padding:14px;background:#EEF2FF;border:1.5px solid #C7D2FE;border-radius:var(--rs);font-size:15px;font-weight:700;color:var(--indigo)">Eenheid toevoegen</button>
   </div>`;
   html+='<div style="height:20px"></div>';
   document.getElementById('floor-view-body').innerHTML=html;
