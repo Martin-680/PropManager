@@ -3977,7 +3977,7 @@ function tixItemHTML(t,clickable=true){
   const scopeLabel = hasAsset ? 'Middel' : hasUnit ? 'Eenheid' : hasFloor ? 'Verdieping' : 'Gebouw';
   const scopeColor = hasAsset ? '#059669' : hasUnit ? '#2563eb' : hasFloor ? '#d97706' : '#dc2626';
   const scopeBg    = hasAsset ? 'rgba(5,150,105,.1)' : hasUnit ? 'rgba(37,99,235,.1)' : hasFloor ? 'rgba(217,119,6,.1)' : 'rgba(220,38,38,.12)';
-  const badgeStyle = `font-size:10px;font-weight:700;height:20px;padding:0 7px;border-radius:20px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;flex-shrink:0;background:${scopeBg};color:${scopeColor}`;
+  const badgeStyle = 'font-size:10px;font-weight:700;height:20px;padding:0 7px;border-radius:20px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;flex-shrink:0;background:'+scopeBg+';color:'+scopeColor;
   // Individual ticket pressure: base 2pts × age multiplier (cap ×4 at 90 days)
   const isClosed = t.status==='Closed';
   const tixScore = isClosed
