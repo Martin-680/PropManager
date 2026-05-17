@@ -6442,12 +6442,6 @@ function renderInspections(){
     (r.title||'').toLowerCase().includes(inspQ) ||
     (r.category||'').toLowerCase().includes(inspQ)
   );
-
-
-
-
-
-  );
   // Hide-completed strip: only applies when status filter is 'All'
   const inspHideActive = (statusVal === 'All');
   const completedCount = inspHideActive ? list.filter(r=>r.status==='Completed').length : 0;
