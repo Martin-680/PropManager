@@ -4593,7 +4593,7 @@ function astCardHTML(a, onclick){
   const openTixArr   = (DB.tickets||[]).filter(t=>t.assetId===a.id&&t.status!=='Closed'&&_astInP(t.dateOpened));
   const closedAstTix = (DB.tickets||[]).filter(t=>t.assetId===a.id&&t.status==='Closed'&&_astInP(t.dateOpened)).length;
   // Open tickets: +2 × age factor (capped ×4 at 90 days)
-  const openTixPtsA  = openTixArr.reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0);
+  const openTixPtsA  = openTixArr.reduce((s,t)=>s + 2*scopeMult(t)*ageMult(t.dateOpened), 0);
   // Inspection items: pending +2×age, approved/failed +0.5, skipped 0
   const _astInspIds = new Set(DB.inspections.filter(i=>_astInP(i.dateStart)).map(i=>i.id));
   const astInspItems = (DB.inspectionItems||[]).filter(i=>i.assetId===a.id&&_astInspIds.has(i.inspectionId));
@@ -5404,7 +5404,7 @@ function renderUnits(){
     const _unitInP=d=>d&&new Date(d)>=_unitCut;
     const closedUnitTix = DB.tickets.filter(t=>t.unit===u.label&&t.building===(bld?.name||'')&&t.status==='Closed'&&_unitInP(t.dateOpened)).length;
     // Open tickets: +2 × age factor (period-filtered)
-    const openTixPtsU  = openTix.filter(t=>_unitInP(t.dateOpened)).reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0);
+    const openTixPtsU  = openTix.filter(t=>_unitInP(t.dateOpened)).reduce((s,t)=>s + 2*scopeMult(t)*ageMult(t.dateOpened), 0);
     // Inspection items: pending +2×age, approved/failed +0.5, skipped 0
     const _unitInspIds = new Set(DB.inspections.filter(i=>_unitInP(i.dateStart)).map(i=>i.id));
     const unitInspItems = DB.inspectionItems.filter(i=>i.unitId===u.id&&_unitInspIds.has(i.inspectionId));
@@ -5736,7 +5736,7 @@ function renderFloors(){
     // Tickets: open +2×age, closed −1 (period-filtered)
     const fTixOpen   = DB.tickets.filter(t=>t.floorId===f.id&&t.status!=='Closed'&&_flrInP(t.dateOpened));
     const fTixClosed = DB.tickets.filter(t=>t.floorId===f.id&&t.status==='Closed'&&_flrInP(t.dateOpened));
-    const tixPts     = fTixOpen.reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0) + fTixClosed.length*-1;
+    const tixPts     = fTixOpen.reduce((s,t)=>s + 2*scopeMult(t)*ageMult(t.dateOpened), 0) + fTixClosed.length*-1;
 
     // Inspection items: pending +2×age, approved/failed +0.5, skipped 0 (period-filtered)
     const _flrInspIds = new Set(DB.inspections.filter(i=>_flrInP(i.dateStart)).map(i=>i.id));
@@ -6159,7 +6159,7 @@ function calcBldData(b){
   // Tickets with dateOpened in period
   const periodTix  = DB.tickets.filter(t=>t.buildingId===b.id&&inPeriod(t.dateOpened));
   const openTix    = periodTix.filter(t=>t.status!=='Closed');
-  const openTixPts = openTix.reduce((s,t)=>s + 2*ageMult(t.dateOpened), 0);
+  const openTixPts = openTix.reduce((s,t)=>s + 2*scopeMult(t)*ageMult(t.dateOpened), 0);
   const closedTixPts = periodTix.filter(t=>t.status==='Closed').length * -1;
 
   // Inspection items from inspections with dateStart in period
@@ -6410,7 +6410,7 @@ function renderSupDetailTix(supId){
     return;
   }
   document.getElementById('sup-detail-tix').innerHTML='<div style="padding:0 14px">'+tix.map(t=>{
-    const tixAge=t.status==='Closed'?0:2*ageMult(t.dateOpened);
+    const tixAge=t.status==='Closed'?0:2*scopeMult(t)*ageMult(t.dateOpened);
     const score=Math.round(tixAge*10)/10;
     const hc=score>=6?'#dc2626':score>=3?'#d97706':'#059669';
     const clsMap={Open:'b-open','In Progress':'b-prog',Closed:'b-closed',Planned:'b-planned',Requested:'b-requested',Ordered:'b-ordered'};
