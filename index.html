@@ -1148,15 +1148,13 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div class="mh"></div>
     <div class="mt"><span id="tix-modal-title">Nieuwe melding</span><button class="mt-close" onclick="closeMo('mo-tix')">✕</button></div>
     <div class="fg"><label>Onderwerp *</label><input class="fi2" id="tf-subj" placeholder="Beschrijf het probleem…"/></div>
+    <div class="fg"><label>Gebouw *</label><select class="fs2" id="tf-bldg" onchange="tfOnBldgChange()"><option value="">— Select —</option></select></div>
     <div class="frow2">
-      <div class="fg"><label>Gebouw *</label><select class="fs2" id="tf-bldg" onchange="tfOnBldgChange()"><option value="">— Select —</option></select></div>
       <div class="fg"><label>Verdieping</label><select class="fs2" id="tf-sub" onchange="tfOnFloorChange()"><option value="">— Geen —</option></select></div>
-    </div>
-    <div class="frow2">
       <div class="fg"><label>Eenheid</label><select class="fs2" id="tf-unit" onchange="tfOnUnitChange()"><option value="">— Geen —</option></select></div>
-      <div class="fg"><label>Asset</label><select class="fs2" id="tf-asset" onchange="tfOnAssetChange()"><option value="">— Geen —</option></select></div>
     </div>
     <div class="frow2">
+      <div class="fg"><label>Asset</label><select class="fs2" id="tf-asset" onchange="tfOnAssetChange()"><option value="">— Geen —</option></select></div>
       <div class="fg"><label>Type</label>
         <select class="fs2" id="tf-type">
           <option value="">— Select —</option>
@@ -1172,16 +1170,16 @@ input,select,textarea{font-family:inherit;color:var(--text);}
           <option value="verhuizing">Verhuizing</option>
         </select>
       </div>
+    </div>
+    <div class="frow2">
       <div class="fg"><label>Categorie</label>
         <select class="fs2" id="tf-cat"><option value="">— Select —</option></select>
       </div>
-    </div>
-    <div class="fg"><label>Status</label>
+      <div class="fg"><label>Status</label>
         <select class="fs2" id="tf-status"><option value="Open">Open</option><option value="In Progress">In behandeling</option><option value="Planned">Gepland</option><option value="Requested">Aangevraagd</option><option value="Ordered">Besteld</option><option value="Closed">Gesloten</option></select>
       </div>
-    <div class="frow2">
-      <div class="fg"><label>Toewijzen aan</label><select class="fs2" id="tf-assign"><option value="">Niet toegewezen</option></select></div>
     </div>
+    <div style="display:none"><select id="tf-assign"><option value="">Niet toegewezen</option></select></div>
     <div class="frow2">
       <div class="fg"><label>Datum geopend</label><input class="fi2" type="date" id="tf-date-opened"/></div>
       <div class="fg"><label>Datum gesloten</label><input class="fi2" type="date" id="tf-date-closed"/></div>
