@@ -6885,11 +6885,13 @@ async function launchInspectionRound(){
   const _existingRound = DB.inspections.find(r=>r.buildingId===(bldObj?.id||bldgName) && r.status==='In Progress');
   const inspId = _existingRound ? _existingRound.id : nextId(DB.inspections,'INS');
   const _unitId = inspSelUnits.length===1 ? (DB.units.find(u=>u.label===inspSelUnits[0])?.id||'') : '';
+  const _catId  = inspSelCats.length===1 ? (DB.categories.find(x=>x.category===inspSelCats[0])?.id||'') : '';
   activeRound={
     inspId, building:bldgName, resuming: !!_existingRound,
     unitId: _unitId,
     floor:inspSelFloors.join(', '),
     category:[...inspTypes].join('+')+( inspSelCats.length? ' · '+inspSelCats.join(','):''),
+    categoryId: _catId,
     dateStart:chosenDate, status:isFuture?'Planned':'In Progress', items,
   };
   closeMo('mo-insp-start');
@@ -7365,7 +7367,7 @@ async function saveInspectionRound(){
     buildingId : inspBld ? inspBld.id : activeRound.building,
     floorId    : inspFlr ? inspFlr.id : activeRound.floor,
     unitId     : activeRound.unitId || '',
-    categoryId : inspCat ? inspCat.id : activeRound.category,
+    categoryId : activeRound.categoryId || (inspCat ? inspCat.id : ''),
     building   : activeRound.building,
     floor      : activeRound.floor,
     category   : activeRound.category,
