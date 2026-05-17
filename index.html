@@ -2455,10 +2455,8 @@ function tfOnBldgChange(){
   // Reset downstream
   document.getElementById('tf-unit').innerHTML='<option value="">— None —</option>';
   document.getElementById('tf-asset').innerHTML='<option value="">— None —</option>';
-  // Populate floor from DB.floors
-  const floors=getFloorsForBuilding(bldg);
-  const floorSel=document.getElementById('tf-sub');
-  floorSel.innerHTML='<option value="">— None —</option>'+floors.map(f=>`<option value="${f.id}">${f.label}</option>`).join('');
+  // Populate floors using helper
+  document.getElementById('tf-sub').innerHTML = floorOptions(bldg);
 }
 function tfOnFloorChange(){
   const floorId=document.getElementById('tf-sub').value;
@@ -2466,13 +2464,8 @@ function tfOnFloorChange(){
   const floorLabel=floor?floor.label:'';
   fSupClear('tf');
   // Populate units from DB.units
-  const unitList=floorId ? DB.units.filter(u=>u.floorId===floorId) : [];
-  const unitSel=document.getElementById('tf-unit');
-  if(unitList.length){
-    unitSel.innerHTML='<option value="">— None —</option>'+unitList.map(u=>`<option value="${u.label}">${u.label}</option>`).join('');
-  } else {
-    unitSel.innerHTML='<option value="">— None —</option>';
-  }
+  // Populate units using helper
+  document.getElementById('tf-unit').innerHTML = unitOptions(floorId);
   // Populate assets for this floor (no unit filter yet)
   tfOnUnitChange();
 }
@@ -4685,9 +4678,7 @@ function afOnBldgChange(){
 }
 function afOnFloorChange(){
   const floorId=document.getElementById('af-sub').value;
-  const unitList=floorId ? DB.units.filter(u=>u.floorId===floorId).sort((a,z)=>a.sortOrder-z.sortOrder) : [];
-  const sel=document.getElementById('af-loc');
-  sel.innerHTML='<option value="">— Select unit —</option>'+unitList.map(u=>`<option value="${u.id}">${u.label}</option>`).join('');
+  document.getElementById('af-loc').innerHTML = unitOptions(floorId);
 }
 function populateAstSupplierSelect(id, selectedId=''){
   // id is always 'af-cat'; use new search widget
@@ -5402,9 +5393,8 @@ function editUnit(id){
 }
 function uf2OnBldgChange(){
   const bldName=document.getElementById('uf2-bldg').value;
-  const floors=getFloorsForBuilding(bldName);
-  const sel=document.getElementById('uf2-floor');
-  sel.innerHTML='<option value="">— Select floor —</option>'+floors.map(f=>`<option value="${f.id}">${f.label}</option>`).join('');
+  const bld=DB.buildings.find(b=>b.name===bldName);
+  document.getElementById('uf2-floor').innerHTML = floorOptions(bld?.id||'');
 }
 async function saveUnit(){
   const label=document.getElementById('uf2-label').value.trim();
