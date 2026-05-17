@@ -1592,6 +1592,21 @@ function statusBadge(status) {
   return '<span style="font-size:10px;font-weight:700;height:20px;padding:0 7px;border-radius:20px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;flex-shrink:0;" class="badge-status badge-status--' + (status||'').replace(' ','-').toLowerCase() + '">' + label + '</span>';
 }
 // ─────────────────────────────────────────────────────────────────────────────
+// ── Locatie regel helper ──────────────────────────────────────────────────────
+const _bldgIcon  = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="flex-shrink:0"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>';
+const _floorIcon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="flex-shrink:0"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>';
+const _unitIcon  = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>';
+const _dot = '<span style="color:var(--border);margin:0 2px">·</span>';
+function locLine(t) {
+  const floorLabel = DB.floors.find(f => f.id === t.floorId || f.id === t.floor || f.label === t.floor)?.label || t.floor || '';
+  const parts = [];
+  if (t.building) parts.push(_bldgIcon + '<span>' + t.building + '</span>');
+  if (floorLabel)  parts.push(_floorIcon + '<span>' + floorLabel + '</span>');
+  if (t.unit)      parts.push(_unitIcon  + '<span>' + t.unit + '</span>');
+  if (!parts.length) return '—';
+  return '<div class="cm" style="display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px">' + parts.join(_dot) + '</div>';
+}
+// ─────────────────────────────────────────────────────────────────────────────
 const d=(n)=>{const x=new Date(today);x.setDate(x.getDate()-n);return x.toISOString().split('T')[0];};
 const df=(s)=>s?parseDate(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';
 const daysSince=(s)=>s?Math.max(0,Math.floor((today-parseDate(s))/_MS_DAY)):0;
@@ -3984,7 +3999,7 @@ function renderTix(){
 function tixItemHTML(t,clickable=true){
   const fn=clickable?`openTixDetail('${t.id}')`:`navTo('tickets')`;
   const fmtDate=s=>{if(!s)return'—';const d=new Date(s);return String(d.getDate()).padStart(2,'0')+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+d.getFullYear();};
-  const locParts=[t.building, DB.floors.find(f=>f.id===t.floor||f.label===t.floor)?.label||t.floor||'', t.unit||''].filter(Boolean).join(' · ');
+  // locLine(t) renders building · floor · unit with icons
   const dateStart=fmtDate(t.dateOpened);
   const dateEnd=t.dateClosed?fmtDate(t.dateClosed):'—';
   const dur=t.dateOpened?(t.dateClosed?Math.round((new Date(t.dateClosed)-new Date(t.dateOpened))/_MS_DAY):daysSince(t.dateOpened)):0;
@@ -4006,7 +4021,7 @@ function tixItemHTML(t,clickable=true){
           <div class="ct" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.subject||'—'}</div>
           <span style="${badgeStyle}">${statusMap[t.status]||t.status}</span>
         </div>
-        <div class="cm" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px">${locParts||'—'}</div>
+        ${locLine(t)}
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span class="cm">${dateStart}</span>
           <span class="cm">${durLabel}</span>
