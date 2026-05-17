@@ -1712,6 +1712,45 @@ function filterTix() {
   return { list, statusVal, sortVal };
 }
 // ─────────────────────────────────────────────────────────────────────────────
+function filterInsp() {
+  const inspQ        = (document.getElementById('insp-search')?.value||'').toLowerCase().trim();
+  const statusVal    = document.getElementById('sel-insp-status')?.value    || 'All';
+  const bldgVal      = document.getElementById('sel-insp-bldg')?.value      || 'All';
+  const catVal       = document.getElementById('sel-insp-cat')?.value       || 'All';
+  const inspectorVal = document.getElementById('sel-insp-inspector')?.value || 'All';
+  const resultVal    = document.getElementById('sel-insp-result')?.value    || 'All';
+  const dateFrom     = document.getElementById('sel-insp-date-from')?.value || '';
+  const dateTo       = document.getElementById('sel-insp-date-to')?.value   || '';
+
+  let list = [...DB.inspections].sort((a,b) => inspSort==='alpha'
+    ? (a.building||'').localeCompare(b.building||'')
+    : (b.dateStart||'') > (a.dateStart||'') ? 1 : -1);
+
+  const _bldIds = getUserBuildingIds();
+  if(_bldIds.size) list = list.filter(r => _bldIds.has(r.buildingId));
+  if(statusVal    !== 'All') list = list.filter(r => r.status === statusVal);
+  if(bldgVal      !== 'All') list = list.filter(r => r.buildingId === bldgVal);
+  if(catVal       !== 'All') list = list.filter(r => r.category === catVal);
+  if(inspectorVal !== 'All') list = list.filter(r => r.inspector === inspectorVal);
+  if(resultVal    !== 'All') list = list.filter(r => {
+    const items = Array.isArray(r.items) ? r.items : [];
+    const hasFailed  = items.some(i=>i.result==='Failed');
+    const hasPending = items.some(i=>!i.result||i.result==='');
+    if(resultVal==='hasFailed')  return hasFailed;
+    if(resultVal==='hasPending') return hasPending;
+    if(resultVal==='allClear')   return !hasFailed && !hasPending && items.length > 0;
+    return true;
+  });
+  if(dateFrom) list = list.filter(r => (r.dateStart||'') >= dateFrom);
+  if(dateTo)   list = list.filter(r => (r.dateStart||'') <= dateTo);
+  const _cut = _periodCutoff(inspPeriod);
+  if(_cut) list = list.filter(r => r.dateStart && new Date(r.dateStart) >= _cut);
+  if(inspQ) list = list.filter(r =>
+    (r.title||'').toLowerCase().includes(inspQ) ||
+    (r.category||'').toLowerCase().includes(inspQ)
+  );
+  return { list, statusVal };
+}
 const d=(n)=>{const x=new Date(today);x.setDate(x.getDate()-n);return x.toISOString().split('T')[0];};
 const df=(s)=>s?parseDate(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';
 const daysSince=(s)=>s?Math.max(0,Math.floor((today-parseDate(s))/_MS_DAY)):0;
@@ -6453,43 +6492,14 @@ function renderInspections(){
     catSel.value = getCategoryList().includes(cur) ? cur : 'All';
   }
 
-  const statusVal    = document.getElementById('sel-insp-status')?.value    || 'All';
-  const catVal       = document.getElementById('sel-insp-cat')?.value       || 'All';
-  const inspectorVal = document.getElementById('sel-insp-inspector')?.value || 'All';
-  const resultVal    = document.getElementById('sel-insp-result')?.value    || 'All';
-
   syncSelActive('sel-insp-status'); syncSelActive('sel-insp-bldg');
   syncSelActive('sel-insp-inspector'); syncSelActive('sel-insp-result'); syncSelActive('sel-insp-cat');
   updateInspFilterBadge();
 
-  const inspQ = (document.getElementById('insp-search')?.value || '').toLowerCase().trim();
-  let list = [...DB.inspections].sort((a,b)=> inspSort==='alpha' ? (a.building||'').localeCompare(b.building||'') : (b.dateStart||'') > (a.dateStart||'') ? 1 : -1);
-  const _inspBldIds=getUserBuildingIds(); if(_inspBldIds.size) list=list.filter(r=>_inspBldIds.has(r.buildingId));
-  if(statusVal    !== 'All') list = list.filter(r => r.status === statusVal);
-  if(bldgVal      !== 'All') list = list.filter(r => r.buildingId === bldgVal);
-  if(catVal       !== 'All') list = list.filter(r => r.category === catVal);
-  if(inspectorVal !== 'All') list = list.filter(r => r.inspector === inspectorVal);
-  if(resultVal    !== 'All') list = list.filter(r => {
-    const items = Array.isArray(r.items) ? r.items : [];
-    const hasFailed  = items.some(i=>i.result==='Failed');
-    const hasPending = items.some(i=>!i.result || i.result==='');
-    if(resultVal==='hasFailed')  return hasFailed;
-    if(resultVal==='hasPending') return hasPending;
-    if(resultVal==='allClear')   return !hasFailed && !hasPending && items.length > 0;
-    return true;
-  });
-  const inspDateFrom = document.getElementById('sel-insp-date-from')?.value || '';
-  const inspDateTo   = document.getElementById('sel-insp-date-to')?.value   || '';
-  if(inspDateFrom) list = list.filter(r => (r.dateStart||'') >= inspDateFrom);
-  if(inspDateTo)   list = list.filter(r => (r.dateStart||'') <= inspDateTo);
-  const _inspCutoff = _periodCutoff(inspPeriod);
-  if(_inspCutoff) list = list.filter(r => r.dateStart && new Date(r.dateStart) >= _inspCutoff);
-  if(inspQ) list = list.filter(r =>
-    (r.title||'').toLowerCase().includes(inspQ) ||
-    (r.category||'').toLowerCase().includes(inspQ)
-  );
-  // Hide-completed strip: only applies when status filter is 'All'
-  const inspHideActive = (statusVal === 'All');
+  const { list: _rawInsp, statusVal: _sv } = filterInsp();
+  let list = _rawInsp;
+  // Hide-completed strip
+  const inspHideActive = (_sv === 'All');
   const completedCount = inspHideActive ? list.filter(r=>r.status==='Completed').length : 0;
   if(inspHideActive && !showCompletedInsp) list = list.filter(r=>r.status!=='Completed');
   const inspStrip = document.getElementById('insp-hide-strip');
@@ -6502,7 +6512,7 @@ function renderInspections(){
   }
 
   const lbl = document.getElementById('insp-lbl');
-  const _inspDays = _inspCutoff ? Math.max(1, Math.ceil((new Date() - _inspCutoff) / _MS_DAY)) : null;
+  const _cut2 = _periodCutoff(inspPeriod); const _inspDays = _cut2 ? Math.max(1, Math.ceil((new Date() - _cut2) / _MS_DAY)) : null;
   if(lbl) lbl.textContent = list.length + ' ronde' + (list.length!==1?'n':'') + (_inspDays ? ' · ' + _inspDays + ' day' + (_inspDays===1?'':'s') : '');
 
   const c = document.getElementById('insp-list');
