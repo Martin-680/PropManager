@@ -1592,21 +1592,6 @@ function scopeMult(t) {
   }
   return 2; // whole building
 }
-function scopeBadge(t) {
-  const { label, color, bg } = scopeInfo(t);
-  return '<span style="font-size:10px;font-weight:700;height:20px;padding:0 7px;border-radius:20px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;flex-shrink:0;background:' + bg + ';color:' + color + '">' + label + '</span>';
-}
-function statusBadge(status) {
-  const statusMap = {Open:'Open','In Progress':'In behandeling',Closed:'Gesloten',Planned:'Gepland',Requested:'Aangevraagd',Ordered:'Besteld'};
-  const label = statusMap[status] || status;
-  return '<span style="font-size:10px;font-weight:700;height:20px;padding:0 7px;border-radius:20px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;flex-shrink:0;" class="badge-status badge-status--' + (status||'').replace(' ','-').toLowerCase() + '">' + label + '</span>';
-}
-// ─────────────────────────────────────────────────────────────────────────────
-// ── Locatie regel helper ──────────────────────────────────────────────────────
-const _bldgIcon  = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="flex-shrink:0"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>';
-const _floorIcon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="flex-shrink:0"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>';
-const _unitIcon  = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>';
-const _dot = '<span style="color:var(--border);margin:0 2px">·</span>';
 function locLine(t) {
   const floorLabel = DB.floors.find(f => f.id === t.floorId || f.id === t.floor || f.label === t.floor)?.label || t.floor || '';
   const parts = [];
@@ -1618,12 +1603,6 @@ function locLine(t) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 // ── Dropdown option helpers ───────────────────────────────────────────────────
-function buildingOptions(selectedId = '') {
-  return '<option value="">— Selecteer gebouw —</option>' +
-    [...DB.buildings].sort((a,b) => a.name.localeCompare(b.name))
-      .map(b => `<option value="${b.id}"${b.id === selectedId ? ' selected' : ''}>${b.name}</option>`)
-      .join('');
-}
 function floorOptions(buildingId, selectedId = '') {
   const floors = DB.floors.filter(f => f.buildingId === buildingId)
     .sort((a,b) => a.sortOrder - b.sortOrder);
@@ -2206,21 +2185,6 @@ async function loadAllData(){
   });
 }
 
-async function loadSheet(key){
-  const rows = await sheetsGet(`${TABS[key]}!A:Z`);
-  DB[key] = rowsToObjects(rows, COLS[key]);
-  // After reloading inspections or inspectionItems, re-join items onto inspections
-  if(key === 'inspections' || key === 'inspectionItems'){
-    DB.inspections = (DB.inspections || []).map(r => ({
-      ...r,
-      items: (DB.inspectionItems || []).filter(i => i.inspectionId === r.id),
-    }));
-  }
-}
-
-/* ══════════════════════════════════════════════════════════
-   GOOGLE SHEETS API — WRITE
-══════════════════════════════════════════════════════════ */
 function objToRow(obj, cols){
   return cols.map(col=>{
     let v = obj[col];
@@ -2794,18 +2758,6 @@ function populateAssignSelect(id){
   const el=document.getElementById(id); if(!el) return;
   const cur=el.value;
   el.innerHTML='<option value="">Niet toegewezen</option>'+DB.users.filter(u=>u.active).sort((a,z)=>a.name.localeCompare(z.name)).map(u=>`<option value="${u.name}">${u.name} (${u.role})</option>`).join('');
-  if(cur) el.value=cur;
-}
-function populateAssetSelect(id){
-  const el=document.getElementById(id); if(!el) return;
-  const cur=el.value;
-  el.innerHTML='<option value="">None</option>'+[...DB.assets].sort((a,z)=>a.name.localeCompare(z.name)).map(a=>`<option value="${a.id}">${a.id} – ${a.name}</option>`).join('');
-  if(cur) el.value=cur;
-}
-function populateSupplierSelect(id){
-  const el=document.getElementById(id); if(!el) return;
-  const cur=el.value;
-  el.innerHTML='<option value="">None</option>'+DB.suppliers.filter(s=>s.status!=='Inactive').sort((a,z)=>a.name.localeCompare(z.name)).map(s=>`<option value="${s.id}">${s.name} (€ ${s.ratePerHour}/hr)</option>`).join('');
   if(cur) el.value=cur;
 }
 function populateMgrSelect(id){
@@ -3414,32 +3366,6 @@ function renderDash(){
   // Recent open
 }
 
-function dashGoBuilding(bldId){
-  const b=DB.buildings.find(x=>x.id===bldId); if(!b) return;
-  openBldDetail(bldId);
-}
-
-/* KPI drill-down */
-let kpiFilterStatus='All';
-function openKpiList(status){
-  kpiFilterStatus=status;
-  const list=status==='All'?DB.tickets
-    :status==='Other'?DB.tickets.filter(t=>t.status==='Planned'||t.status==='Ordered'||t.status==='Requested')
-    :status==='Niet toegewezen'?DB.tickets.filter(t=>t.status!=='Closed'&&(!t.assignedTo||t.assignedTo.trim()===''||t.assignedTo.trim()==='Niet toegewezen'))
-    :DB.tickets.filter(t=>t.status===status);
-  const colors={'All':'var(--blue)','Open':'var(--red)','In Progress':'var(--amber)','Closed':'var(--green)','Niet toegewezen':'var(--indigo)'};
-  document.getElementById('kpi-list-title').textContent=status==='All'?'Alle meldingen':status+' meldingen';
-  document.getElementById('kpi-list-title').style.color=colors[status]||'var(--blue)';
-  document.getElementById('kpi-list-count').textContent=`${list.length} ticket${list.length!==1?'s':''}`;
-  let page=1;
-  const render=()=>{
-    const slice=list.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
-    document.getElementById('kpi-list-body').innerHTML='<div class="tlist">'+slice.map(t=>tixCard(t,true)).join('')+'</div>'+renderPagination('kpi',list.length,'kpiPage');
-  };
-  window.kpiPage=(p)=>{page=p;render();};
-  render();
-  openMo('mo-kpi-list');
-}
 function goToTicketsFiltered(){
   closeMo('mo-kpi-list');
   navTo('tickets');
@@ -4008,18 +3934,6 @@ function openInspFilterModal(){
   if(dtFrom) dtFrom.value = document.getElementById('sel-insp-date-from')?.value || '';
   if(dtTo)   dtTo.value   = document.getElementById('sel-insp-date-to')?.value   || '';
   openMo('mo-insp-filter');
-}
-function onMfInspBldgChange(silent){
-  const bldgId = document.getElementById('mf-insp-bldg')?.value || 'All';
-  const mFloor = document.getElementById('mf-insp-floor');
-  if(!mFloor) return;
-  const floors = bldgId==='All'
-    ? [...DB.floors].sort((a,z)=>a.label.localeCompare(z.label))
-    : getFloorsForBuilding(bldgId);
-  const seen=new Set();
-  const unique=floors.filter(f=>{ if(seen.has(f.label)) return false; seen.add(f.label); return true; });
-  mFloor.innerHTML = '<option value="All">Alle verdiepingen</option>' +
-    unique.map(f=>`<option value="${f.label}">${f.label}</option>`).join('');
 }
 function applyInspFilterModal(){
   ['status','cat','inspector','result'].forEach(k=>{
@@ -5229,69 +5143,6 @@ async function saveUser(){
 /* ══════════════════════════════════════════════════════════
    FLOOR VIEW
 ══════════════════════════════════════════════════════════ */
-function openFloorView(buildingName, buildingId, floorEnc){
-  const floor = decodeURIComponent(floorEnc);
-  document.getElementById('floor-view-title').textContent = floor;
-  document.getElementById('floor-view-sub').textContent = buildingName;
-
-  const tickets   = DB.tickets.filter(t=>t.buildingId===buildingId && t.floor===floor);
-  const assets    = DB.assets.filter(a=>a.buildingId===buildingId && a.floor===floor);
-  const suppliers = DB.suppliers.filter(s=>
-    tickets.some(t=>t.supplierId===s.id) || assets.some(a=>false)
-  );
-  const building  = DB.buildings.find(b=>b.id===buildingId);
-
-  let html = '';
-
-  // ── Building info strip ──
-  html += `<div style="margin:12px 14px 4px;padding:14px 16px;background:linear-gradient(135deg,rgba(37,99,235,.07),rgba(79,70,229,.04));border:1.5px solid var(--border);border-radius:var(--r)">
-    <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Building</div>
-    <div style="font-size:16px;font-weight:800;font-family:'Outfit',sans-serif">${buildingName}</div>
-    <div style="font-size:12px;color:var(--sub);margin-top:2px">${building?.address||''}</div>
-  </div>`;
-
-  // ── Tickets ──
-  html += `<div class="sh"><span class="sh-title">Tickets (${tickets.length})</span><span class="sh-link" onclick="navTo('tickets')">All →</span></div>`;
-  if(tickets.length){
-    html += '<div class="tlist">' + tickets.map(t=>tixCard(t,true)).join('') + '</div>';
-  } else {
-    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 9a2 2 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="9" y1="9" x2="9" y2="15"/></svg></div><div style="font-size:12px">Geen meldingen for this floor</div></div>';
-  }
-
-  // ── Assets ──
-  html += `<div class="sh"><span class="sh-title">Assets (${assets.length})</span><span class="sh-link" onclick="navTo('assets')">All →</span></div>`;
-  if(assets.length){
-    html += '<div style="padding:0 14px 8px">' + assets.map(a=>astCardHTML(a,`openAstDetail('${a.id}')`)).join('') + '</div>';
-  } else {
-    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div style="font-size:12px">No assets for this floor</div></div>';
-  }
-
-  // ── Suppliers linked via tickets on this floor ──
-  const linkedSupIds = [...new Set(tickets.filter(t=>t.supplierId).map(t=>t.supplierId))];
-  const linkedSups = DB.suppliers.filter(s=>linkedSupIds.includes(s.id));
-  html += `<div class="sh"><span class="sh-title">Suppliers (${linkedSups.length})</span><span class="sh-link" onclick="navTo('suppliers')">All →</span></div>`;
-  if(linkedSups.length){
-    const exp=s=>Array.isArray(s.expertise)?s.expertise:String(s.expertise||'').replace(/[\[\]"]/g,'').split(',').map(x=>x.trim()).filter(Boolean);
-    html += linkedSups.map(s=>`
-      <div class="sup-card" onclick="openSupDetail('${s.id}')">
-        <div class="sup-hdr">
-          <div style="flex:1;min-width:0"><div class="sup-name">${s.name}</div>${exp(s).length?`<div style="font-size:11px;color:var(--sub);margin-top:3px">${exp(s).join(', ')}</div>`:''}</div>
-        </div>
-      </div>`).join('');
-  } else {
-    html += '<div class="empty" style="padding:20px 24px"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7-6-7 6v3l-4-3v12z"/><path d="M17 20v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/></svg></div><div style="font-size:12px">No suppliers linked to this floor</div></div>';
-  }
-
-  document.getElementById('floor-view-body').innerHTML = html;
-  navTo('floor');
-}
-
-/* ══════════════════════════════════════════════════════════
-   UNITS
-══════════════════════════════════════════════════════════ */
-let unitSort = 'asc';
-let unitActiveBldg = null;
-
 function toggleUnitSort(){
   unitSort = unitSort === 'asc' ? 'desc' : 'asc';
   const btn = document.getElementById('unit-sort-btn');
@@ -5858,24 +5709,6 @@ function openFloorDetail(id){
   openMo('mo-floor-detail');
 }
 
-function fvAccordion(secId, chevId){
-  const allSecs  = ['fv-sec-tickets','fv-sec-assets','fv-sec-suppliers'];
-  const allChevs = ['fv-chev-tickets','fv-chev-assets','fv-chev-suppliers'];
-  allSecs.forEach((s,i)=>{
-    const sec  = document.getElementById(s);
-    const chev = document.getElementById(allChevs[i]);
-    if(!sec) return;
-    if(s===secId){
-      const opening = sec.style.display==='none';
-      sec.style.display  = opening ? '' : 'none';
-      if(chev) chev.style.transform = opening ? 'rotate(180deg)' : '';
-    } else {
-      sec.style.display = 'none';
-      if(chev) chev.style.transform = '';
-    }
-  });
-}
-
 function unitDetailTab(tab){
   const tabs=['inspect','tickets'];
   const activeS='flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);transition:color .15s,border-color .15s';
@@ -5910,31 +5743,6 @@ function floorDetailTab(tab){
     if(btn)   btn.style.cssText   = t===tab ? activeS : inactS;
     if(panel) panel.style.display = t===tab ? '' : 'none';
   });
-}
-
-function inspDetailToggle(filter, btn){
-  const active = btn.dataset.active !== '1';
-  btn.dataset.active = active ? '1' : '';
-  btn.style.background  = active ? 'var(--teal)'  : 'var(--card2)';
-  btn.style.color       = active ? '#fff'          : 'var(--muted)';
-  btn.style.borderColor = active ? 'var(--teal)'  : 'var(--border)';
-
-  const typeOn   = ['units','assets'].filter(f => { const b=document.getElementById('idpill-'+f); return b && b.dataset.active==='1'; });
-  const resultOn = ['failed','pending'].filter(f => { const b=document.getElementById('idpill-'+f); return b && b.dataset.active==='1'; });
-
-  const items = document.querySelectorAll('#idsec-items .id-item');
-  let visible = 0;
-  items.forEach(el => {
-    const type   = el.dataset.type;
-    const result = el.dataset.result;
-    const typeOk   = typeOn.length   === 0 || typeOn.includes(type);
-    const resultOk = resultOn.length === 0 || resultOn.includes(result);
-    const show = typeOk && resultOk;
-    el.style.display = show ? '' : 'none';
-    if(show) visible++;
-  });
-  const noRes = document.getElementById('id-noresults');
-  if(noRes) noRes.style.display = visible === 0 ? '' : 'none';
 }
 
 function openNewFloor(){
@@ -6180,7 +5988,6 @@ function calcBldData(b){
   const score    = Math.max(0, Math.min(100, Math.round(100 - pressure)));
   return {score, periodTix:openTix.length, periodItems:periodItems.length, effSqm};
 }
-function calcBldScore(b){ return calcBldData(b).score; }
 function renderBlds(){
   updateBldFilterBadge();
   const list = filterBlds();
@@ -7677,23 +7484,6 @@ async function saveInspectionRound(){
 }
 
 /* ── Create a ticket from a failure (called from round screen) ── */
-function createTicketFromFailure(idx){
-  if(!activeRound || !can('canCreateTickets')) return;
-  const item = activeRound.items[idx];
-  // Sync note first
-  const noteEl = document.getElementById('insp-note-' + idx);
-  if(noteEl) item.note = noteEl.value;
-  if(!item.note.trim()){ toast('Add a note describing the failure first','err'); noteEl?.focus(); return; }
-  _prefillTicketFromFailure(item);
-}
-
-function createTicketFromFailure_summary(idx){
-  if(!activeRound || !can('canCreateTickets')) return;
-  const item = activeRound.items[idx];
-  closeMo('mo-insp-summary');
-  _prefillTicketFromFailure(item);
-}
-
 function _prefillTicketFromFailure(item){
   // Pre-fill the ticket form with failure details
   editingId.tix = null;
@@ -7958,10 +7748,6 @@ function fSupSelect(prefix, id, name){
   if(hidden) hidden.value = id;
   if(srch)   srch.value  = id ? name : '';
   fSupClose(prefix);
-}
-function fSupGetValue(prefix){
-  const hiddenId = prefix==='af' ? prefix+'-cat' : prefix+'-supplier';
-  return document.getElementById(hiddenId)?.value || '';
 }
 function fSupSetValue(prefix, id){
   const data = _fSupData[prefix] || [];
