@@ -1700,7 +1700,7 @@ function filterTix() {
 
   let list = DB.tickets;
   const _bldIds = getUserBuildingIds();
-  if(_bldIds.size) list = list.filter(t => _bldIds.has(DB.buildings.find(b=>b.name===t.building)?.id));
+  if(_bldIds.size) list = list.filter(t => _bldIds.has(t.buildingId));
   if(tixActiveBldg)         list = list.filter(t => t.building === tixActiveBldg);
   if(statusVal === 'mine')       list = list.filter(t => t.assignedTo===currentUser?.name||t.createdBy===currentUser?.name);
   else if(statusVal === 'notclosed') list = list.filter(t => t.status !== 'Closed');
@@ -1880,8 +1880,8 @@ function filterBlds() {
   const _bldIds   = getUserBuildingIds();
   let list = DB.buildings.filter(b => !q || b.name.toLowerCase().includes(q) || (b.address||'').toLowerCase().includes(q));
   if(_bldIds.size) list = list.filter(b => _bldIds.has(b.id));
-  if(statusVal === 'Active') list = list.filter(b => !DB.tickets.some(t => t.building===b.name && t.status!=='Closed'));
-  if(statusVal === 'Issues') list = list.filter(b =>  DB.tickets.some(t => t.building===b.name && t.status!=='Closed'));
+  if(statusVal === 'Active') list = list.filter(b => !DB.tickets.some(t => t.buildingId===b.id && t.status!=='Closed'));
+  if(statusVal === 'Issues') list = list.filter(b =>  DB.tickets.some(t => t.buildingId===b.id && t.status!=='Closed'));
   return list;
 }
 function filterSuppliers() {
@@ -5234,8 +5234,8 @@ function openFloorView(buildingName, buildingId, floorEnc){
   document.getElementById('floor-view-title').textContent = floor;
   document.getElementById('floor-view-sub').textContent = buildingName;
 
-  const tickets   = DB.tickets.filter(t=>t.building===buildingName && t.floor===floor);
-  const assets    = DB.assets.filter(a=>a.building===buildingName && a.floor===floor);
+  const tickets   = DB.tickets.filter(t=>t.buildingId===buildingId && t.floor===floor);
+  const assets    = DB.assets.filter(a=>a.buildingId===buildingId && a.floor===floor);
   const suppliers = DB.suppliers.filter(s=>
     tickets.some(t=>t.supplierId===s.id) || assets.some(a=>false)
   );
@@ -5990,9 +5990,9 @@ async function saveFloor(){
 function openBldDetail(id){
   const b=DB.buildings.find(x=>x.id===id); if(!b) return;
   const floorCount=DB.floors.filter(f=>f.buildingId===b.id).length;
-  const allTix=DB.tickets.filter(t=>t.building===b.name);
+  const allTix=DB.tickets.filter(t=>t.buildingId===b.id);
   const openTix=allTix.filter(t=>t.status!=='Closed');
-  const allAsts=DB.assets.filter(a=>a.building===b.name);
+  const allAsts=DB.assets.filter(a=>a.buildingId===b.id);
   const sc={Active:'var(--green)','Under Maintenance':'var(--amber)',Decommissioned:'var(--red)'};
 
   document.getElementById('floor-view-title').textContent=b.name;
@@ -6060,7 +6060,7 @@ function openBldDetail(id){
 
   // ── Assets Affected ──
   const affectedAsts=[...new Map(
-    openTix.filter(t=>t.assetId).map(t=>DB.assets.find(a=>a.id===t.assetId&&a.building===b.name)).filter(Boolean).map(a=>[a.id,a])
+    openTix.filter(t=>t.assetId).map(t=>DB.assets.find(a=>a.id===t.assetId&&a.buildingId===b.id)).filter(Boolean).map(a=>[a.id,a])
   ).values()];
   if(affectedAsts.length){
     html+=`<div class="sh"><span class="sh-title">Betrokken middelen (${affectedAsts.length})</span></div>`;
@@ -6187,7 +6187,7 @@ function renderBlds(){
   document.getElementById('bld-lbl').textContent=`${list.length} gebouw${list.length!==1?'en':''}`;
   const c=document.getElementById('bld-list');
   if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon" style="font-size:0;color:var(--muted)"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;opacity:0.4"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></div><div style="font-size:13px">No buildings yet</div></div>';return;}
-  const totalTix  = list.reduce((a,b)=>a+DB.tickets.filter(t=>t.building===b.name&&t.status!=='Closed').length,0)||1;
+  const totalTix  = list.reduce((a,b)=>a+DB.tickets.filter(t=>t.buildingId===b.id&&t.status!=='Closed').length,0)||1;
   const totalInsp = list.reduce((a,b)=>{
     const ids=new Set(DB.inspections.filter(i=>i.buildingId===b.id).map(i=>i.id));
     return a+DB.inspectionItems.filter(i=>ids.has(i.inspectionId)).length;
@@ -7050,8 +7050,9 @@ async function launchInspectionRound(){
   const _existingRound = DB.inspections.find(r=>r.buildingId===(bldObj?.id||bldgName) && r.status==='In Progress');
   const inspId = _existingRound ? _existingRound.id : nextId(DB.inspections,'INS');
   const _unitId = inspSelUnits.length===1 ? (DB.units.find(u=>u.label===inspSelUnits[0])?.id||'') : '';
+  const _launchBld=DB.buildings.find(b=>b.name===bldgName);
   activeRound={
-    inspId, building:bldgName, resuming: !!_existingRound,
+    inspId, building:bldgName, buildingId:_launchBld?_launchBld.id:"", resuming: !!_existingRound,
     unitId: _unitId,
     floor:inspSelFloors.join(', '),
     category:[...inspTypes].join('+')+( inspSelCats.length? ' · '+inspSelCats.join(','):''),
@@ -7513,7 +7514,7 @@ async function saveInspectionRound(){
   const allApproved = activeRound.items.every(i => i.result === 'Approved');
   const allChecked  = activeRound.items.every(i => i.result !== 'Open');
   const isCompleted = allApproved || (allChecked && !activeRound.items.some(i => i.result === 'Open'));
-  const inspBld = DB.buildings.find(b=>b.name===activeRound.building);
+  const inspBld = DB.buildings.find(b=>b.id===activeRound.buildingId||b.name===activeRound.building);
   const inspFlr = DB.floors.find(f=>f.label===activeRound.floor);
   const inspCat = DB.categories.find(x=>x.category===activeRound.category);
   const todayStr = today.toISOString().split('T')[0];
@@ -7586,7 +7587,7 @@ async function saveInspectionRound(){
 
   // Auto-create template from completed round if none exists yet
   if(newStatus === 'Completed' && !inspActiveTplId){
-    const bldObj = DB.buildings.find(b=>b.name===activeRound.building);
+    const bldObj = DB.buildings.find(b=>b.id===activeRound.buildingId||b.name===activeRound.building);
     const autoTplName = `${activeRound.building}${activeRound.floor?' · '+activeRound.floor:''}${activeRound.category?' · '+activeRound.category:''}`;
     const alreadyExists = DB.inspectionTemplates.some(t=>t.buildingId===(bldObj?.id||activeRound.building) && t.name===autoTplName);
     if(!alreadyExists){
@@ -7615,7 +7616,7 @@ async function saveInspectionRound(){
     const dueDate = new Date(today); dueDate.setDate(dueDate.getDate()+14);
     const dueDateStr = dueDate.toISOString().split('T')[0];
     const todayStr2 = today.toISOString().split('T')[0];
-    const inspBld2 = DB.buildings.find(b=>b.name===(activeRound?.building||''));
+    const inspBld2 = DB.buildings.find(b=>b.id===(activeRound?.buildingId||'')||b.name===(activeRound?.building||''));
     const createdTickets = [];
     chks.forEach(chk=>{
       const idx = parseInt(chk.dataset.idx);
@@ -7713,7 +7714,7 @@ function _prefillTicketFromFailure(item){
   }
 
   populateBldSelect('tf-bldg','— Select —');
-  const _arBld=DB.buildings.find(b=>b.name===activeRound.building);
+  const _arBld=DB.buildings.find(b=>b.id===activeRound.buildingId||b.name===activeRound.building);
   bsdSetExternal('tf-bldg', _arBld?_arBld.id:'');
   tfOnBldgChange();
 
