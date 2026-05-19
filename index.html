@@ -974,7 +974,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div style="padding:14px 18px">
       <div class="info-desc">Statistieken geeft een portfoliobrede weergave van de werkdruk per gebouw. Alle cijfers worden live herberekend vanuit je Google Sheets-data.</div>
       <div class="info-section-lbl" style="padding:14px 0 6px">Capaciteits management</div>
-      <div class="info-desc">Het capaciteitsoverzicht toont vijf waarden voor de geselecteerde periode (Week, Maand of Kwartaal):<br><br><strong>Periode capaciteit</strong> — alle werkdagen in de periode × 7,2 uur. Dit is het totale beschikbare uurbudget, exclusief feestdagen en vrije dagen in je profiel.<br><br><strong>Bestede tijd</strong> — handmatig geregistreerde uren op meldingen en inspectieitems in de periode.<br><br><strong>Resterende tijd</strong> — periode capaciteit minus bestede tijd. Hoeveel uurbudget er nog over is om in te vullen.<br><br><strong>Tijd over in periode</strong> — werkdagen vanaf morgen t/m einde periode × 7,2 uur. Hoeveel kalendertijd er fysiek nog beschikbaar is, ongeacht wat al geregistreerd is.<br><br><strong>Benutting in %</strong> — bestede tijd ÷ periode capaciteit × 100. Antwoord op: "Van alle beschikbare uren deze periode, welk percentage heb ik al geregistreerd?" Zegt niets over hoeveel kalendertijd er nog over is — dat toont Tijd over in periode.<br><br>Uren worden handmatig ingevoerd per melding of inspectie-item in het veld Bestede tijd.</div>
+      <div class="info-desc">Het capaciteitsoverzicht toont vijf waarden voor de geselecteerde periode (Week, Maand of Kwartaal):<br><br><strong>Periode capaciteit</strong> — alle werkdagen in de periode × 7,2 uur. Dit is het totale beschikbare uurbudget, exclusief feestdagen en vrije dagen in je profiel.<br><br><strong>Bestede tijd (handmatig)</strong> — uren die je zelf hebt geregistreerd op meldingen en inspecties in de periode.<br><br><strong>Administratie (automatisch)</strong> — geschatte beheertijd die automatisch wordt berekend op basis van je gebouwen en werkzaamheden in de periode. Zo werkt de berekening:<br><br>· <strong>1 uur per gebouw per werkdag</strong> — voor elk gebouw dat aan jou is gekoppeld telt elke werkdag in de periode als 1 uur beheer. Weekenden en feestdagen tellen niet mee.<br><br>· <strong>15 minuten per melding</strong> — voor elke melding waarvan de openingsdatum in de periode valt, wordt 15 minuten administratie geteld.<br><br>· <strong>15 minuten per inspectieronde</strong> — voor elke inspectieronde waarvan de startdatum in de periode valt, wordt 15 minuten administratie geteld (niet per afzonderlijk item).<br><br>Deze tijd wordt automatisch opgeteld bij de handmatig geregistreerde uren, zodat het totaal een reëler beeld geeft van je daadwerkelijke werklast.<br><br><strong>Totaal bestede tijd</strong> — handmatig geregistreerde uren plus automatische administratietijd samen.<br><br><strong>Resterende tijd</strong> — periode capaciteit minus totaal bestede tijd. Hoeveel uurbudget er nog over is.<br><br><strong>Tijd over in periode</strong> — werkdagen vanaf morgen t/m einde periode × 7,2 uur. Hoeveel kalendertijd er fysiek nog beschikbaar is, ongeacht wat al geregistreerd is.<br><br><strong>Benutting in %</strong> — totaal bestede tijd ÷ periode capaciteit × 100. Antwoord op: "Van alle beschikbare uren deze periode, welk percentage is al ingevuld?" Zegt niets over hoeveel kalendertijd er nog over is — dat toont Tijd over in periode.</div>
       <div class="info-section-lbl" style="padding:14px 0 6px">Per prioriteit</div>
       <div class="info-desc">Dit onderdeel toont alle openstaande middelen en eenheden per automatisch bepaalde prioriteitsband: Kritiek, Hoog, Gemiddeld en Laag. De prioriteitsband wordt automatisch berekend op basis van signalen zoals mislukte inspecties, open meldingen, middelstatus en garantiewaarschuwingen — deze wordt nooit handmatig ingesteld.<br><br>Gebruik dit overzicht om snel te beoordelen of de huidige werkdruk beheersbaar is — een groot aantal Kritieke of Hoge items vraagt om directe aandacht vóór werk met lagere prioriteit.</div>
       <div class="info-section-lbl" style="padding:14px 0 6px">Afgelopen 8 weken</div>
@@ -3039,23 +3039,34 @@ function renderDash(){
         return { bid, name:b?.name||bid, mins, type };
       }).sort((a,z)=>z.mins-a.mins);
 
-    const totalMins = tracked.reduce((s,t)=>s+t.mins,0);
-    const primMins  = tracked.filter(t=>t.type==='primary').reduce((s,t)=>s+t.mins,0);
-    const ownedMins = tracked.filter(t=>t.type==='owned').reduce((s,t)=>s+t.mins,0);
-    const extMins   = tracked.filter(t=>t.type==='ext').reduce((s,t)=>s+t.mins,0);
+    const manualMins = tracked.reduce((s,t)=>s+t.mins,0);
+    const primMins   = tracked.filter(t=>t.type==='primary').reduce((s,t)=>s+t.mins,0);
+    const ownedMins  = tracked.filter(t=>t.type==='owned').reduce((s,t)=>s+t.mins,0);
+    const extMins    = tracked.filter(t=>t.type==='ext').reduce((s,t)=>s+t.mins,0);
+    // ── Admin time: 1 hr/workday per building + 15 min per ticket + 15 min per inspection round ──
+    const {pStart:_pS,pEnd:_pE} = getDashPeriodBounds();
+    const _userDaysOff2 = (currentUser?.daysOff||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const _wpAdmin = workingDaysInRange(_pS, _pE, _userDaysOff2);
+    const _adminBldgIds = allTracked.size>0 ? allTracked : new Set(DB.buildings.map(b=>b.id));
+    const adminPerBldg = {};
+    _adminBldgIds.forEach(bid=>{
+      adminPerBldg[bid] = (_wpAdmin.days*60)
+        + DB.tickets.filter(t=>t.buildingId===bid&&inPeriod(t.dateOpened)).length*15
+        + DB.inspections.filter(i=>i.buildingId===bid&&inPeriod(i.dateStart)).length*15;
+    });
+    const totalAdminMins = Object.values(adminPerBldg).reduce((s,v)=>s+v,0);
+    const totalMins = manualMins + totalAdminMins;
 
-    const fmtMins = m => { const h = m/60; return (Number.isInteger(h)?h.toFixed(1):h.toFixed(1)).replace('.',',')+'h'; };
+    const fmtMins = m => { const h = m/60; return h.toFixed(1).replace('.',',')+'h'; };
     const pct = (m,t) => t?Math.round(m/t*100):0;
-    const externalPct = pct(ownedMins+extMins, totalMins);
+    const externalPct = pct(ownedMins+extMins, manualMins);
     const typeColor = t => t==='primary'?'#3B6D11':t==='owned'?'#D97706':'#dc2626';
 
-    if(totalMins===0){
-      capEl.innerHTML = `<div style="font-size:13px;color:var(--muted);padding:6px 0 10px">Nog geen tijd geregistreerd deze periode</div>`;
-    } else {
-      const warn = externalPct>=25 ? `<div style="padding:8px 10px;background:rgba(245,158,11,.1);border-radius:var(--rs);font-size:12px;color:var(--amber);margin-top:10px">⚠️ ${externalPct}% van de geregistreerde tijd is buiten primaire gebouwen deze periode</div>` : '';
+    {
+      const warn = manualMins>0&&externalPct>=25 ? `<div style="padding:8px 10px;background:rgba(245,158,11,.1);border-radius:var(--rs);font-size:12px;color:var(--amber);margin-top:10px">⚠️ ${externalPct}% van de handmatig geregistreerde tijd is buiten primaire gebouwen deze periode</div>` : '';
 
       const perBldg = tracked.map(t=>{
-        const w = pct(t.mins, totalMins);
+        const w = pct(t.mins, manualMins);
         const c = typeColor(t.type);
         return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;gap:10px;padding:4px 0">
           <div style="display:flex;align-items:center;gap:6px;min-width:0">
@@ -3069,24 +3080,44 @@ function renderDash(){
         </div>`;
       }).join('');
 
+      // Admin breakdown per building
+      const adminBldgRows = [..._adminBldgIds].map(bid=>{
+        const b = DB.buildings.find(x=>x.id===bid);
+        if(!b) return '';
+        const am = adminPerBldg[bid]||0;
+        const tixCount  = DB.tickets.filter(t=>t.buildingId===bid&&inPeriod(t.dateOpened)).length;
+        const inspCount = DB.inspections.filter(i=>i.buildingId===bid&&inPeriod(i.dateStart)).length;
+        const w = pct(am, totalAdminMins);
+        return `<div style="display:grid;grid-template-columns:1fr auto 52px;align-items:center;gap:8px;padding:4px 0">
+          <div style="display:flex;align-items:center;gap:6px;min-width:0">
+            <div style="width:7px;height:7px;border-radius:50%;background:#185FA5;flex-shrink:0"></div>
+            <span style="font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.name}</span>
+          </div>
+          <span style="font-size:11px;color:var(--muted);white-space:nowrap">${_wpAdmin.days}d${tixCount>0?` · ${tixCount}m`:''}${inspCount>0?` · ${inspCount}i`:''}</span>
+          <span style="font-size:12px;font-weight:700;color:#185FA5;text-align:right">${fmtMins(am)}</span>
+        </div>`;
+      }).join('');
+
       const {pStart,pEnd,tomorrow} = getDashPeriodBounds();
       const _userDaysOff = (currentUser?.daysOff||'').split(',').map(s=>s.trim()).filter(Boolean);
       const wpFull = workingDaysInRange(pStart, pEnd, _userDaysOff);
       const wpRem  = workingDaysInRange(tomorrow<=pEnd?tomorrow:new Date(9999,0,1), pEnd, _userDaysOff);
-      const capMins = wpFull.days * 7.2 * 60;
-      const remMins = wpRem.days * 7.2 * 60;
-      const utilPct = capMins ? Math.min(100,(totalMins/capMins*100)) : 0;
+      const capMins  = wpFull.days * 7.2 * 60;
+      const remMins  = wpRem.days * 7.2 * 60;
+      const utilPct  = capMins ? Math.min(100,(totalMins/capMins*100)) : 0;
       const f2 = n => n.toFixed(2).replace('.',',');
-      const capH   = f2(capMins/60);
-      const capD   = f2(wpFull.days);
-      const remH   = f2(remMins/60);
-      const remD   = f2(wpRem.days);
-      const spentH = f2(totalMins/60);
-      const spentD = f2(totalMins/432);
-      const restH  = f2(Math.max(0,(capMins-totalMins)/60));
-      const restD  = f2(Math.max(0,(capMins-totalMins)/432));
-      const utilF  = f2(utilPct);
-      const vSpan  = (val,col,unit) => `<span style="font-weight:700;font-variant-numeric:tabular-nums;text-align:right;min-width:52px;display:inline-block;color:${col}">${val}</span><span style="font-size:10px;color:${col};width:12px;display:inline-block">${unit}</span>`;
+      const capH    = f2(capMins/60);
+      const capD    = f2(wpFull.days);
+      const remH    = f2(remMins/60);
+      const remD    = f2(wpRem.days);
+      const manualH = f2(manualMins/60);
+      const adminH  = f2(totalAdminMins/60);
+      const totalH  = f2(totalMins/60);
+      const totalD  = f2(totalMins/432);
+      const restH   = f2(Math.max(0,(capMins-totalMins)/60));
+      const restD   = f2(Math.max(0,(capMins-totalMins)/432));
+      const utilF   = f2(utilPct);
+      const vSpan   = (val,col,unit) => `<span style="font-weight:700;font-variant-numeric:tabular-nums;text-align:right;min-width:52px;display:inline-block;color:${col}">${val}</span><span style="font-size:10px;color:${col};width:12px;display:inline-block">${unit}</span>`;
       const holidayHtml = wpFull.holidays.length
         ? `<div style="display:flex;align-items:flex-start;gap:5px;margin-top:6px"><span style="flex-shrink:0;line-height:1.5">🇳🇱</span><span style="font-size:11px;color:var(--muted);line-height:1.5">${[...new Set(wpFull.holidays)].join(', ')}</span></div>`
         : '';
@@ -3105,9 +3136,17 @@ function renderDash(){
                 <span style="color:var(--sub)">Periode capaciteit</span>
                 <div style="display:flex;gap:6px;align-items:center">${vSpan(capH,'#185FA5','u')}<span style="color:var(--border2)">·</span>${vSpan(capD,'#185FA5','d')}</div>
               </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
                 <span style="color:var(--sub)">Bestede tijd</span>
-                <div style="display:flex;gap:6px;align-items:center">${vSpan(spentH,'#3B6D11','u')}<span style="color:var(--border2)">·</span>${vSpan(spentD,'#3B6D11','d')}</div>
+                <div style="display:flex;gap:6px;align-items:center">${vSpan(manualH,'#3B6D11','u')}</div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="color:var(--muted);padding-left:10px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;position:relative" onclick="(function(el){const t=el.querySelector('.cap-tip');t.style.display=t.style.display==='block'?'none':'block';})(this)">+ Administratie <span style="font-size:9px;background:rgba(37,99,235,.1);color:#185FA5;padding:1px 5px;border-radius:20px;font-weight:600">auto</span> <span style="font-size:10px;opacity:.5">ⓘ</span><span class="cap-tip" style="display:none;position:absolute;left:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;font-size:11px;color:var(--text);white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)">1u/werkdag per gebouw<br>+ 15 min per melding<br>+ 15 min per inspectieronde</span></span>
+                <div style="display:flex;gap:6px;align-items:center">${vSpan(adminH,'#185FA5','u')}</div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px dashed var(--border);border-bottom:1px dashed var(--border);margin-bottom:4px">
+                <span style="color:var(--sub);font-weight:600">Totaal bestede tijd</span>
+                <div style="display:flex;gap:6px;align-items:center">${vSpan(totalH,'#3B6D11','u')}<span style="color:var(--border2)">·</span>${vSpan(totalD,'#3B6D11','d')}</div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
                 <span style="color:var(--sub)">Resterende tijd</span>
@@ -3118,28 +3157,38 @@ function renderDash(){
                 <div style="display:flex;gap:6px;align-items:center">${vSpan(remH,'var(--sub)','u')}<span style="color:var(--border2)">·</span>${vSpan(remD,'var(--sub)','d')}</div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                <span style="color:var(--sub);display:inline-flex;align-items:center;gap:4px;cursor:pointer;position:relative" onclick="(function(el){const t=el.querySelector('.cap-tip');t.style.display=t.style.display==='block'?'none':'block';})(this)">Benutting in % <span style="font-size:10px;opacity:.5">ⓘ</span><span class="cap-tip" style="display:none;position:absolute;left:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;font-size:11px;color:var(--text);white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)">Van de <strong>${capH}</strong> beschikbare uren<br>is <strong>${spentH} uur</strong> geregistreerd (${utilF}%).</span></span>
+                <span style="color:var(--sub);display:inline-flex;align-items:center;gap:4px;cursor:pointer;position:relative" onclick="(function(el){const t=el.querySelector('.cap-tip');t.style.display=t.style.display==='block'?'none':'block';})(this)">Benutting in % <span style="font-size:10px;opacity:.5">ⓘ</span><span class="cap-tip" style="display:none;position:absolute;left:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;font-size:11px;color:var(--text);white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)">Van de <strong>${capH}</strong> beschikbare uren<br>is <strong>${totalH} uur</strong> ingevuld (${utilF}%).</span></span>
                 <div style="display:flex;gap:6px;align-items:center">${vSpan(utilF,'var(--text)','%')}</div>
               </div>
-              <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
-                <div style="width:${Math.min(100,utilPct)}%;height:100%;background:#1D9E75;border-radius:3px;transition:width .4s"></div>
+              <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;display:flex">
+                <div style="width:${Math.min(100,capMins?manualMins/capMins*100:0)}%;height:100%;background:#3B6D11;border-radius:3px 0 0 3px;transition:width .4s"></div>
+                <div style="width:${Math.min(100,capMins?Math.min(totalAdminMins,Math.max(0,capMins-manualMins))/capMins*100:0)}%;height:100%;background:#185FA5;transition:width .4s"></div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:5px">
+                <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:2px;background:#3B6D11"></div><span style="font-size:10px;color:var(--muted)">Handmatig</span></div>
+                <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:2px;background:#185FA5"></div><span style="font-size:10px;color:var(--muted)">Administratie</span></div>
               </div>
               ${holidayHtml}${daysOffHtml}
             </div>
           </div>
-          <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;display:flex;margin-bottom:10px">
-            <div style="width:${pct(primMins,totalMins)}%;background:#3B6D11;transition:width .4s"></div>
-            <div style="width:${pct(ownedMins,totalMins)}%;background:#D97706;transition:width .4s"></div>
-            <div style="width:${pct(extMins,totalMins)}%;background:#dc2626;transition:width .4s"></div>
+          ${manualMins>0?`<div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;display:flex;margin-bottom:10px">
+            <div style="width:${pct(primMins,manualMins)}%;background:#3B6D11;transition:width .4s"></div>
+            <div style="width:${pct(ownedMins,manualMins)}%;background:#D97706;transition:width .4s"></div>
+            <div style="width:${pct(extMins,manualMins)}%;background:#dc2626;transition:width .4s"></div>
           </div>
-          <div style="border-top:1px solid var(--border);padding-top:10px">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:8px">Per gebouw</div>
+          <div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:10px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:8px">Handmatig per gebouw</div>
             ${perBldg}
           </div>
-          <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:10px;display:flex;gap:14px;flex-wrap:wrap">
+          <div style="margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:5px"><div style="width:9px;height:9px;border-radius:2px;background:#3B6D11"></div><span style="font-size:11px;color:var(--sub)">Primair</span></div>
             <div style="display:flex;align-items:center;gap:5px"><div style="width:9px;height:9px;border-radius:2px;background:#D97706"></div><span style="font-size:11px;color:var(--sub)">Beheerd extern</span></div>
             <div style="display:flex;align-items:center;gap:5px"><div style="width:9px;height:9px;border-radius:2px;background:#dc2626"></div><span style="font-size:11px;color:var(--sub)">Derden</span></div>
+          </div>`:''}
+          <div style="border-top:1px solid var(--border);padding-top:10px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px">Administratie per gebouw</div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:6px">d = werkdagen · m = meldingen · i = inspecties</div>
+            ${adminBldgRows}
           </div>
           ${warn}
         </div>`;
