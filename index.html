@@ -974,7 +974,7 @@ input,select,textarea{font-family:inherit;color:var(--text);}
     <div style="padding:14px 18px">
       <div class="info-desc">Statistieken geeft een portfoliobrede weergave van de werkdruk per gebouw. Alle cijfers worden live herberekend vanuit je Google Sheets-data.</div>
       <div class="info-section-lbl" style="padding:14px 0 6px">Capaciteits management</div>
-      <div class="info-desc">Het capaciteitsoverzicht toont vijf waarden voor de geselecteerde periode (Week, Maand of Kwartaal):<br><br><strong>Periode capaciteit</strong> — alle werkdagen in de periode × 7,2 uur. Dit is het totale beschikbare uurbudget, exclusief feestdagen en vrije dagen in je profiel.<br><br><strong>Bestede tijd (handmatig)</strong> — uren die je zelf hebt geregistreerd op meldingen en inspecties in de periode.<br><br><strong>Administratie (automatisch)</strong> — geschatte beheertijd die automatisch wordt berekend: 90 minuten per werkdag in de periode. Weekenden en feestdagen tellen niet mee. Dit is een vaste waarde, ongeacht het aantal gebouwen of activiteiten.<br><br><strong>Totaal bestede tijd</strong> — handmatig geregistreerde uren plus automatische administratietijd samen.<br><br><strong>Capaciteit over</strong> — periode capaciteit minus totaal bestede tijd. Hoeveel uurbudget er nog over is.<br><br><strong>Tijd over in periode</strong> — werkdagen vanaf morgen t/m einde periode × 7,2 uur. Hoeveel kalendertijd er fysiek nog beschikbaar is, ongeacht wat al geregistreerd is.<br><br><strong>Benutting in %</strong> — totaal bestede tijd ÷ periode capaciteit × 100. Antwoord op: "Van alle beschikbare uren deze periode, welk percentage is al ingevuld?" Zegt niets over hoeveel kalendertijd er nog over is — dat toont Tijd over in periode.</div>
+      <div class="info-desc">Het capaciteitsoverzicht toont vijf waarden voor de geselecteerde periode (Week, Maand of Kwartaal):<br><br><strong>Periode capaciteit</strong> — alle werkdagen in de periode × 7,2 uur. Dit is het totale beschikbare uurbudget, exclusief feestdagen en vrije dagen in je profiel.<br><br><strong>Bestede tijd (handmatig)</strong> — uren die je zelf hebt geregistreerd op meldingen en inspecties in de periode.<br><br><strong>Reistijd</strong> — reisminuten geregistreerd op meldingen en inspectieronden in de periode. Per melding en per volledige inspectieronde in te voeren, niet per item.<br><br><strong>Administratie (automatisch)</strong> — geschatte beheertijd die automatisch wordt berekend: 90 minuten per werkdag in de periode. Weekenden en feestdagen tellen niet mee. Dit is een vaste waarde, ongeacht het aantal gebouwen of activiteiten.<br><br><strong>Totaal bestede tijd</strong> — handmatig geregistreerde uren plus automatische administratietijd samen.<br><br><strong>Capaciteit over</strong> — periode capaciteit minus totaal bestede tijd. Hoeveel uurbudget er nog over is.<br><br><strong>Tijd over in periode</strong> — werkdagen vanaf morgen t/m einde periode × 7,2 uur. Hoeveel kalendertijd er fysiek nog beschikbaar is, ongeacht wat al geregistreerd is.<br><br><strong>Benutting in %</strong> — totaal bestede tijd ÷ periode capaciteit × 100. Antwoord op: "Van alle beschikbare uren deze periode, welk percentage is al ingevuld?" Zegt niets over hoeveel kalendertijd er nog over is — dat toont Tijd over in periode.</div>
       <div class="info-section-lbl" style="padding:14px 0 6px">Per prioriteit</div>
       <div class="info-desc">Dit onderdeel toont alle openstaande middelen en eenheden per automatisch bepaalde prioriteitsband: Kritiek, Hoog, Gemiddeld en Laag. De prioriteitsband wordt automatisch berekend op basis van signalen zoals mislukte inspecties, open meldingen, middelstatus en garantiewaarschuwingen — deze wordt nooit handmatig ingesteld.<br><br>Gebruik dit overzicht om snel te beoordelen of de huidige werkdruk beheersbaar is — een groot aantal Kritieke of Hoge items vraagt om directe aandacht vóór werk met lagere prioriteit.</div>
       <div class="info-section-lbl" style="padding:14px 0 6px">Afgelopen 8 weken</div>
@@ -1203,6 +1203,15 @@ input,select,textarea{font-family:inherit;color:var(--text);}
       <div style="display:flex;gap:8px;align-items:center">
         <input class="fi2" type="number" id="tf-time-val" placeholder="0" min="0" style="flex:1;text-align:center"/>
         <select class="fs2" id="tf-time-unit" style="flex:0 0 90px">
+          <option value="min">min</option>
+          <option value="hr">hr</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Reistijd</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="fi2" type="number" id="tf-travel-val" placeholder="0" min="0" style="flex:1;text-align:center"/>
+        <select class="fs2" id="tf-travel-unit" style="flex:0 0 90px">
           <option value="min">min</option>
           <option value="hr">hr</option>
         </select>
@@ -1461,9 +1470,9 @@ const COLS = {
   users:     ['id','name','role','email','phone','buildings','buildingsOwned','buildingsExternal','active','daysOff'],
   buildings: ['id','name','address','daysOpen','timeOpen','units','manager','phone','email','size'],
   assets:    ['id','label','buildingId','floorId','unitId','supplierId','categoryId','status','manufacturer','model','warrantyExpiry','purchaseDate','lastServiced','inspectionTime','photos'],
-  tickets:   ['id','buildingId','floorId','unitId','subject','status','priority','categoryId','assignedTo','dateOpened','dateClosed','assetId','supplierId','reportedBy','notes','createdBy','activity','type','timeSpent','dueDate','photos'],
+  tickets:   ['id','buildingId','floorId','unitId','subject','status','priority','categoryId','assignedTo','dateOpened','dateClosed','assetId','supplierId','reportedBy','notes','createdBy','activity','type','timeSpent','travelTime','dueDate','photos'],
   suppliers: ['id','name','contact','expertise','ratePerHour','transportCost','phone','email','address','status'],
-  inspections:      ['id','buildingId','floorId','unitId','categoryId','dateStart','dateEnd','inspector','status','notes','reinspectedAt','dueDate','templateId'],
+  inspections:      ['id','buildingId','floorId','unitId','categoryId','dateStart','dateEnd','inspector','status','notes','reinspectedAt','dueDate','templateId','travelTime'],
   inspectionItems:  ['id','inspectionId','unitId','assetId','label','result','note','timeSpent','photos'],
   floors:    ['id','buildingId','label','sortOrder','inspectionTime'],
   units:     ['id','floorId','buildingId','label','sortOrder','inspectionTime'],
@@ -3043,12 +3052,23 @@ function renderDash(){
     const primMins   = tracked.filter(t=>t.type==='primary').reduce((s,t)=>s+t.mins,0);
     const ownedMins  = tracked.filter(t=>t.type==='owned').reduce((s,t)=>s+t.mins,0);
     const extMins    = tracked.filter(t=>t.type==='ext').reduce((s,t)=>s+t.mins,0);
+    // ── Travel time: sum travelTime from tickets + inspections in period ──
+    const travelMins = (() => {
+      let m = 0;
+      DB.tickets.filter(t=>t.travelTime&&inPeriod(t.dateOpened)).forEach(t=>{
+        if(allTracked.size===0||allTracked.has(t.buildingId)) m += parseInt(t.travelTime)||0;
+      });
+      DB.inspections.filter(i=>i.travelTime&&inPeriod(i.dateStart)).forEach(i=>{
+        if(allTracked.size===0||allTracked.has(i.buildingId)) m += parseInt(i.travelTime)||0;
+      });
+      return m;
+    })();
     // ── Admin time: 90 min per workday (flat) ──
     const {pStart:_pS,pEnd:_pE} = getDashPeriodBounds();
     const _userDaysOff2 = (currentUser?.daysOff||'').split(',').map(s=>s.trim()).filter(Boolean);
     const _wpAdmin = workingDaysInRange(_pS, _pE, _userDaysOff2);
     const totalAdminMins = _wpAdmin.days * 90;
-    const totalMins = manualMins + totalAdminMins;
+    const totalMins = manualMins + travelMins + totalAdminMins;
 
     const fmtMins = m => { const h = m/60; return h.toFixed(1).replace('.',',')+'h'; };
     const pct = (m,t) => t?Math.round(m/t*100):0;
@@ -3086,6 +3106,7 @@ function renderDash(){
       const remH    = f2(remMins/60);
       const remD    = f2(wpRem.days);
       const manualH = f2(manualMins/60);
+      const travelH = f2(travelMins/60);
       const adminH  = f2(totalAdminMins/60);
       const totalH  = f2(totalMins/60);
       const totalD  = f2(totalMins/432);
@@ -3114,6 +3135,10 @@ function renderDash(){
                 <span style="color:var(--sub)">Bestede tijd</span>
                 <span style="font-weight:700;font-variant-numeric:tabular-nums;text-align:right;color:#3B6D11">${manualH} <span style="font-size:10px;font-weight:400">u</span></span>
               </div>
+              <div style="display:grid;grid-template-columns:1fr 56px;align-items:center;padding:3px 0">
+                <span style="color:var(--muted);padding-left:10px">+ Reistijd</span>
+                <span style="font-weight:700;font-variant-numeric:tabular-nums;text-align:right;color:#3B6D11">${travelH} <span style="font-size:10px;font-weight:400">u</span></span>
+              </div>
               <div style="display:grid;grid-template-columns:1fr 56px;align-items:center;padding:3px 0;margin-bottom:2px">
                 <span style="color:var(--muted);padding-left:10px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;position:relative" onclick="(function(el){const t=el.querySelector('.cap-tip');t.style.display=t.style.display==='block'?'none':'block';})(this)">+ Administratie <span style="font-size:9px;background:rgba(37,99,235,.1);color:#185FA5;padding:1px 5px;border-radius:20px;font-weight:600">auto</span> <span style="font-size:10px;opacity:.5">ⓘ</span><span class="cap-tip" style="display:none;position:absolute;left:0;top:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:6px 8px;font-size:11px;color:var(--text);white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.12)">1,5u administratie per werkdag</span></span>
                 <span style="font-weight:700;font-variant-numeric:tabular-nums;text-align:right;color:#185FA5">${adminH} <span style="font-size:10px;font-weight:400">u</span></span>
@@ -3138,10 +3163,12 @@ function renderDash(){
               </div>
               <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;display:flex">
                 <div style="width:${Math.min(100,capMins?manualMins/capMins*100:0)}%;height:100%;background:#3B6D11;border-radius:3px 0 0 3px;transition:width .4s"></div>
-                <div style="width:${Math.min(100,capMins?Math.min(totalAdminMins,Math.max(0,capMins-manualMins))/capMins*100:0)}%;height:100%;background:#185FA5;transition:width .4s"></div>
+                <div style="width:${Math.min(100,capMins?travelMins/capMins*100:0)}%;height:100%;background:#1D9E75;transition:width .4s"></div>
+                <div style="width:${Math.min(100,capMins?Math.min(totalAdminMins,Math.max(0,capMins-manualMins-travelMins))/capMins*100:0)}%;height:100%;background:#185FA5;transition:width .4s"></div>
               </div>
-              <div style="display:flex;gap:10px;margin-top:5px">
+              <div style="display:flex;gap:10px;margin-top:5px;flex-wrap:wrap">
                 <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:2px;background:#3B6D11"></div><span style="font-size:10px;color:var(--muted)">Handmatig</span></div>
+                <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:2px;background:#1D9E75"></div><span style="font-size:10px;color:var(--muted)">Reistijd</span></div>
                 <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:2px;background:#185FA5"></div><span style="font-size:10px;color:var(--muted)">Administratie</span></div>
               </div>
               ${holidayHtml}${daysOffHtml}
@@ -4252,6 +4279,7 @@ function openTixDetail(id){
       ${sup?`<div class="dr"><span class="dk">E-mail leverancier</span><span class="dv">${sup.email?`<a href="mailto:${sup.email}" style="color:var(--blue)">${sup.email}</a>`:'—'}</span></div>`:''}
       <div class="dr"><span class="dk">Gemeld door</span><span class="dv">${t.reportedBy||'—'}</span></div>
       <div class="dr"><span class="dk">Bestede tijd</span><span class="dv">${t.timeSpent?(t.timeSpent>=60&&t.timeSpent%60===0?`${t.timeSpent/60} hr`:`${t.timeSpent} min`):'—'}</span></div>
+      <div class="dr"><span class="dk">Reistijd</span><span class="dv">${t.travelTime?(t.travelTime>=60&&t.travelTime%60===0?`${t.travelTime/60} hr`:`${t.travelTime} min`):'—'}</span></div>
       <div class="dr"><span class="dk">Notities</span><span class="dv">${t.notes||'—'}</span></div>
       <div class="dr"><span class="dk">Aangemaakt door</span><span class="dv">${t.createdBy||'—'}</span></div>
     </div>
@@ -4333,6 +4361,7 @@ function openNewTicket(){
   document.getElementById('btn-dup-tix').style.display='none';
   ['tf-subj','tf-reporter','tf-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   tfSetTimeMinutes(0);;
+  tfSetTravelMinutes(0);
   document.getElementById('tf-status').value='Open';
   document.getElementById('tf-type').value='';
   document.getElementById('tf-date-opened').value=today.toISOString().split('T')[0];
@@ -4357,6 +4386,16 @@ function openNewTicket(){
   openMo('mo-tix');
   renderPhotoEditor('tf-photos-editor', '', v => { window._tfPhotos = v; });
   window._tfPhotos = '';
+}
+function tfGetTravelMinutes(){
+  const val=parseFloat(document.getElementById('tf-travel-val').value)||0;
+  const unit=document.getElementById('tf-travel-unit').value;
+  return unit==='hr'?Math.round(val*60):Math.round(val);
+}
+function tfSetTravelMinutes(mins){
+  if(!mins){ document.getElementById('tf-travel-val').value=''; document.getElementById('tf-travel-unit').value='min'; return; }
+  if(mins>=60 && mins%60===0){ document.getElementById('tf-travel-val').value=mins/60; document.getElementById('tf-travel-unit').value='hr'; }
+  else { document.getElementById('tf-travel-val').value=mins; document.getElementById('tf-travel-unit').value='min'; }
 }
 function tfGetTimeMinutes(){
   const val=parseFloat(document.getElementById('tf-time-val').value)||0;
@@ -4385,6 +4424,7 @@ function editTix(id){
     document.getElementById('tf-reporter').value=t.reportedBy||'';
     document.getElementById('tf-notes').value=t.notes||'';
     tfSetTimeMinutes(t.timeSpent||0);
+    tfSetTravelMinutes(t.travelTime||0);
     // Cascade: building → floor → unit → asset → supplier
     populateBldSelect('tf-bldg','— Select —');
     bsdSetExternal('tf-bldg',t.buildingId||DB.buildings.find(b=>b.name===t.building)?.id||'');
@@ -4454,6 +4494,7 @@ async function saveTix(){
       t.notes=document.getElementById('tf-notes').value;
       t.photos=window._tfPhotos||t.photos||'';
       t.timeSpent=tfGetTimeMinutes();
+      t.travelTime=tfGetTravelMinutes();
       if(!Array.isArray(t.activity)) t.activity=[];
       if(prevStatus!==status) t.activity.push({ts:new Date().toISOString(),user:currentUser.name,action:`Status: ${prevStatus} → ${status}`});
       else t.activity.push({ts:new Date().toISOString(),user:currentUser.name,action:'Melding bijgewerkt'});
@@ -4469,7 +4510,7 @@ async function saveTix(){
     const _nflr=DB.floors.find(f=>f.id===_nfId);
     const _nunt=DB.units.find(u=>u.label===_nu&&(_nflr?u.floorId===_nflr.id:true));
     const _ncat=DB.categories.find(x=>x.id===_nc);
-    DB.tickets.unshift({id,buildingId:_nbld?_nbld.id:_nbldId,floorId:_nflr?_nflr.id:_nfId,unitId:_nunt?_nunt.id:_nu,subject:subj,status,type:document.getElementById('tf-type').value,categoryId:_nc,assignedTo:document.getElementById('tf-assign').value,dateOpened:document.getElementById('tf-date-opened').value||today.toISOString().split('T')[0],dateClosed:document.getElementById('tf-date-closed').value||'',assetId:document.getElementById('tf-asset').value,supplierId:document.getElementById('tf-supplier').value,reportedBy:document.getElementById('tf-reporter').value,notes:document.getElementById('tf-notes').value,timeSpent:tfGetTimeMinutes(),photos:window._tfPhotos||'',createdBy:currentUser.name,activity:JSON.stringify([{ts:new Date().toISOString(),user:currentUser.name,action:'Melding aangemaakt'}]),building:_nb,floor:_nflr?_nflr.label:_nfId,unit:_nu,category:_ncat?_ncat.category:_nc});
+    DB.tickets.unshift({id,buildingId:_nbld?_nbld.id:_nbldId,floorId:_nflr?_nflr.id:_nfId,unitId:_nunt?_nunt.id:_nu,subject:subj,status,type:document.getElementById('tf-type').value,categoryId:_nc,assignedTo:document.getElementById('tf-assign').value,dateOpened:document.getElementById('tf-date-opened').value||today.toISOString().split('T')[0],dateClosed:document.getElementById('tf-date-closed').value||'',assetId:document.getElementById('tf-asset').value,supplierId:document.getElementById('tf-supplier').value,reportedBy:document.getElementById('tf-reporter').value,notes:document.getElementById('tf-notes').value,timeSpent:tfGetTimeMinutes(),travelTime:tfGetTravelMinutes(),photos:window._tfPhotos||'',createdBy:currentUser.name,activity:JSON.stringify([{ts:new Date().toISOString(),user:currentUser.name,action:'Melding aangemaakt'}]),building:_nb,floor:_nflr?_nflr.label:_nfId,unit:_nu,category:_ncat?_ncat.category:_nc});
   }
   closeMo('mo-tix');
   await writeSheet('tickets');
@@ -7654,6 +7695,16 @@ function openInspDetail(id){
         <label style="font-size:12px;color:var(--sub);display:block;margin-bottom:5px">Notities</label>
         <textarea id="idtl-notes" style="width:100%;font-size:12px;padding:7px 8px;border:0.5px solid var(--border2);border-radius:6px;background:var(--card2);color:var(--text);resize:none;line-height:1.4" rows="3" placeholder="Voeg een notitie toe aan deze ronde…">${r.notes||''}</textarea>
       </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid var(--border)">
+        <label style="font-size:12px;color:var(--sub)">Reistijd</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="number" id="idtl-travel-val" min="0" placeholder="0" value="${r.travelTime&&r.travelTime>=60&&r.travelTime%60===0?r.travelTime/60:(r.travelTime||'')}" style="font-size:12px;padding:4px 8px;border:0.5px solid var(--border2);border-radius:6px;background:var(--card2);color:var(--text);width:70px;text-align:center"/>
+          <select id="idtl-travel-unit" style="font-size:12px;padding:4px 8px;border:0.5px solid var(--border2);border-radius:6px;background:var(--card2);color:var(--text)">
+            <option value="min"${(!r.travelTime||r.travelTime<60||r.travelTime%60!==0)?' selected':''}>min</option>
+            <option value="hr"${(r.travelTime&&r.travelTime>=60&&r.travelTime%60===0)?' selected':''}>hr</option>
+          </select>
+        </div>
+      </div>
       <button onclick="saveInspDetailEdits('${r.id}')" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--rs);font-weight:700;font-size:13px;color:#fff">Opslaan</button>
     </div>` : ''}
     <div style="padding:12px 18px;border-bottom:1px solid var(--border)">
@@ -7677,9 +7728,13 @@ async function saveInspDetailEdits(id){
   const ds = document.getElementById('idtl-datestart')?.value || r.dateStart;
   const de = document.getElementById('idtl-dateend')?.value || r.dateEnd;
   const nt = document.getElementById('idtl-notes')?.value ?? r.notes;
+  const tvVal = parseFloat(document.getElementById('idtl-travel-val')?.value)||0;
+  const tvUnit = document.getElementById('idtl-travel-unit')?.value||'min';
+  const tv = tvUnit==='hr' ? Math.round(tvVal*60) : Math.round(tvVal);
   r.dateStart = ds;
   r.dateEnd   = de;
   r.notes     = nt;
+  r.travelTime = tv;
   try {
     await writeSheet('inspections');
     toast('Inspectie opgeslagen');
